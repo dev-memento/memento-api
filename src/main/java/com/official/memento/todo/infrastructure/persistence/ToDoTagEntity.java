@@ -1,9 +1,6 @@
 package com.official.memento.todo.infrastructure.persistence;
 
 import com.official.memento.global.entity.BaseTimeEntity;
-import com.official.memento.schedule.domain.ScheduleTag;
-import com.official.memento.schedule.infrastructure.persistence.ScheduleTagEntity;
-import com.official.memento.tag.infrastructure.persistence.TagEntity;
 import com.official.memento.todo.domain.ToDoTag;
 import jakarta.persistence.*;
 
@@ -21,6 +18,10 @@ public class ToDoTagEntity extends BaseTimeEntity {
         this.id=id;
         this.tagId = tagId;
         this.toDoId = toDoId;
+    }
+
+    public ToDoTagEntity() {
+
     }
 
     public static ToDoTagEntity of(final ToDoTag toDoTag){

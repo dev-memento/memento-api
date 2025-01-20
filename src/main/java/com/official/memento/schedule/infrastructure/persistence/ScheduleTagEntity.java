@@ -1,7 +1,7 @@
 package com.official.memento.schedule.infrastructure.persistence;
 
 import com.official.memento.global.entity.BaseTimeEntity;
-import com.official.memento.schedule.domain.ScheduleTag;
+import com.official.memento.schedule.domain.entity.ScheduleTag;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;

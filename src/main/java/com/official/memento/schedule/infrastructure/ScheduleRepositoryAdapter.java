@@ -3,7 +3,7 @@ package com.official.memento.schedule.infrastructure;
 import com.official.memento.global.exception.EntityNotFoundException;
 import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.stereotype.Adapter;
-import com.official.memento.schedule.domain.Schedule;
+import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.schedule.domain.ScheduleRepository;
 import com.official.memento.schedule.infrastructure.persistence.ScheduleEntity;
 import com.official.memento.schedule.infrastructure.persistence.ScheduleEntityJpaRepository;

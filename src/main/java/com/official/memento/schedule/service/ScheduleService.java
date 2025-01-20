@@ -1,15 +1,18 @@
 package com.official.memento.schedule.service;
 
 import com.official.memento.global.entity.enums.RepeatOption;
+import com.official.memento.member.domain.MemberPersonalInfo;
+import com.official.memento.member.domain.port.MemberPersonalInfoRepository;
 import com.official.memento.orderinfo.domain.EventType;
 import com.official.memento.orderinfo.domain.OrderInfo;
 import com.official.memento.orderinfo.domain.OrderInfoRepository;
 import com.official.memento.orderinfo.domain.OrderWithScheduleOrToDo;
-import com.official.memento.schedule.domain.Schedule;
+import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.schedule.domain.ScheduleRepository;
-import com.official.memento.schedule.domain.ScheduleTag;
+import com.official.memento.schedule.domain.entity.ScheduleTag;
 import com.official.memento.schedule.domain.ScheduleTagRepository;
 import com.official.memento.schedule.service.command.*;
+import com.official.memento.schedule.service.usecase.*;
 import com.official.memento.tag.domain.TagRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,17 +38,20 @@ public class ScheduleService implements
     private final ScheduleRepository scheduleRepository;
     private final TagRepository tagRepository;
     private final OrderInfoRepository orderInfoRepository;
+    private final MemberPersonalInfoRepository memberPersonalInfoRepository;
 
     public ScheduleService(
             final ScheduleRepository scheduleRepository,
             final ScheduleTagRepository scheduleTagRepository,
             final TagRepository tagRepository,
-            final OrderInfoRepository orderInfoRepository
+            final OrderInfoRepository orderInfoRepository,
+            final MemberPersonalInfoRepository memberPersonalInfoRepository
     ) {
         this.scheduleRepository = scheduleRepository;
         this.scheduleTagRepository = scheduleTagRepository;
         this.tagRepository = tagRepository;
         this.orderInfoRepository = orderInfoRepository;
+        this.memberPersonalInfoRepository = memberPersonalInfoRepository;
     }
 
     @Override
@@ -61,6 +67,13 @@ public class ScheduleService implements
         }
         int insertOrder = getInsertOrder(command.startDate().toLocalDate(), scheduleList, schedule);
         createOrderInfo(command.startDate().toLocalDate(), schedule, insertOrder);
+        if (command.startDate() != command.endDate()) {
+            createOrderInfo(
+                    command.endDate().toLocalDate(),
+                    schedule,
+                    getInsertOrder(command.endDate().toLocalDate(), scheduleList, schedule)
+            );
+        }
     }
 
     @Override
