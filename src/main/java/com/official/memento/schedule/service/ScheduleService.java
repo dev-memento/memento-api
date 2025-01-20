@@ -1,16 +1,14 @@
 package com.official.memento.schedule.service;
 
 import com.official.memento.global.entity.enums.RepeatOption;
-import com.official.memento.member.domain.MemberPersonalInfo;
-import com.official.memento.member.domain.port.MemberPersonalInfoRepository;
 import com.official.memento.orderinfo.domain.EventType;
 import com.official.memento.orderinfo.domain.OrderInfo;
 import com.official.memento.orderinfo.domain.OrderInfoRepository;
 import com.official.memento.orderinfo.domain.OrderWithScheduleOrToDo;
-import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.schedule.domain.ScheduleRepository;
-import com.official.memento.schedule.domain.entity.ScheduleTag;
 import com.official.memento.schedule.domain.ScheduleTagRepository;
+import com.official.memento.schedule.domain.entity.Schedule;
+import com.official.memento.schedule.domain.entity.ScheduleTag;
 import com.official.memento.schedule.service.command.*;
 import com.official.memento.schedule.service.usecase.*;
 import com.official.memento.tag.domain.TagRepository;
@@ -38,42 +36,58 @@ public class ScheduleService implements
     private final ScheduleRepository scheduleRepository;
     private final TagRepository tagRepository;
     private final OrderInfoRepository orderInfoRepository;
-    private final MemberPersonalInfoRepository memberPersonalInfoRepository;
 
     public ScheduleService(
             final ScheduleRepository scheduleRepository,
             final ScheduleTagRepository scheduleTagRepository,
             final TagRepository tagRepository,
-            final OrderInfoRepository orderInfoRepository,
-            final MemberPersonalInfoRepository memberPersonalInfoRepository
+            final OrderInfoRepository orderInfoRepository
     ) {
         this.scheduleRepository = scheduleRepository;
         this.scheduleTagRepository = scheduleTagRepository;
         this.tagRepository = tagRepository;
         this.orderInfoRepository = orderInfoRepository;
-        this.memberPersonalInfoRepository = memberPersonalInfoRepository;
     }
 
     @Override
     @Transactional
     public void create(final ScheduleCreateCommand command) {
         String scheduleGroupId = UUID.randomUUID().toString();
-        List<OrderWithScheduleOrToDo> scheduleList = orderInfoRepository.findOrderInfoWithDetails(
-                command.startDate().toLocalDate()
-        );
         Schedule schedule = createSchedule(command, scheduleGroupId);
         if (command.tagId() != null) {
             connectTag(command.tagId(), schedule);
         }
-        int insertOrder = getInsertOrder(command.startDate().toLocalDate(), scheduleList, schedule);
-        createOrderInfo(command.startDate().toLocalDate(), schedule, insertOrder);
-        if (command.startDate() != command.endDate()) {
-            createOrderInfo(
-                    command.endDate().toLocalDate(),
-                    schedule,
-                    getInsertOrder(command.endDate().toLocalDate(), scheduleList, schedule)
-            );
+        assignOrder(command.startDate().toLocalDate(), schedule);
+    }
+
+    @Override
+    @Transactional
+    public void update(final ScheduleUpdateCommand command) {
+        Schedule schedule = scheduleRepository.findById(command.scheduleId());
+        checkOwn(command.memberId(), schedule);
+        schedule.update(
+                command.description(),
+                command.startDate(),
+                command.endDate(),
+                command.isAllDay()
+        );
+        scheduleRepository.update(schedule);
+        updateOrDeleteTag(schedule, command.tagId());
+        if (schedule.getStartDate() != command.startDate() || schedule.getEndDate() != command.endDate()) {
+            orderInfoRepository.deleteByScheduleId(schedule.getId());
+            assignOrder(command.startDate().toLocalDate(), schedule);
+
         }
+    }
+
+    @Override
+    @Transactional
+    public void delete(final ScheduleDeleteCommand command) {
+        Schedule schedule = scheduleRepository.findById(command.scheduleId());
+        checkOwn(command.memberId(), schedule);
+        scheduleRepository.deleteById(schedule.getId());
+        scheduleTagRepository.deleteByScheduleId(schedule.getId());
+        orderInfoRepository.deleteByScheduleId(schedule.getId());
     }
 
     @Override
@@ -98,16 +112,6 @@ public class ScheduleService implements
 
     @Override
     @Transactional
-    public void delete(final ScheduleDeleteCommand command) {
-        Schedule schedule = scheduleRepository.findById(command.scheduleId());
-        checkOwn(command.memberId(), schedule);
-        scheduleRepository.deleteById(schedule.getId());
-        scheduleTagRepository.deleteByScheduleId(schedule.getId());
-        //Todo 순서 관련 삭제
-    }
-
-    @Override
-    @Transactional
     public void deleteGroup(final ScheduleDeleteGroupCommand command) {
         Schedule schedule = scheduleRepository.findById(command.scheduleId());
         checkOwn(command.memberId(), schedule);
@@ -116,21 +120,6 @@ public class ScheduleService implements
         targetSchedules.forEach(targetSchedule -> removeTagConnection(targetSchedule.getId()));
         scheduleRepository.deleteAll(targetSchedules);
         //Todo 순서 관련 삭제
-    }
-
-    @Override
-    @Transactional
-    public void update(final ScheduleUpdateCommand command) {
-        Schedule schedule = scheduleRepository.findById(command.scheduleId());
-        checkOwn(command.memberId(), schedule);
-        schedule.update(
-                command.description(),
-                command.startDate(),
-                command.endDate(),
-                command.isAllDay()
-        );
-        scheduleRepository.update(schedule);
-        updateOrDeleteTag(schedule, command.tagId());
     }
 
     @Override
@@ -171,6 +160,12 @@ public class ScheduleService implements
                 NORMAL,
                 scheduleGroupId
         ));
+    }
+
+    private void assignOrder(LocalDate date, Schedule schedule) {
+        List<OrderWithScheduleOrToDo> scheduleList = orderInfoRepository.findOrderInfoWithDetails(date);
+        int insertOrder = getInsertOrder(date, scheduleList, schedule);
+        createOrderInfo(date, schedule, insertOrder);
     }
 
     private List<Schedule> createRepeatSchedules(
