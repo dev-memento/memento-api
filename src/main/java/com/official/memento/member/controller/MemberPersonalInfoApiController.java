@@ -29,8 +29,8 @@ public class MemberPersonalInfoApiController implements MemberPersonalInfoApiDoc
     public ResponseEntity<SuccessResponse<?>> updatePersonalInfo(
             @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final MemberPersonalInfoRequest request) {
-        final MemberPersonalInfo personalInfo = memberPersonalInfoUpdateUseCase.update(
-                new MemberPersonalInfoCommand(
+        memberPersonalInfoUpdateUseCase.update(
+                MemberPersonalInfoCommand.of(
                         authorizationUser.memberId(),
                         request.wakeUpTime(),
                         request.windDownTime(),

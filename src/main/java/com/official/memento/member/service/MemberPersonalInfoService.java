@@ -21,10 +21,9 @@ public class MemberPersonalInfoService implements MemberPersonalInfoUpdateUseCas
 
     @Override
     @Transactional
-    public MemberPersonalInfo update(final MemberPersonalInfoCommand command) {
-        return memberPersonalInfoRepository.update(
-                MemberPersonalInfo.of(
-                        command.memberId(),
+    public void update(final MemberPersonalInfoCommand command) {
+        MemberPersonalInfo memberPersonalInfo = memberPersonalInfoRepository.findByMemberId(command.memberId());
+        memberPersonalInfo.update(
                         command.wakeUpTime(),
                         command.windDownTime(),
                         command.job(),
@@ -33,7 +32,7 @@ public class MemberPersonalInfoService implements MemberPersonalInfoUpdateUseCas
                         command.isForgetImportantThings(),
                         command.isPreferReminder(),
                         command.isImportantBreaks()
-                ));
+                );
     }
 
     @Override
