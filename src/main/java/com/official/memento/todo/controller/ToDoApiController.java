@@ -3,6 +3,7 @@ package com.official.memento.todo.controller;
 import com.official.memento.global.annotation.Authorization;
 import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
+import com.official.memento.todo.controller.dto.ToDoCreateRequest;
 import com.official.memento.global.entity.enums.RepeatOption;
 import com.official.memento.schedule.service.command.ScheduleDeleteCommand;
 import com.official.memento.todo.controller.dto.ToDoCreateRequest;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/todos")
-public class ToDoApiController {
+public class ToDoApiController implements ToDoApiDocs {
 
     private final ToDoCreateUseCase toDoCreateUseCase;
     private final ToDoDeleteUseCase toDoDeleteUseCase;
@@ -37,13 +38,11 @@ public class ToDoApiController {
     }
 
     @PostMapping
+    @Override
     public ResponseEntity<SuccessResponse<?>> createToDo(
-            //@Authorization final AuthorizationUser authorizationUser,
+            @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final ToDoCreateRequest request
     ) {
-        //test용, 로그인 구현되면 지우기
-        final AuthorizationUser authorizationUser = new AuthorizationUser(2L);
-
         toDoCreateUseCase.create(ToDoCreateCommand.of(
                         authorizationUser.memberId(),
                         request.date(),
@@ -63,12 +62,16 @@ public class ToDoApiController {
     }
 
     @DeleteMapping("/{toDoId}")
-    ResponseEntity<SuccessResponse<?>> deleteToDo(
-            //@Authorization final AuthorizationUser authorizationUser,
+    @Override
+    public ResponseEntity<SuccessResponse<?>> deleteToDo(
+            @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId
     ) {
         // todo: 로그인 후 추후 삭제 예정
-        toDoDeleteUseCase.delete(ToDoDeleteCommand.of(2L, toDoId));
+        toDoDeleteUseCase.delete(ToDoDeleteCommand.of(
+                authorizationUser.memberId(),
+                toDoId)
+        );
         return SuccessResponse.of(
                 HttpStatus.OK,
                 "단일 스케줄 삭제 성공"
