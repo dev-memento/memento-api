@@ -9,7 +9,7 @@ public class OrderInfo {
     private Long toDoId;
     private int orderNum;
     private LocalDate date;
-    private EventType eventType;
+    private PlanType planType;
     private LocalDateTime createdAt;
 
 
@@ -19,7 +19,7 @@ public class OrderInfo {
             final Long toDoId,
             final int orderNum,
             final LocalDate date,
-            final EventType eventType,
+            final PlanType planType,
             final LocalDateTime createdAt
     ) {
         this.id = id;
@@ -27,7 +27,7 @@ public class OrderInfo {
         this.toDoId = toDoId;
         this.orderNum = orderNum;
         this.date = date;
-        this.eventType = eventType;
+        this.planType = planType;
         this.createdAt = createdAt;
     }
 
@@ -36,14 +36,14 @@ public class OrderInfo {
             final Long toDoId,
             final int orderNum,
             final LocalDate date,
-            final EventType eventType,
+            final PlanType planType,
             final LocalDateTime createdAt
     ) {
         this.scheduleId = scheduleId;
         this.toDoId = toDoId;
         this.orderNum = orderNum;
         this.date = date;
-        this.eventType = eventType;
+        this.planType = planType;
         this.createdAt = createdAt;
     }
 
@@ -52,10 +52,10 @@ public class OrderInfo {
             final Long toDoId,
             final int order,
             final LocalDate date,
-            final EventType eventType,
+            final PlanType planType,
             final LocalDateTime createdAt
     ) {
-        return new OrderInfo(scheduleId, toDoId, order, date, eventType, createdAt);
+        return new OrderInfo(scheduleId, toDoId, order, date, planType, createdAt);
     }
 
     public static OrderInfo withId(
@@ -64,10 +64,10 @@ public class OrderInfo {
             final Long toDoId,
             final int order,
             final LocalDate date,
-            final EventType eventType,
+            final PlanType planType,
             final LocalDateTime createdAt
     ) {
-        return new OrderInfo(id, scheduleId, toDoId, order, date, eventType, createdAt);
+        return new OrderInfo(id, scheduleId, toDoId, order, date, planType, createdAt);
     }
 
     public Long getId() {
@@ -90,8 +90,8 @@ public class OrderInfo {
         return date;
     }
 
-    public EventType getEventType() {
-        return eventType;
+    public PlanType getEventType() {
+        return planType;
     }
 
     public int getOrderNum() {

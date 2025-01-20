@@ -1,6 +1,6 @@
 package com.official.memento.orderinfo.infrastructure.persistence;
 
-import com.official.memento.orderinfo.domain.EventType;
+import com.official.memento.orderinfo.domain.PlanType;
 import com.official.memento.orderinfo.domain.OrderInfo;
 import jakarta.persistence.*;
 
@@ -19,7 +19,7 @@ public class OrderInfoEntity {
     private int orderNum;
     private LocalDate date;
     @Enumerated(EnumType.STRING)
-    private EventType eventType;
+    private PlanType planType;
     private LocalDateTime createdAt;
 
     private OrderInfoEntity(
@@ -28,7 +28,7 @@ public class OrderInfoEntity {
             final Long toDoId,
             final int orderNum,
             final LocalDate date,
-            final EventType eventType,
+            final PlanType planType,
             final LocalDateTime createdAt
     ) {
         this.id = id;
@@ -36,7 +36,7 @@ public class OrderInfoEntity {
         this.toDoId = toDoId;
         this.orderNum = orderNum;
         this.date = date;
-        this.eventType = eventType;
+        this.planType = planType;
         this.createdAt = createdAt;
     }
 
@@ -45,14 +45,14 @@ public class OrderInfoEntity {
             final Long toDoId,
             final int orderNum,
             final LocalDate date,
-            final EventType eventType,
+            final PlanType planType,
             final LocalDateTime createdAt
     ) {
         this.scheduleId = scheduleId;
         this.toDoId = toDoId;
         this.orderNum = orderNum;
         this.date = date;
-        this.eventType = eventType;
+        this.planType = planType;
         this.createdAt = createdAt;
     }
 
@@ -105,8 +105,8 @@ public class OrderInfoEntity {
         return orderNum;
     }
 
-    public EventType getEventType() {
-        return eventType;
+    public PlanType getEventType() {
+        return planType;
     }
 
     public LocalDateTime getCreatedAt() {

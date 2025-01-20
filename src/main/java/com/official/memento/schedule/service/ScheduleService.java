@@ -1,7 +1,7 @@
 package com.official.memento.schedule.service;
 
 import com.official.memento.global.entity.enums.RepeatOption;
-import com.official.memento.orderinfo.domain.EventType;
+import com.official.memento.orderinfo.domain.PlanType;
 import com.official.memento.orderinfo.domain.OrderInfo;
 import com.official.memento.orderinfo.domain.OrderInfoRepository;
 import com.official.memento.orderinfo.domain.OrderWithScheduleOrToDo;
@@ -276,7 +276,7 @@ public class ScheduleService implements
         for (OrderWithScheduleOrToDo existingOrder : scheduleList) {
 
             //순서정보중 스케줄의 시간을 고려하여 삽입해야할 위치 선정
-            if (!isInserted && existingOrder.getType() == EventType.Schedule) {
+            if (!isInserted && existingOrder.getType() == PlanType.SCHEDULE) {
                 if (schedule.getStartDate().equals(existingOrder.getStartDate()) && schedule.getEndDate().isBefore(existingOrder.getEndDate())) {
                     insertOrder = existingOrder.getOrder();
                     isInserted = true;
@@ -315,7 +315,7 @@ public class ScheduleService implements
                 null,
                 insertOrder,
                 date,
-                EventType.Schedule,
+                PlanType.SCHEDULE,
                 LocalDateTime.now()
         ));
     }

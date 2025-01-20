@@ -1,6 +1,6 @@
 package com.official.memento.orderinfo.infrastructure.persistence.projection;
 
-import com.official.memento.orderinfo.domain.EventType;
+import com.official.memento.orderinfo.domain.PlanType;
 
 import java.time.LocalDateTime;
 
@@ -19,7 +19,7 @@ public interface OrderInfoProjection {
 
     int getOrderNum();
 
-    EventType getEventType();
+    PlanType getEventType();
 
     LocalDateTime getCreatedAt();
 

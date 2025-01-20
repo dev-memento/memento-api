@@ -10,7 +10,7 @@ public class OrderWithScheduleOrToDo {
     private LocalDateTime endDate;
     private Double priorityValue;
     private int order;
-    private EventType type;
+    private PlanType type;
     private LocalDateTime createdAt;
 
     private OrderWithScheduleOrToDo(
@@ -21,7 +21,7 @@ public class OrderWithScheduleOrToDo {
             final LocalDateTime endDate,
             final Double priorityValue,
             final int order,
-            final EventType type,
+            final PlanType type,
             final LocalDateTime createdAt
     ) {
         this.orderInfoId = orderInfoId;
@@ -43,7 +43,7 @@ public class OrderWithScheduleOrToDo {
             final LocalDateTime endDate,
             final Double priorityValue,
             final int order,
-            final EventType eventType,
+            final PlanType planType,
             final LocalDateTime createdAt
 
     ) {
@@ -55,7 +55,7 @@ public class OrderWithScheduleOrToDo {
                 endDate,
                 priorityValue,
                 order,
-                eventType,
+                planType,
                 createdAt
         );
     }
@@ -96,7 +96,7 @@ public class OrderWithScheduleOrToDo {
         this.order++;
     }
 
-    public EventType getType() {
+    public PlanType getType() {
         return type;
     }
 
