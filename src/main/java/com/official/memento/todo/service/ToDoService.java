@@ -47,6 +47,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         } else {
             createRepeatToDos(command, toDoGroupId);
         }
+        //TODO 순서 관련 로직 추가
     }
 
     @Override
@@ -56,7 +57,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         checkOwn(toDoDeleteCommand.memberId(),toDo);
         toDoRepository.deleteById(toDo.getId());
         toDoTagRepository.deleteByToDoId(toDo.getId());
-        //TODO 순서 삭제
+        //TODO 순서 관련 로직 삭제
     }
 
     @Override
@@ -73,6 +74,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         );
         toDoRepository.update(toDo);
         updateOrDeleteTag(toDo, command.tagId());
+        //TODO 순서 관련 로직 수정
     }
 
     private void createSingleToDo(final ToDoCreateCommand command, final String toDoGroupId) {
