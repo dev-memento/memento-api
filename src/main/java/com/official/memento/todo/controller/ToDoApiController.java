@@ -1,16 +1,13 @@
 package com.official.memento.todo.controller;
 
+import com.official.memento.global.annotation.Authorization;
 import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
-import com.official.memento.todo.controller.dto.ToDoCreateRequest;
 import com.official.memento.global.entity.enums.RepeatOption;
 import com.official.memento.todo.controller.dto.ToDoCreateRequest;
-import com.official.memento.todo.controller.dto.ToDoGetResponse;
 import com.official.memento.todo.controller.dto.ToDoUpdateRequest;
-import com.official.memento.todo.domain.ToDo;
 import com.official.memento.todo.service.ToDoCreateUseCase;
 import com.official.memento.todo.service.ToDoDeleteUseCase;
-import com.official.memento.todo.service.ToDoGetUseCase;
 import com.official.memento.todo.service.ToDoUpdateUseCase;
 import com.official.memento.todo.service.command.ToDoCompletionUpdateCommand;
 import com.official.memento.todo.service.command.ToDoCreateCommand;
@@ -81,12 +78,12 @@ public class ToDoApiController implements ToDoApiDocs {
 
     @PatchMapping("/{toDoId}")
     ResponseEntity<SuccessResponse<?>> updateToDo(
-            //@Authorization final AuthorizationUser authorizationUser,
+            @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId,
             @RequestBody final ToDoUpdateRequest request
     ) {
         toDoUpdateUseCase.update(ToDoUpdateCommand.of(
-                2,
+                authorizationUser.memberId(),
                 toDoId,
                 request.date(),
                 request.description(),
@@ -103,12 +100,12 @@ public class ToDoApiController implements ToDoApiDocs {
 
     @PatchMapping("/{toDoId}/completion")
     ResponseEntity<SuccessResponse<Boolean>> updateToDoCompletion(
-            //@Authorization final AuthorizationUser authorizationUser,
+            @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId
     ) {
 
         boolean currentCompletion = toDoUpdateUseCase.updateCompletion(ToDoCompletionUpdateCommand.of(
-                2,
+                authorizationUser.memberId(),
                 toDoId
         ));
 
