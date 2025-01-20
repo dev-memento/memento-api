@@ -4,28 +4,27 @@ import com.official.memento.auth.domain.AuthProvider;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "member_auth")
+@Table(name = "member_auth", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"platformId", "provider"})})
 public class MemberAuthEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final Long id;
+    private Long id;
 
+    private long memberId;
+
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private final AuthProvider provider;
+    private AuthProvider provider;
 
-    private final String platformId;
+    @Column(nullable = false)
+    private String platformId;
 
-    private final String refreshToken;
-
-    private final Long memberId;
+    @Column(nullable = false)
+    private String refreshToken;
 
     protected MemberAuthEntity() {
-        this.id = null;
-        this.provider = null;
-        this.platformId = null;
-        this.refreshToken = null;
-        this.memberId = null;
     }
 
     public MemberAuthEntity(
@@ -33,8 +32,7 @@ public class MemberAuthEntity {
             final AuthProvider provider,
             final String platformId,
             final String refreshToken,
-            final Long memberId
-    ) {
+            final long memberId) {
         this.id = id;
         this.provider = provider;
         this.platformId = platformId;
@@ -58,7 +56,14 @@ public class MemberAuthEntity {
         return refreshToken;
     }
 
-    public Long getMemberId() {
+    public long getMemberId() {
         return memberId;
+    }
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public void setMemberId(long memberId) {
+        this.memberId = memberId;
     }
 }

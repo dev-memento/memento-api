@@ -5,7 +5,7 @@ import com.official.memento.member.domain.enums.JobType;
 import java.time.LocalTime;
 
 public record MemberPersonalInfoCommand(
-        Long memberId,
+        long memberId,
         LocalTime wakeUpTime,
         LocalTime windDownTime,
         JobType job,
@@ -16,7 +16,7 @@ public record MemberPersonalInfoCommand(
         Boolean isImportantBreaks
 ) {
     public static MemberPersonalInfoCommand of(
-            final Long memberId,
+            final long memberId,
             final LocalTime wakeUpTime,
             final LocalTime windDownTime,
             final JobType job,

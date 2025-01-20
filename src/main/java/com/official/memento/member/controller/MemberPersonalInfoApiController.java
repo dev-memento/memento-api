@@ -4,33 +4,33 @@ import com.official.memento.global.annotation.Authorization;
 import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
 import com.official.memento.member.controller.dto.MemberPersonalInfoRequest;
+import com.official.memento.member.controller.dto.MemberUptimeResponse;
 import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.service.command.MemberPersonalInfoCommand;
+import com.official.memento.member.service.usecase.MemberPersonalInfoRetrieveUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoUpdateUseCase;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/members/personal-info")
 public class MemberPersonalInfoApiController implements MemberPersonalInfoApiDocs {
-    private final MemberPersonalInfoUpdateUseCase memberPersonalInfoUseCase;
+    private final MemberPersonalInfoUpdateUseCase memberPersonalInfoUpdateUseCase;
+    private final MemberPersonalInfoRetrieveUseCase memberPersonalInfoRetrieveUseCase;
 
-    public MemberPersonalInfoApiController(MemberPersonalInfoUpdateUseCase memberPersonalInfoUseCase) {
-        this.memberPersonalInfoUseCase = memberPersonalInfoUseCase;
+    public MemberPersonalInfoApiController(MemberPersonalInfoUpdateUseCase memberPersonalInfoUpdateUseCase, MemberPersonalInfoRetrieveUseCase memberPersonalInfoRetrieveUseCase) {
+        this.memberPersonalInfoUpdateUseCase = memberPersonalInfoUpdateUseCase;
+        this.memberPersonalInfoRetrieveUseCase = memberPersonalInfoRetrieveUseCase;
     }
 
     @PatchMapping
     @Override
     public ResponseEntity<SuccessResponse<?>> updatePersonalInfo(
             @Authorization final AuthorizationUser authorizationUser,
-            @RequestBody final MemberPersonalInfoRequest request)
-    {
-        final MemberPersonalInfo personalInfo = memberPersonalInfoUseCase.update(
-                new MemberPersonalInfoCommand(
+            @RequestBody final MemberPersonalInfoRequest request) {
+        memberPersonalInfoUpdateUseCase.update(
+                MemberPersonalInfoCommand.of(
                         authorizationUser.memberId(),
                         request.wakeUpTime(),
                         request.windDownTime(),
@@ -42,5 +42,16 @@ public class MemberPersonalInfoApiController implements MemberPersonalInfoApiDoc
                         request.isImportantBreaks())
         );
         return SuccessResponse.of(HttpStatus.OK, "회원 개인 정보 업데이트 성공");
+    }
+
+    @GetMapping("/uptime")
+    public ResponseEntity<SuccessResponse<MemberUptimeResponse>> getUpTime(
+            @Authorization final AuthorizationUser authorizationUser) {
+        final MemberPersonalInfo personalInfo = memberPersonalInfoRetrieveUseCase.retrieveUptime(authorizationUser.memberId());
+        final MemberUptimeResponse response = MemberUptimeResponse.of(
+                personalInfo.getWakeUpTime().toString(),
+                personalInfo.getWindDownTime().toString()
+        );
+        return SuccessResponse.of(HttpStatus.OK, "사용자 업타임 조회 성공", response);
     }
 }

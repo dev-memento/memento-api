@@ -1,11 +1,16 @@
 package com.official.memento.schedule.service;
 
 import com.official.memento.global.entity.enums.RepeatOption;
-import com.official.memento.schedule.domain.Schedule;
+import com.official.memento.orderinfo.domain.PlanType;
+import com.official.memento.orderinfo.domain.OrderInfo;
+import com.official.memento.orderinfo.domain.OrderInfoRepository;
+import com.official.memento.orderinfo.domain.OrderWithScheduleOrToDo;
 import com.official.memento.schedule.domain.ScheduleRepository;
-import com.official.memento.schedule.domain.ScheduleTag;
 import com.official.memento.schedule.domain.ScheduleTagRepository;
+import com.official.memento.schedule.domain.entity.Schedule;
+import com.official.memento.schedule.domain.entity.ScheduleTag;
 import com.official.memento.schedule.service.command.*;
+import com.official.memento.schedule.service.usecase.*;
 import com.official.memento.tag.domain.TagRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,15 +35,18 @@ public class ScheduleService implements
     private final ScheduleTagRepository scheduleTagRepository;
     private final ScheduleRepository scheduleRepository;
     private final TagRepository tagRepository;
+    private final OrderInfoRepository orderInfoRepository;
 
     public ScheduleService(
             final ScheduleRepository scheduleRepository,
             final ScheduleTagRepository scheduleTagRepository,
-            final TagRepository tagRepository
+            final TagRepository tagRepository,
+            final OrderInfoRepository orderInfoRepository
     ) {
         this.scheduleRepository = scheduleRepository;
         this.scheduleTagRepository = scheduleTagRepository;
         this.tagRepository = tagRepository;
+        this.orderInfoRepository = orderInfoRepository;
     }
 
     @Override
@@ -49,7 +57,37 @@ public class ScheduleService implements
         if (command.tagId() != null) {
             connectTag(command.tagId(), schedule);
         }
-        //Todo 순서관련 로직 추가
+        assignOrder(command.startDate().toLocalDate(), schedule);
+    }
+
+    @Override
+    @Transactional
+    public void update(final ScheduleUpdateCommand command) {
+        Schedule schedule = scheduleRepository.findById(command.scheduleId());
+        checkOwn(command.memberId(), schedule);
+        schedule.update(
+                command.description(),
+                command.startDate(),
+                command.endDate(),
+                command.isAllDay()
+        );
+        scheduleRepository.update(schedule);
+        updateOrDeleteTag(schedule, command.tagId());
+        if (schedule.getStartDate() != command.startDate() || schedule.getEndDate() != command.endDate()) {
+            orderInfoRepository.deleteByScheduleId(schedule.getId());
+            assignOrder(command.startDate().toLocalDate(), schedule);
+
+        }
+    }
+
+    @Override
+    @Transactional
+    public void delete(final ScheduleDeleteCommand command) {
+        Schedule schedule = scheduleRepository.findById(command.scheduleId());
+        checkOwn(command.memberId(), schedule);
+        scheduleRepository.deleteById(schedule.getId());
+        scheduleTagRepository.deleteByScheduleId(schedule.getId());
+        orderInfoRepository.deleteByScheduleId(schedule.getId());
     }
 
     @Override
@@ -74,16 +112,6 @@ public class ScheduleService implements
 
     @Override
     @Transactional
-    public void delete(final ScheduleDeleteCommand command) {
-        Schedule schedule = scheduleRepository.findById(command.scheduleId());
-        checkOwn(command.memberId(), schedule);
-        scheduleRepository.deleteById(schedule.getId());
-        scheduleTagRepository.deleteByScheduleId(schedule.getId());
-        //Todo 순서 관련 삭제
-    }
-
-    @Override
-    @Transactional
     public void deleteGroup(final ScheduleDeleteGroupCommand command) {
         Schedule schedule = scheduleRepository.findById(command.scheduleId());
         checkOwn(command.memberId(), schedule);
@@ -92,21 +120,6 @@ public class ScheduleService implements
         targetSchedules.forEach(targetSchedule -> removeTagConnection(targetSchedule.getId()));
         scheduleRepository.deleteAll(targetSchedules);
         //Todo 순서 관련 삭제
-    }
-
-    @Override
-    @Transactional
-    public void update(final ScheduleUpdateCommand command) {
-        Schedule schedule = scheduleRepository.findById(command.scheduleId());
-        checkOwn(command.memberId(), schedule);
-        schedule.update(
-                command.description(),
-                command.startDate(),
-                command.endDate(),
-                command.isAllDay()
-        );
-        scheduleRepository.update(schedule);
-        updateOrDeleteTag(schedule, command.tagId());
     }
 
     @Override
@@ -147,6 +160,12 @@ public class ScheduleService implements
                 NORMAL,
                 scheduleGroupId
         ));
+    }
+
+    private void assignOrder(LocalDate date, Schedule schedule) {
+        List<OrderWithScheduleOrToDo> scheduleList = orderInfoRepository.findOrderInfoWithDetails(date);
+        int insertOrder = getInsertOrder(date, scheduleList, schedule);
+        createOrderInfo(date, schedule, insertOrder);
     }
 
     private List<Schedule> createRepeatSchedules(
@@ -249,5 +268,55 @@ public class ScheduleService implements
         if (!schedule.getScheduleGroupId().equals(scheduleGroupId)) {
             throw new IllegalArgumentException("해당 스케줄의 그룹 아이디와 일치하지 않습니다."); //Todo 커스텀
         }
+    }
+
+    private int getInsertOrder(final LocalDate date, final List<OrderWithScheduleOrToDo> scheduleList, final Schedule schedule) {
+        int insertOrder = 1;
+        boolean isInserted = false;
+        for (OrderWithScheduleOrToDo existingOrder : scheduleList) {
+
+            //순서정보중 스케줄의 시간을 고려하여 삽입해야할 위치 선정
+            if (!isInserted && existingOrder.getType() == PlanType.SCHEDULE) {
+                if (schedule.getStartDate().equals(existingOrder.getStartDate()) && schedule.getEndDate().isBefore(existingOrder.getEndDate())) {
+                    insertOrder = existingOrder.getOrder();
+                    isInserted = true;
+                } else if (schedule.getStartDate().isBefore(existingOrder.getStartDate())) {
+                    insertOrder = existingOrder.getOrder();
+                    isInserted = true;
+                }
+            }
+
+            //삽입 된 곳 이후의 순서정보들을 1씩 증가
+            if (isInserted) {
+                existingOrder.shiftBack();
+                orderInfoRepository.update(
+                        OrderInfo.withId(
+                                existingOrder.getOrderInfoId(),
+                                existingOrder.getScheduleId(),
+                                existingOrder.getToDoId(),
+                                existingOrder.getOrder(),
+                                date,
+                                existingOrder.getType(),
+                                existingOrder.getCreatedAt()
+                        ));
+            }
+        }
+
+        //위 로직에 걸리지 않았을 경우 -> 빈리스트거나 가장 마지막에 추가되는 순서정보
+        if (!isInserted) {
+            insertOrder = scheduleList.isEmpty() ? 1 : scheduleList.get(scheduleList.size() - 1).getOrder() + 1;
+        }
+        return insertOrder;
+    }
+
+    private void createOrderInfo(final LocalDate date, final Schedule schedule, final int insertOrder) {
+        orderInfoRepository.save(OrderInfo.of(
+                schedule.getId(),
+                null,
+                insertOrder,
+                date,
+                PlanType.SCHEDULE,
+                LocalDateTime.now()
+        ));
     }
 }

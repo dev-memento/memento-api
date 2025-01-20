@@ -1,5 +1,7 @@
 package com.official.memento.schedule.domain;
 
+import com.official.memento.schedule.domain.entity.Schedule;
+
 import java.time.LocalDateTime;
 import java.util.List;
 

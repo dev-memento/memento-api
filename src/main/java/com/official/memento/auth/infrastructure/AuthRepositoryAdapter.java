@@ -1,14 +1,13 @@
 package com.official.memento.auth.infrastructure;
 
-import com.official.memento.auth.domain.AuthorizationMember;
 import com.official.memento.auth.domain.AuthProvider;
-import com.official.memento.auth.domain.RefreshToken;
 import com.official.memento.auth.domain.port.AuthRepository;
-import com.official.memento.global.exception.ErrorCode;
-import com.official.memento.global.exception.MementoException;
+import com.official.memento.member.domain.MemberAuth;
 import com.official.memento.member.infrastructure.persistence.MemberAuthEntity;
 import com.official.memento.member.infrastructure.persistence.MemberAuthJpaRepository;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
 public class AuthRepositoryAdapter implements AuthRepository {
@@ -20,47 +19,33 @@ public class AuthRepositoryAdapter implements AuthRepository {
     }
 
     @Override
-    public AuthorizationMember save(final AuthorizationMember member) {
-        // MemberAuthEntity 생성 시 필요한 값 초기화
-        final MemberAuthEntity entity = new MemberAuthEntity(
-                null, // ID는 JPA에서 자동 생성
-                member.getProvider(),
-                member.getPlatformId(),
-                member.getRefreshToken().getToken(),
-                null // memberId는 사용하지 않으므로 null
+    public MemberAuth save(final MemberAuth auth) {
+        MemberAuthEntity entityToSave = new MemberAuthEntity(
+                auth.getId(),
+                auth.getProvider(),
+                auth.getPlatformId(),
+                auth.getRefreshToken(),
+                auth.getMemberId()
         );
-        final MemberAuthEntity savedEntity = memberAuthJpaRepository.save(entity);
-
-        // 저장된 엔티티를 기반으로 AuthorizationMember 반환
-        return AuthorizationMember.of(
-                savedEntity.getPlatformId(),
+        MemberAuthEntity savedEntity = memberAuthJpaRepository.save(entityToSave);
+        return MemberAuth.withId(
+                savedEntity.getId(),
+                savedEntity.getMemberId(),
                 savedEntity.getProvider(),
-                new RefreshToken(savedEntity.getRefreshToken()),
-                true // 새 사용자 등록이므로 isNewUser = true
+                savedEntity.getPlatformId(),
+                savedEntity.getRefreshToken()
         );
     }
 
     @Override
-    public AuthorizationMember findById(final String id) {
-        return memberAuthJpaRepository.findById(Long.parseLong(id))
-                .map(entity -> AuthorizationMember.of(
-                        entity.getPlatformId(),
-                        entity.getProvider(),
-                        new RefreshToken(entity.getRefreshToken()),
-                        false // 기존 사용자는 isNewUser = false
-                ))
-                .orElseThrow(() -> new MementoException(ErrorCode.NOT_FOUND_ENTITY));
-    }
-
-    @Override
-    public AuthorizationMember findByPlatformIdAndProvider(final String platformId, final AuthProvider provider) {
+    public Optional<MemberAuth> findByPlatformIdAndProvider(final String platformId, final AuthProvider provider) {
         return memberAuthJpaRepository.findByPlatformIdAndProvider(platformId, provider)
-                .map(entity -> AuthorizationMember.of(
-                        entity.getPlatformId(),
+                .map(entity -> MemberAuth.withId(
+                        entity.getId(),
+                        entity.getMemberId(),
                         entity.getProvider(),
-                        new RefreshToken(entity.getRefreshToken()),
-                        false // 기존 사용자는 isNewUser = false
-                ))
-                .orElseThrow(() -> new MementoException(ErrorCode.NOT_FOUND_ENTITY));
+                        entity.getPlatformId(),
+                        entity.getRefreshToken()
+                ));
     }
 }

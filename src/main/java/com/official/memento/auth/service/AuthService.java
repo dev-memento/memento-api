@@ -1,8 +1,12 @@
 package com.official.memento.auth.service;
 
+import com.official.memento.member.domain.Member;
+import com.official.memento.member.domain.MemberAuth;
+import com.official.memento.member.domain.MemberPersonalInfo;
+import com.official.memento.member.domain.port.MemberPersonalInfoRepository;
+import com.official.memento.member.domain.port.MemberRepository;
 import com.official.memento.auth.domain.AccessToken;
 import com.official.memento.auth.domain.AuthProvider;
-import com.official.memento.auth.domain.AuthorizationMember;
 import com.official.memento.auth.domain.RefreshToken;
 import com.official.memento.auth.domain.port.AuthClientOutputPort;
 import com.official.memento.auth.domain.port.AuthRepository;
@@ -20,15 +24,21 @@ public class AuthService implements AuthUseCase {
 
     private final Map<AuthProvider, AuthClientOutputPort> authClientAdapters;
     private final AuthRepository authRepository;
+    private final MemberRepository memberRepository;
+    private final MemberPersonalInfoRepository memberPersonalInfoRepository;
     private final JwtUtil jwtUtil;
 
     public AuthService(
             Map<AuthProvider, AuthClientOutputPort> authClientAdapters,
             AuthRepository authRepository,
+            MemberRepository memberRepository,
+            MemberPersonalInfoRepository memberPersonalInfoRepository,
             JwtUtil jwtUtil
     ) {
         this.authClientAdapters = authClientAdapters;
         this.authRepository = authRepository;
+        this.memberRepository = memberRepository;
+        this.memberPersonalInfoRepository = memberPersonalInfoRepository;
         this.jwtUtil = jwtUtil;
     }
 
@@ -37,28 +47,40 @@ public class AuthService implements AuthUseCase {
     public AuthResult authenticate(final AuthCommand command) {
         final AuthProvider provider = getAuthProvider(command.providerName());
         final Map<String, Object> tokenInfo = verifyIdToken(provider, command.idToken());
-        final String userId = (String) tokenInfo.get("sub");
+
+        final String platformId = (String) tokenInfo.get("sub");
         final String email = (String) tokenInfo.get("email");
 
-        AuthorizationMember member = authRepository.findByPlatformIdAndProvider(userId, provider);
+        MemberAuth auth = authRepository.findByPlatformIdAndProvider(platformId, provider)
+                .orElseGet(() -> createNewMember(platformId, provider));
 
-        final boolean isNewUser = (member == null); // new user 여부
-        if (isNewUser) {
-            member = AuthorizationMember.of(userId, provider, null, true); // isNewUser = true
-            authRepository.save(member);
-        } else {
-            member = AuthorizationMember.of(userId, provider, member.getRefreshToken(), false); // isNewUser = false
-        }
+        boolean isNewUser = memberRepository.findPersonalInfoByMemberId(auth.getId()).isEmpty();
 
-        final AccessToken accessToken = jwtUtil.generateAccessToken(userId, email);
-        final RefreshToken refreshToken = jwtUtil.generateRefreshToken(userId);
+        AccessToken accessToken = jwtUtil.generateAccessToken(auth.getId().toString(), email);
+        RefreshToken refreshToken = jwtUtil.generateRefreshToken(auth.getId().toString());
 
-        member = AuthorizationMember.of(userId, provider, refreshToken, isNewUser);
+        auth.withUpdatedToken(refreshToken.getToken());
+        authRepository.save(auth);
 
-        // TODO : return type 수정
-        return new AuthResult(accessToken, member);
+        Member member = new Member(
+                auth.getId(),
+                null,
+                null
+        );
+
+        return new AuthResult(accessToken, refreshToken, member, isNewUser);
     }
 
+    @Transactional
+    private MemberAuth createNewMember(String platformId, AuthProvider provider) {
+        Member newMember = memberRepository.save(Member.createNew());
+        MemberAuth newAuth = MemberAuth.of(newMember.getId(), provider, platformId, "");
+        MemberPersonalInfo personalInfo = MemberPersonalInfo.of(newMember.getId());
+        memberPersonalInfoRepository.create(personalInfo);
+        return authRepository.save(newAuth);
+    }
+
+    @Transactional
     private AuthProvider getAuthProvider(final String providerName) {
         try {
             return AuthProvider.valueOf(providerName.toUpperCase());
@@ -67,6 +89,7 @@ public class AuthService implements AuthUseCase {
         }
     }
 
+    @Transactional
     private Map<String, Object> verifyIdToken(final AuthProvider provider, final String idToken) {
         final AuthClientOutputPort clientAdapter = authClientAdapters.get(provider);
         if (clientAdapter == null) {
@@ -79,4 +102,5 @@ public class AuthService implements AuthUseCase {
         }
     }
 }
+
 

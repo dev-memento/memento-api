@@ -1,8 +1,6 @@
 package com.official.memento.todo.service;
 
 import com.official.memento.global.entity.enums.RepeatOption;
-import com.official.memento.schedule.domain.ScheduleTag;
-import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.TagRepository;
 import com.official.memento.todo.domain.ToDo;
 import com.official.memento.todo.domain.ToDoRepository;
