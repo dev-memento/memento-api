@@ -37,6 +37,7 @@ public class ToDoEntity extends BaseTimeEntity {
     }
 
     private ToDoEntity(
+            final long id,
             final long memberId,
             final String groupId,
             final LocalDate date,
@@ -49,8 +50,11 @@ public class ToDoEntity extends BaseTimeEntity {
             final Double priorityImportance,
             final Double priorityValue,
             final String priorityType,
-            final ToDoType type
+            final ToDoType type,
+            final LocalDateTime createdAt,
+            final LocalDateTime updatedAt
     ) {
+        this.id=id;
         this.memberId = memberId;
         this.groupId = groupId;
         this.date = date;
@@ -64,6 +68,42 @@ public class ToDoEntity extends BaseTimeEntity {
         this.priorityValue = priorityValue;
         this.priorityType = priorityType;
         this.type = type;
+        this.createdAt=createdAt;
+        this.updatedAt=updatedAt;
+    }
+
+    private ToDoEntity(
+            final long memberId,
+            final String groupId,
+            final LocalDate date,
+            final String description,
+            final LocalDate deadline,
+            final boolean isCompleted,
+            final RepeatOption repeatOption,
+            final LocalDate repeatExpiredDate,
+            final Double priorityUrgency,
+            final Double priorityImportance,
+            final Double priorityValue,
+            final String priorityType,
+            final ToDoType type,
+            final LocalDateTime createdAt,
+            final LocalDateTime updatedAt
+    ){
+        this.memberId = memberId;
+        this.groupId = groupId;
+        this.date = date;
+        this.description = description;
+        this.deadline = deadline;
+        this.isCompleted = isCompleted;
+        this.repeatOption = repeatOption;
+        this.repeatExpiredDate = repeatExpiredDate;
+        this.priorityUrgency = priorityUrgency;
+        this.priorityImportance = priorityImportance;
+        this.priorityValue = priorityValue;
+        this.priorityType = priorityType;
+        this.type = type;
+        this.createdAt=createdAt;
+        this.updatedAt=updatedAt;
     }
 
     public static ToDoEntity of(final ToDo toDo) {
@@ -80,8 +120,46 @@ public class ToDoEntity extends BaseTimeEntity {
                 toDo.getPriorityImportance(),
                 toDo.getPriorityValue(),
                 toDo.getPriorityType(),
-                toDo.getType()
+                toDo.getType(),
+                toDo.getCreatedAt(),
+                toDo.getUpdatedAt()
         );
+    }
+
+    public static ToDoEntity withId(final ToDo toDo) {
+        return new ToDoEntity(
+                toDo.getId(),
+                toDo.getMemberId(),
+                toDo.getGroupId(),
+                toDo.getDate(),
+                toDo.getDescription(),
+                toDo.getDeadline(),
+                toDo.isCompleted(),
+                toDo.getRepeatOption(),
+                toDo.getRepeatExpiredDate(),
+                toDo.getPriorityUrgency(),
+                toDo.getPriorityImportance(),
+                toDo.getPriorityValue(),
+                toDo.getPriorityType(),
+                toDo.getType(),
+                toDo.getCreatedAt(),
+                toDo.getUpdatedAt()
+        );
+    }
+
+    public void update(
+            final LocalDate date,
+            final String description,
+            final LocalDate deadline,
+            final Double priorityUrgency,
+            final Double priorityImportance
+    ){
+        this.date=date;
+        this.description=description;
+        this.deadline=deadline;
+        this.priorityUrgency = priorityUrgency;
+        this.priorityImportance=priorityImportance;
+
     }
 
     public Long getId() {
