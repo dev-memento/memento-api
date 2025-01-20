@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/todos")
-public class ToDoApiController {
+public class ToDoApiController implements ToDoApiDocs {
 
     private final ToDoCreateUseCase toDoCreateUseCase;
     private final ToDoDeleteUseCase toDoDeleteUseCase;
@@ -28,6 +28,7 @@ public class ToDoApiController {
     }
 
     @PostMapping
+    @Override
     public ResponseEntity<SuccessResponse<?>> createToDo(
             @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final ToDoCreateRequest request
@@ -51,7 +52,8 @@ public class ToDoApiController {
     }
 
     @DeleteMapping("/{toDoId}")
-    ResponseEntity<SuccessResponse<?>> deleteToDo(
+    @Override
+    public ResponseEntity<SuccessResponse<?>> deleteToDo(
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId
     ) {
