@@ -26,18 +26,15 @@ public class MemberPersonalInfoRepositoryAdapter implements MemberPersonalInfoRe
     }
 
     @Override
-    public Optional<MemberPersonalInfo> findByMemberId(final Long memberId) {
+    public MemberPersonalInfo findByMemberId(final Long memberId) {
         MemberPersonalInfoEntity entity = memberPersonalInfoEntityJpaRepository
                 .findByMemberId(memberId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY));
-        return Optional.of(MemberPersonalInfoMapper.toDomain(entity));
+        return MemberPersonalInfoMapper.toDomain(entity);
     }
 
     @Override
     public MemberPersonalInfo create(final MemberPersonalInfo memberPersonalInfo) {
-        if (memberPersonalInfoEntityJpaRepository.findByMemberId(memberPersonalInfo.getMemberId()) != null) {
-            throw new IllegalStateException("이미 존재하는 회원 정보입니다.");
-        }
         MemberPersonalInfoEntity entityToSave = MemberPersonalInfoMapper.toEntity(memberPersonalInfo, memberRepository);
         MemberPersonalInfoEntity savedEntity = memberPersonalInfoEntityJpaRepository.save(entityToSave);
         return MemberPersonalInfoMapper.toDomain(savedEntity);
