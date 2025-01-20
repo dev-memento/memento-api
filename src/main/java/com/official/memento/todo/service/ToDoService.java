@@ -7,6 +7,7 @@ import com.official.memento.todo.domain.ToDoRepository;
 import com.official.memento.todo.domain.ToDoTag;
 import com.official.memento.todo.domain.ToDoTagRepository;
 import com.official.memento.todo.domain.enums.PriorityType;
+import com.official.memento.todo.service.command.ToDoCompletionUpdateCommand;
 import com.official.memento.todo.service.command.ToDoCreateCommand;
 import com.official.memento.todo.service.command.ToDoDeleteCommand;
 import com.official.memento.todo.service.command.ToDoUpdateCommand;
@@ -75,6 +76,19 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         //TODO 순서 관련 로직 수정
     }
 
+    @Override
+    @Transactional
+    public boolean updateCompletion(final ToDoCompletionUpdateCommand command) {
+        ToDo toDo = toDoRepository.findById(command.toDoId());
+        checkOwn(command.memberId(), toDo);
+        if (toDo.getIsCompleted()) {
+            toDo.updateCompletion(false);
+        } else {
+            toDo.updateCompletion(true);
+        }
+        return toDoRepository.update(toDo).getIsCompleted();
+    }
+
     private void createSingleToDo(final ToDoCreateCommand command, final String toDoGroupId) {
         Double priorityValue = calculatePriorityValue(command.priorityUrgency(), command.priorityImportance());
         PriorityType priorityType = determinePriorityType(command.priorityUrgency(), command.priorityImportance());
@@ -131,7 +145,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
                 command.priorityUrgency(),
                 command.priorityImportance(),
                 priorityValue,
-                priorityType.name(),
+                priorityType,
                 NORMAL
         ));
     }
