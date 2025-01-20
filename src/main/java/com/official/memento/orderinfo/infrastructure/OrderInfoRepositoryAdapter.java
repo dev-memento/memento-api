@@ -31,6 +31,11 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
     }
 
     @Override
+    public void deleteByScheduleId(long scheduleId) {
+        orderInfoEntityJpaRepository.deleteByScheduleId(scheduleId);
+    }
+
+    @Override
     public List<OrderWithScheduleOrToDo> findOrderInfoWithDetails(final LocalDate startDate) {
         List<OrderInfoProjection> projections = orderInfoEntityJpaRepository.findOrderInfoWithDetails(startDate);
         return projections.stream()

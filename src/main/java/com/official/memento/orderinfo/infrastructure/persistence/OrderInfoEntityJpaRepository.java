@@ -25,4 +25,6 @@ public interface OrderInfoEntityJpaRepository extends JpaRepository<OrderInfoEnt
             ORDER BY o.orderNum ASC, o.createdAt ASC
             """)
     List<OrderInfoProjection> findOrderInfoWithDetails(final LocalDate startDate);
+
+    void deleteByScheduleId(final long scheduleId);
 }

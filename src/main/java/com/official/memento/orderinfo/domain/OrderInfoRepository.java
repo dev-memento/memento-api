@@ -9,5 +9,7 @@ public interface OrderInfoRepository {
 
     void update(final OrderInfo orderInfo);
 
+    void deleteByScheduleId(final long scheduleId);
+
     List<OrderWithScheduleOrToDo> findOrderInfoWithDetails(final LocalDate startDate);
 }
