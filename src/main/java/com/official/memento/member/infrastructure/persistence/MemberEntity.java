@@ -19,12 +19,6 @@ public class MemberEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
-    private MemberAuthEntity auth;
-
-    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
-    private MemberPersonalInfoEntity personalInfo;
-
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
@@ -40,18 +34,11 @@ public class MemberEntity extends BaseTimeEntity {
         return id;
     }
 
-    public MemberPersonalInfoEntity getPersonalInfo() {
-        return personalInfo;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public MemberAuthEntity getAuth() {
-        return auth;
-    }
-
-    public void setAuth(MemberAuthEntity auth) {
-        this.auth = auth;
-        if (auth != null) {
-            auth.setMember(this);
-        }
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

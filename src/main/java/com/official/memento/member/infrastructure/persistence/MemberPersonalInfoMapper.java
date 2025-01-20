@@ -7,8 +7,9 @@ import com.official.memento.member.domain.port.MemberRepository;
 
 public class MemberPersonalInfoMapper {
     public static MemberPersonalInfo toDomain(final MemberPersonalInfoEntity entity) {
-        return MemberPersonalInfo.of(
-                entity.getMember().getId(),
+        return MemberPersonalInfo.withId(
+                entity.getId(),
+                entity.getMemberId(),
                 entity.getWakeUpTime(),
                 entity.getWindDownTime(),
                 entity.getJob(),
@@ -19,9 +20,9 @@ public class MemberPersonalInfoMapper {
                 entity.getIsImportantBreaks());
     }
 
-    public static MemberPersonalInfoEntity toEntity(final MemberPersonalInfo domain, MemberRepository memberRepository) {
+    public static MemberPersonalInfoEntity toEntity(final MemberPersonalInfo domain) {
         return MemberPersonalInfoEntity.of(
-                memberRepository.findById(domain.getMemberId()).orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY)),
+                domain.getMemberId(),
                 domain.getWakeUpTime(),
                 domain.getWindDownTime(),
                 domain.getJob(),

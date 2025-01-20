@@ -12,9 +12,7 @@ public class MemberAuthEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private MemberEntity member;
+    private long memberId;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -34,12 +32,12 @@ public class MemberAuthEntity {
             final AuthProvider provider,
             final String platformId,
             final String refreshToken,
-            final MemberEntity member) {
+            final long memberId) {
         this.id = id;
         this.provider = provider;
         this.platformId = platformId;
         this.refreshToken = refreshToken;
-        this.member = member;
+        this.memberId = memberId;
     }
 
     public Long getId() {
@@ -58,14 +56,14 @@ public class MemberAuthEntity {
         return refreshToken;
     }
 
-    public MemberEntity getMember() {
-        return member;
+    public long getMemberId() {
+        return memberId;
     }
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
 
-    public void setMember(MemberEntity member) {
-        this.member = member;
+    public void setMemberId(long memberId) {
+        this.memberId = memberId;
     }
 }

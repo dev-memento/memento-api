@@ -6,8 +6,8 @@ import java.time.LocalTime;
 
 public class MemberPersonalInfo {
 
-    private final Long id;
-    private final Long memberId;
+    private Long id;
+    private long memberId;
     private LocalTime wakeUpTime;
     private LocalTime windDownTime;
     private JobType job;
@@ -18,27 +18,18 @@ public class MemberPersonalInfo {
     private Boolean isImportantBreaks;
 
     public static MemberPersonalInfo of(
-            final Long memberId,
-            final LocalTime wakeUpTime,
-            final LocalTime windDownTime,
-            final JobType job,
-            final String jobOtherDetail,
-            final Boolean isStressedUnorganizedSchedule,
-            final Boolean isForgetImportantThings,
-            final Boolean isPreferReminder,
-            final Boolean isImportantBreaks)
+            final Long memberId)
     {
         return new MemberPersonalInfo(
-                null,
                 memberId,
-                wakeUpTime,
-                windDownTime,
-                job,
-                jobOtherDetail,
-                isStressedUnorganizedSchedule,
-                isForgetImportantThings,
-                isPreferReminder,
-                isImportantBreaks);
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
     }
 
     public static MemberPersonalInfo withId(
@@ -66,7 +57,29 @@ public class MemberPersonalInfo {
                 isImportantBreaks);
     }
 
-    private MemberPersonalInfo(
+    public MemberPersonalInfo(
+            final Long memberId,
+            final LocalTime wakeUpTime,
+            final LocalTime windDownTime,
+            final JobType job,
+            final String jobOtherDetail,
+            final Boolean isStressedUnorganizedSchedule,
+            final Boolean isForgetImportantThings,
+            final Boolean isPreferReminder,
+            final Boolean isImportantBreaks)
+    {
+        this.memberId = memberId;
+        this.wakeUpTime = wakeUpTime;
+        this.windDownTime = windDownTime;
+        this.job = job;
+        this.jobOtherDetail = jobOtherDetail;
+        this.isStressedUnorganizedSchedule = isStressedUnorganizedSchedule;
+        this.isForgetImportantThings = isForgetImportantThings;
+        this.isPreferReminder = isPreferReminder;
+        this.isImportantBreaks = isImportantBreaks;
+    }
+
+    public MemberPersonalInfo(
             final Long id,
             final Long memberId,
             final LocalTime wakeUpTime,

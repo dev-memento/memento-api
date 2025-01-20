@@ -35,7 +35,7 @@ public class MemberPersonalInfoRepositoryAdapter implements MemberPersonalInfoRe
 
     @Override
     public MemberPersonalInfo create(final MemberPersonalInfo memberPersonalInfo) {
-        MemberPersonalInfoEntity entityToSave = MemberPersonalInfoMapper.toEntity(memberPersonalInfo, memberRepository);
+        MemberPersonalInfoEntity entityToSave = MemberPersonalInfoMapper.toEntity(memberPersonalInfo);
         MemberPersonalInfoEntity savedEntity = memberPersonalInfoEntityJpaRepository.save(entityToSave);
         return MemberPersonalInfoMapper.toDomain(savedEntity);
     }

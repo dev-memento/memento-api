@@ -1,6 +1,8 @@
 package com.official.memento.member.infrastructure;
 
 import com.official.memento.global.stereotype.Adapter;
+import com.official.memento.member.domain.Member;
+import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.domain.port.MemberRepository;
 import com.official.memento.member.infrastructure.persistence.MemberEntity;
 import com.official.memento.member.infrastructure.persistence.MemberJpaRepository;
@@ -20,19 +22,44 @@ public class MemberRepositoryAdapter implements MemberRepository {
     }
 
     @Override
-    public MemberEntity save(MemberEntity member) {
-        return memberJpaRepository.save(member);
+    public Member save(Member member) {
+        MemberEntity entityToSave = new MemberEntity();
+        entityToSave.setCreatedAt(member.getCreatedAt());
+        entityToSave.setUpdatedAt(member.getUpdatedAt());
+
+        MemberEntity savedEntity = memberJpaRepository.save(entityToSave);
+
+        return new Member(
+                savedEntity.getId(),
+                savedEntity.getCreatedAt(),
+                savedEntity.getUpdatedAt()
+        );
     }
 
     @Override
-    public Optional<MemberEntity> findById(Long id) {
-        return memberJpaRepository.findById(id);
+    public Optional<Member> findById(Long id) {
+        return memberJpaRepository.findById(id)
+                .map(entity -> new Member(
+                        entity.getId(),
+                        entity.getCreatedAt(),
+                        entity.getUpdatedAt()
+                ));
     }
 
     @Override
-    public Optional<MemberPersonalInfoEntity> findPersonalInfoByMemberId(Long memberId) {
-        return personalInfoRepository.findByMemberId(memberId);
+    public Optional<MemberPersonalInfo> findPersonalInfoByMemberId(Long memberId) {
+        return personalInfoRepository.findByMemberId(memberId)
+                .map(entity -> new MemberPersonalInfo(
+                        entity.getId(),
+                        entity.getMemberId(),
+                        entity.getWakeUpTime(),
+                        entity.getWindDownTime(),
+                        entity.getJob(),
+                        entity.getJobOtherDetail(),
+                        entity.getIsStressedUnorganizedSchedule(),
+                        entity.getIsForgetImportantThings(),
+                        entity.getIsPreferReminder(),
+                        entity.getIsImportantBreaks()
+                ));
     }
-
-
 }
