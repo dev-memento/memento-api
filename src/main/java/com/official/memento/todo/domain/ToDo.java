@@ -1,12 +1,14 @@
 package com.official.memento.todo.domain;
 
+import com.official.memento.global.entity.BaseTimeEntity;
 import com.official.memento.global.entity.enums.RepeatOption;
 import com.official.memento.todo.domain.enums.PriorityType;
 import com.official.memento.todo.domain.enums.ToDoType;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-public class ToDo {
+public class ToDo extends BaseTimeEntity {
     private Long id;
     private long memberId;
     private String groupId;
@@ -36,8 +38,10 @@ public class ToDo {
             final Double priorityImportance,
             final Double priorityValue,
             final String priorityType,
-            final ToDoType type
-    ) {
+            final ToDoType type,
+            final LocalDateTime createdAt,
+            final LocalDateTime updatedAt
+            ) {
         this.id = id;
         this.memberId = memberId;
         this.groupId = groupId;
@@ -52,6 +56,8 @@ public class ToDo {
         this.priorityValue = priorityValue;
         this.priorityType = priorityType;
         this.type = type;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     private ToDo(
@@ -98,7 +104,9 @@ public class ToDo {
             final Double priorityImportance,
             final Double priorityValue,
             final String priorityType,
-            final ToDoType type
+            final ToDoType type,
+            final LocalDateTime createdAt,
+            final LocalDateTime updatedAt
     ) {
         return new ToDo(
                 id,
@@ -114,7 +122,9 @@ public class ToDo {
                 priorityImportance,
                 priorityValue,
                 priorityType,
-                type
+                type,
+                createdAt,
+                updatedAt
         );
     }
 
@@ -148,6 +158,21 @@ public class ToDo {
                 priorityType,
                 type
         );
+    }
+
+    public void update(
+            final LocalDate date,
+            final String description,
+            final LocalDate deadline,
+            final Double priorityUrgency,
+            final Double priorityImportance
+    ){
+        this.date=date;
+        this.description=description;
+        this.deadline=deadline;
+        this.priorityUrgency = priorityUrgency;
+        this.priorityImportance=priorityImportance;
+
     }
 
     public Long getId() {
