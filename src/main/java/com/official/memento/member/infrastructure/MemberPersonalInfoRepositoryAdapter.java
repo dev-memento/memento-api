@@ -20,11 +20,11 @@ public class MemberPersonalInfoRepositoryAdapter implements MemberPersonalInfoRe
     }
 
     @Override
-    public Optional<MemberPersonalInfo> findByMemberId(final Long memberId) {
+    public MemberPersonalInfo findByMemberId(final Long memberId) {
         MemberPersonalInfoEntity entity = memberPersonalInfoEntityJpaRepository
                 .findByMemberId(memberId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY));
-        return Optional.of(MemberPersonalInfoMapper.toDomain(entity));
+        return MemberPersonalInfoMapper.toDomain(entity);
     }
 
     @Override

@@ -7,7 +7,8 @@ import com.official.memento.member.controller.dto.MemberPersonalInfoRequest;
 import com.official.memento.member.controller.dto.MemberUptimeResponse;
 import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.service.command.MemberPersonalInfoCommand;
-import com.official.memento.member.service.usecase.MemberPersonalInfoUseCase;
+import com.official.memento.member.service.usecase.MemberPersonalInfoRetrieveUseCase;
+import com.official.memento.member.service.usecase.MemberPersonalInfoUpdateUseCase;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +16,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/members/personal-info")
 public class MemberPersonalInfoApiController implements MemberPersonalInfoApiDocs {
-    private final MemberPersonalInfoUseCase memberPersonalInfoUseCase;
+    private final MemberPersonalInfoUpdateUseCase memberPersonalInfoUpdateUseCase;
+    private final MemberPersonalInfoRetrieveUseCase memberPersonalInfoRetrieveUseCase;
 
-    public MemberPersonalInfoApiController(MemberPersonalInfoUseCase memberPersonalInfoUseCase) {
-        this.memberPersonalInfoUseCase = memberPersonalInfoUseCase;
+    public MemberPersonalInfoApiController(MemberPersonalInfoUpdateUseCase memberPersonalInfoUpdateUseCase, MemberPersonalInfoRetrieveUseCase memberPersonalInfoRetrieveUseCase) {
+        this.memberPersonalInfoUpdateUseCase = memberPersonalInfoUpdateUseCase;
+        this.memberPersonalInfoRetrieveUseCase = memberPersonalInfoRetrieveUseCase;
     }
 
     @PatchMapping
@@ -26,7 +29,7 @@ public class MemberPersonalInfoApiController implements MemberPersonalInfoApiDoc
     public ResponseEntity<SuccessResponse<?>> updatePersonalInfo(
             @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final MemberPersonalInfoRequest request) {
-        final MemberPersonalInfo personalInfo = memberPersonalInfoUseCase.update(
+        final MemberPersonalInfo personalInfo = memberPersonalInfoUpdateUseCase.update(
                 new MemberPersonalInfoCommand(
                         authorizationUser.memberId(),
                         request.wakeUpTime(),
@@ -44,7 +47,11 @@ public class MemberPersonalInfoApiController implements MemberPersonalInfoApiDoc
     @GetMapping("/uptime")
     public ResponseEntity<SuccessResponse<MemberUptimeResponse>> getUpTime(
             @Authorization final AuthorizationUser authorizationUser) {
-        final MemberUptimeResponse response = memberPersonalInfoUseCase.retrieveUptime(authorizationUser.memberId());
+        final MemberPersonalInfo personalInfo = memberPersonalInfoRetrieveUseCase.retrieveUptime(authorizationUser.memberId());
+        final MemberUptimeResponse response = MemberUptimeResponse.of(
+                personalInfo.getWakeUpTime().toString(),
+                personalInfo.getWindDownTime().toString()
+        );
         return SuccessResponse.of(HttpStatus.OK, "사용자 업타임 조회 성공", response);
     }
 }
