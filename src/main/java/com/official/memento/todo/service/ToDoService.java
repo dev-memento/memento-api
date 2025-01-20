@@ -1,8 +1,6 @@
 package com.official.memento.todo.service;
 
 import com.official.memento.global.entity.enums.RepeatOption;
-import com.official.memento.schedule.domain.ScheduleTag;
-import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.TagRepository;
 import com.official.memento.todo.domain.ToDo;
 import com.official.memento.todo.domain.ToDoRepository;
@@ -52,9 +50,9 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
 
     @Override
     @Transactional
-    public void delete(final ToDoDeleteCommand toDoDeleteCommand){
+    public void delete(final ToDoDeleteCommand toDoDeleteCommand) {
         ToDo toDo = toDoRepository.findById(toDoDeleteCommand.toDoId());
-        checkOwn(toDoDeleteCommand.memberId(),toDo);
+        checkOwn(toDoDeleteCommand.memberId(), toDo);
         toDoRepository.deleteById(toDo.getId());
         toDoTagRepository.deleteByToDoId(toDo.getId());
         //TODO 순서 관련 로직 삭제
@@ -62,7 +60,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
 
     @Override
     @Transactional
-    public void update(final ToDoUpdateCommand command){
+    public void update(final ToDoUpdateCommand command) {
         ToDo toDo = toDoRepository.findById(command.toDoId());
         checkOwn(command.memberId(), toDo);
         toDo.update(
@@ -106,7 +104,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
                 currentDate = currentDate.plusDays(1);
             } else if (command.repeatOption() == RepeatOption.WEEKLY) {
                 currentDate = currentDate.plusWeeks(1);
-            } else if(command.repeatOption() == RepeatOption.MONTHLY) {
+            } else if (command.repeatOption() == RepeatOption.MONTHLY) {
                 currentDate = currentDate.plusMonths(1);
             } else {
                 currentDate = currentDate.plusYears(1);
