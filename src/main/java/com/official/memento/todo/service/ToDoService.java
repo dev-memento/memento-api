@@ -9,6 +9,7 @@ import com.official.memento.todo.domain.ToDoRepository;
 import com.official.memento.todo.domain.ToDoTag;
 import com.official.memento.todo.domain.ToDoTagRepository;
 import com.official.memento.todo.domain.enums.PriorityType;
+import com.official.memento.todo.service.command.ToDoCompletionUpdateCommand;
 import com.official.memento.todo.service.command.ToDoCreateCommand;
 import com.official.memento.todo.service.command.ToDoDeleteCommand;
 import com.official.memento.todo.service.command.ToDoUpdateCommand;
@@ -52,9 +53,9 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
 
     @Override
     @Transactional
-    public void delete(final ToDoDeleteCommand toDoDeleteCommand){
+    public void delete(final ToDoDeleteCommand toDoDeleteCommand) {
         ToDo toDo = toDoRepository.findById(toDoDeleteCommand.toDoId());
-        checkOwn(toDoDeleteCommand.memberId(),toDo);
+        checkOwn(toDoDeleteCommand.memberId(), toDo);
         toDoRepository.deleteById(toDo.getId());
         toDoTagRepository.deleteByToDoId(toDo.getId());
         //TODO 순서 관련 로직 삭제
@@ -62,7 +63,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
 
     @Override
     @Transactional
-    public void update(final ToDoUpdateCommand command){
+    public void update(final ToDoUpdateCommand command) {
         ToDo toDo = toDoRepository.findById(command.toDoId());
         checkOwn(command.memberId(), toDo);
         toDo.update(
@@ -75,6 +76,19 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         toDoRepository.update(toDo);
         updateOrDeleteTag(toDo, command.tagId());
         //TODO 순서 관련 로직 수정
+    }
+
+    @Override
+    @Transactional
+    public boolean updateCompletion(final ToDoCompletionUpdateCommand command) {
+        ToDo toDo = toDoRepository.findById(command.toDoId());
+        checkOwn(command.memberId(), toDo);
+        if (toDo.getIsCompleted()) {
+            toDo.updateCompletion(false);
+        } else {
+            toDo.updateCompletion(true);
+        }
+        return toDoRepository.update(toDo).getIsCompleted();
     }
 
     private void createSingleToDo(final ToDoCreateCommand command, final String toDoGroupId) {
@@ -106,7 +120,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
                 currentDate = currentDate.plusDays(1);
             } else if (command.repeatOption() == RepeatOption.WEEKLY) {
                 currentDate = currentDate.plusWeeks(1);
-            } else if(command.repeatOption() == RepeatOption.MONTHLY) {
+            } else if (command.repeatOption() == RepeatOption.MONTHLY) {
                 currentDate = currentDate.plusMonths(1);
             } else {
                 currentDate = currentDate.plusYears(1);
@@ -133,7 +147,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
                 command.priorityUrgency(),
                 command.priorityImportance(),
                 priorityValue,
-                priorityType.name(),
+                priorityType,
                 NORMAL
         ));
     }

@@ -35,10 +35,6 @@ public class ToDoTagRepositoryAdapter implements ToDoTagRepository {
     @Override
     public ToDoTag update(final ToDoTag toDoTag) {
         ToDoTagEntity toDoTagEntity = toDoTagJpaRepository.save(ToDoTagEntity.withId(toDoTag));
-        toDoTagEntity.updateTag(
-                toDoTag.getTagId(),
-                toDoTag.getUpdatedAt()
-        );
 
         return ToDoTag.withId(
                 toDoTagEntity.getId(),

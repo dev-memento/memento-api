@@ -1,16 +1,17 @@
 package com.official.memento.todo.controller;
 
-import com.official.memento.global.annotation.Authorization;
 import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
 import com.official.memento.global.entity.enums.RepeatOption;
-import com.official.memento.schedule.service.command.ScheduleDeleteCommand;
 import com.official.memento.todo.controller.dto.ToDoCreateRequest;
+import com.official.memento.todo.controller.dto.ToDoGetResponse;
 import com.official.memento.todo.controller.dto.ToDoUpdateRequest;
 import com.official.memento.todo.domain.ToDo;
 import com.official.memento.todo.service.ToDoCreateUseCase;
 import com.official.memento.todo.service.ToDoDeleteUseCase;
+import com.official.memento.todo.service.ToDoGetUseCase;
 import com.official.memento.todo.service.ToDoUpdateUseCase;
+import com.official.memento.todo.service.command.ToDoCompletionUpdateCommand;
 import com.official.memento.todo.service.command.ToDoCreateCommand;
 import com.official.memento.todo.service.command.ToDoDeleteCommand;
 import com.official.memento.todo.service.command.ToDoUpdateCommand;
@@ -97,4 +98,21 @@ public class ToDoApiController {
         );
     }
 
+    @PatchMapping("/{toDoId}/completion")
+    ResponseEntity<SuccessResponse<Boolean>> updateToDoCompletion(
+            //@Authorization final AuthorizationUser authorizationUser,
+            @PathVariable final long toDoId
+    ) {
+
+        boolean currentCompletion = toDoUpdateUseCase.updateCompletion(ToDoCompletionUpdateCommand.of(
+                2,
+                toDoId
+        ));
+
+        return SuccessResponse.of(
+                HttpStatus.OK,
+                "단일 투두 완료 상태 업데이트 성공",
+                currentCompletion
+        );
+    }
 }
