@@ -34,7 +34,40 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
                 toDoEntity.getPriorityImportance(),
                 toDoEntity.getPriorityValue(),
                 toDoEntity.getPriorityType(),
-                toDoEntity.getType()
+                toDoEntity.getType(),
+                toDoEntity.getCreatedAt(),
+                toDoEntity.getUpdatedAt()
+        );
+    }
+
+    @Override
+    public ToDo update(final ToDo toDo){
+        ToDoEntity toDoEntity = toDoJpaRepository.save(ToDoEntity.withId(toDo));
+        toDoEntity.update(
+                toDo.getDate(),
+                toDo.getDescription(),
+                toDo.getDeadline(),
+                toDo.getPriorityUrgency(),
+                toDo.getPriorityImportance()
+        );
+
+        return ToDo.withId(
+                toDoEntity.getId(),
+                toDoEntity.getMemberId(),
+                toDoEntity.getGroupId(),
+                toDoEntity.getDate(),
+                toDoEntity.getDescription(),
+                toDoEntity.getDeadline(),
+                toDoEntity.isCompleted(),
+                toDoEntity.getRepeatOption(),
+                toDoEntity.getRepeatExpiredDate(),
+                toDoEntity.getPriorityUrgency(),
+                toDoEntity.getPriorityImportance(),
+                toDoEntity.getPriorityValue(),
+                toDoEntity.getPriorityType(),
+                toDoEntity.getType(),
+                toDoEntity.getCreatedAt(),
+                toDoEntity.getUpdatedAt()
         );
     }
 
@@ -58,7 +91,9 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
                 toDoEntity.getPriorityImportance(),
                 toDoEntity.getPriorityValue(),
                 toDoEntity.getPriorityType(),
-                toDoEntity.getType()
+                toDoEntity.getType(),
+                toDoEntity.getCreatedAt(),
+                toDoEntity.getUpdatedAt()
         );
     }
 
