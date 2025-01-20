@@ -1,6 +1,8 @@
 package com.official.memento.todo.service;
 
 import com.official.memento.global.entity.enums.RepeatOption;
+import com.official.memento.schedule.domain.ScheduleTag;
+import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.TagRepository;
 import com.official.memento.todo.domain.ToDo;
 import com.official.memento.todo.domain.ToDoRepository;
@@ -9,16 +11,18 @@ import com.official.memento.todo.domain.ToDoTagRepository;
 import com.official.memento.todo.domain.enums.PriorityType;
 import com.official.memento.todo.service.command.ToDoCreateCommand;
 import com.official.memento.todo.service.command.ToDoDeleteCommand;
+import com.official.memento.todo.service.command.ToDoUpdateCommand;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static com.official.memento.todo.domain.enums.ToDoType.NORMAL;
 
 @Service
-public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase {
+public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUpdateUseCase {
 
     private final ToDoRepository toDoRepository;
     private final ToDoTagRepository toDoTagRepository;
@@ -51,6 +55,24 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase {
         ToDo toDo = toDoRepository.findById(toDoDeleteCommand.toDoId());
         checkOwn(toDoDeleteCommand.memberId(),toDo);
         toDoRepository.deleteById(toDo.getId());
+        toDoTagRepository.deleteByToDoId(toDo.getId());
+        //TODO 순서 삭제
+    }
+
+    @Override
+    @Transactional
+    public void update(final ToDoUpdateCommand command){
+        ToDo toDo = toDoRepository.findById(command.toDoId());
+        checkOwn(command.memberId(), toDo);
+        toDo.update(
+                command.date(),
+                command.description(),
+                command.deadline(),
+                command.priorityUrgency(),
+                command.priorityImportance()
+        );
+        toDoRepository.update(toDo);
+        updateOrDeleteTag(toDo, command.tagId());
     }
 
     private void createSingleToDo(final ToDoCreateCommand command, final String toDoGroupId) {
@@ -141,8 +163,22 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase {
         }
     }
 
+    private void updateOrDeleteTag(final ToDo toDo, final Long tagId) {
+        ToDoTag toDoTag = toDoTagRepository.findByToDoId(toDo.getId());
+        if (tagId == null) {
+            toDoTagRepository.deleteByToDoId(toDo.getId());
+        } else if (toDoTag == null) {
+            toDoTag = ToDoTag.of(tagId, toDo.getId());
+            toDoTagRepository.save(toDoTag);
+        } else if (toDoTag.getTagId() != tagId) {
+            toDoTag.updateTag(tagId, LocalDateTime.now());
+            toDoTagRepository.update(toDoTag);
+        }
+    }
+
+
+    //TODO 순서 로직
     private int determineOrder() {
-        // 순서 결정 로직 (예: 기본값은 0, 나중에 수정 가능)
         return 0;
     }
 }
