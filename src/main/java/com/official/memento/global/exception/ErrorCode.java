@@ -14,7 +14,8 @@ public enum ErrorCode {
     /* 소셜 로그인 관련 에러 */
     INVALID_ID_TOKEN("유효하지 않은 ID 토큰입니다."),
     UNSUPPORTED_PROVIDER("지원하지 않는 소셜 로그인 제공자입니다."),
-    INVALID_ACCESS_TOKEN("유효하지 않은 액세스 토큰입니다.");
+    INVALID_ACCESS_TOKEN("유효하지 않은 액세스 토큰입니다."),
+    INVALID_REFRESH_TOKEN("유효하지 않은 리프레시 토큰입니다.");
 
     private final String message;
 
