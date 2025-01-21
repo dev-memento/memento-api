@@ -14,6 +14,9 @@ import com.official.memento.auth.service.command.AuthCommand;
 import com.official.memento.auth.service.usecase.AuthUseCase;
 import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.exception.MementoException;
+import com.official.memento.tag.domain.Tag;
+import com.official.memento.tag.domain.TagRepository;
+import com.official.memento.tag.domain.enums.TagColor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,19 +30,22 @@ public class AuthService implements AuthUseCase {
     private final MemberRepository memberRepository;
     private final MemberPersonalInfoRepository memberPersonalInfoRepository;
     private final JwtUtil jwtUtil;
+    private final TagRepository tagRepository;
 
     public AuthService(
             Map<AuthProvider, AuthClientOutputPort> authClientAdapters,
             AuthRepository authRepository,
             MemberRepository memberRepository,
             MemberPersonalInfoRepository memberPersonalInfoRepository,
-            JwtUtil jwtUtil
+            JwtUtil jwtUtil,
+            TagRepository tagRepository
     ) {
         this.authClientAdapters = authClientAdapters;
         this.authRepository = authRepository;
         this.memberRepository = memberRepository;
         this.memberPersonalInfoRepository = memberPersonalInfoRepository;
         this.jwtUtil = jwtUtil;
+        this.tagRepository = tagRepository;
     }
 
     @Override
@@ -54,7 +60,7 @@ public class AuthService implements AuthUseCase {
         MemberAuth auth = authRepository.findByPlatformIdAndProvider(platformId, provider)
                 .orElseGet(() -> createNewMember(platformId, provider));
 
-        boolean isNewUser = memberRepository.findPersonalInfoByMemberId(auth.getMemberId()).isEmpty();
+        boolean isNewUser = memberRepository.findPersonalInfoByMemberId(auth.getId()).isEmpty();
 
         AccessToken accessToken = jwtUtil.generateAccessToken(auth.getMemberId());
         RefreshToken refreshToken = jwtUtil.generateRefreshToken(auth.getMemberId());
@@ -67,9 +73,16 @@ public class AuthService implements AuthUseCase {
 
     private MemberAuth createNewMember(String platformId, AuthProvider provider) {
         Member newMember = memberRepository.save(Member.createNew());
-        MemberAuth newAuth = MemberAuth.of(newMember.getId(), provider, platformId, "");
-        MemberPersonalInfo personalInfo = MemberPersonalInfo.of(newMember.getId());
+        Long memberId = newMember.getId();
+        MemberAuth newAuth = MemberAuth.of(memberId, provider, platformId, "");
+        MemberPersonalInfo personalInfo = MemberPersonalInfo.of(memberId);
         memberPersonalInfoRepository.create(personalInfo);
+        tagRepository.save(Tag.of("Untitled", TagColor.GRAY05, memberId));
+        tagRepository.save(Tag.of("Family", TagColor.RED, memberId));
+        tagRepository.save(Tag.of("Hobby", TagColor.ORANGE, memberId));
+        tagRepository.save(Tag.of("Self-Development", TagColor.MINT, memberId));
+        tagRepository.save(Tag.of("Work", TagColor.CYAN, memberId));
+        tagRepository.save(Tag.of("Personal", TagColor.BLUE, memberId));
         return authRepository.save(newAuth);
     }
 
