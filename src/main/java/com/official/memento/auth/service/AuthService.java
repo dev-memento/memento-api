@@ -62,12 +62,9 @@ public class AuthService implements AuthUseCase {
         auth.withUpdatedToken(refreshToken.getToken());
         authRepository.save(auth);
 
-        Member member = Member.fromId(auth.getId());
-
-        return AuthResult.of(accessToken, refreshToken, member, isNewUser);
+        return AuthResult.of(accessToken, refreshToken, isNewUser);
     }
 
-    @Transactional
     private MemberAuth createNewMember(String platformId, AuthProvider provider) {
         Member newMember = memberRepository.save(Member.createNew());
         MemberAuth newAuth = MemberAuth.of(newMember.getId(), provider, platformId, "");
@@ -76,7 +73,6 @@ public class AuthService implements AuthUseCase {
         return authRepository.save(newAuth);
     }
 
-    @Transactional
     private Map<String, Object> verifyIdToken(final AuthProvider provider, final String idToken) {
         final AuthClientOutputPort clientAdapter = authClientAdapters.get(provider);
         if (clientAdapter == null) {
@@ -100,13 +96,13 @@ public class AuthService implements AuthUseCase {
         if (!memberAuth.getRefreshToken().equals(refreshToken)) {
             throw new MementoException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
-        AccessToken newAccessToken = jwtUtil.generateAccessToken(memberId);
-        RefreshToken newRefreshToken = jwtUtil.generateRefreshToken(memberId);
+        AccessToken newAccessToken = jwtUtil.generateAccessToken(Long.parseLong(memberId));
+        RefreshToken newRefreshToken = jwtUtil.generateRefreshToken(Long.parseLong(memberId));
 
         memberAuth.withUpdatedToken(newRefreshToken.getToken());
         authRepository.save(memberAuth);
 
-        return new AuthResult(newAccessToken, newRefreshToken, null, false);
+        return AuthResult.of(newAccessToken, newRefreshToken, false);
 
     }
 }

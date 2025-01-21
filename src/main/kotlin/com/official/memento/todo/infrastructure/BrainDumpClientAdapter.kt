@@ -1,7 +1,6 @@
 package com.official.memento.todo.infrastructure
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.official.memento.global.exception.ErrorCode
 import com.official.memento.global.exception.MementoException
 import com.official.memento.global.stereotype.Adapter
@@ -19,7 +18,6 @@ class BrainDumpClientAdapter(
     private val webClient: WebClient,
     @Value("\${claude.ai.api-key}")
     private val claudeApiKey: String,
-    private val objectMapper: ObjectMapper,
 ) : BrainDumpClientOutputPort {
     companion object {
         private val CLAUDE_API_URL = "https://api.anthropic.com/v1/messages"
@@ -39,8 +37,6 @@ class BrainDumpClientAdapter(
         userInput = brainDump.content
         brainDumpPrompt = readPromptFromFile()
         val replacedPrompt = brainDumpPrompt.replace("{{USER_INPUT}}", userInput!!)
-
-        println(replacedPrompt)
 
         val response =
             webClient.post()
@@ -133,7 +129,7 @@ class BrainDumpClientAdapter(
     }
 
     private fun readPromptFromFile(): String {
-        val path = Paths.get("src/main/resources/braindump-prompt.txt")
+        val path = Paths.get(BRAINDUMP_PROMPT_FILE_PATH)
         return Files.readString(path)
     }
 

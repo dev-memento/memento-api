@@ -3,6 +3,7 @@ package com.official.memento.global.handler;
 import com.official.memento.global.dto.ErrorResponse;
 import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.exception.InvalidRequestBodyException;
+import com.official.memento.global.exception.UnauthorizedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -20,5 +21,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidRequestBodyException.class)
     public ResponseEntity<ErrorResponse> invalidRequestBodyException(InvalidRequestBodyException exception) {
         return ErrorResponse.of(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_REQUEST_BODY);
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ErrorResponse> unauthorizedException(UnauthorizedException exception) {
+        return ErrorResponse.of(HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED_USER);
     }
 }

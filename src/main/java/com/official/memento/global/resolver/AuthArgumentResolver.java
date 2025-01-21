@@ -5,6 +5,7 @@ import com.official.memento.global.annotation.Authorization;
 import com.official.memento.auth.service.JwtUtil;
 import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.exception.MementoException;
+import com.official.memento.global.exception.UnauthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
@@ -48,16 +49,15 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
         if (jwtUtil.validateToken(token)) {
             return Long.parseLong(jwtUtil.getUserIdFromToken(token));
         } else {
-            throw new MementoException(ErrorCode.INVALID_ACCESS_TOKEN);
+            throw new UnauthorizedException(ErrorCode.UNAUTHORIZED_USER);
         }
     }
 
 
     private String parseToken(String token) {
         if (token == null || !token.startsWith(AUTHORIZATION_HEADER_PREFIX)) {
-            throw new MementoException(ErrorCode.INVALID_ACCESS_TOKEN);
+            throw new UnauthorizedException(ErrorCode.INVALID_ACCESS_TOKEN);
         }
-        System.out.println("token : " + token);
         return token.replace(AUTHORIZATION_HEADER_PREFIX, EMPTY);
     }
 }
