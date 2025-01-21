@@ -2,7 +2,6 @@ package com.official.memento.auth.controller;
 
 import com.official.memento.auth.controller.dto.AuthApiRequest;
 import com.official.memento.auth.controller.dto.AuthApiResponse;
-import com.official.memento.auth.domain.AuthorizationMember;
 import com.official.memento.auth.service.AuthResult;
 import com.official.memento.auth.service.AuthService;
 import com.official.memento.auth.service.command.AuthCommand;
@@ -30,7 +29,6 @@ public class AuthApiController {
         final AuthResult authResult = authService.authenticate(command);
 
         final AuthApiResponse response = new AuthApiResponse(
-                "소셜 로그인 성공",
                 authResult.getAccessToken().getToken(),
                 authResult.getRefreshToken().getToken(),
                 authResult.isNewUser()
