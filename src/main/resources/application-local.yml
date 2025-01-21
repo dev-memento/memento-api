@@ -25,3 +25,7 @@ springdoc:
 claude:
   ai:
     api-key: ${CLAUDE.API-KEY.local}
+
+logging:
+  level:
+    root: INFO

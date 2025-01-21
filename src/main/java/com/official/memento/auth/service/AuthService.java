@@ -56,8 +56,8 @@ public class AuthService implements AuthUseCase {
 
         boolean isNewUser = memberRepository.findPersonalInfoByMemberId(auth.getId()).isEmpty();
 
-        AccessToken accessToken = jwtUtil.generateAccessToken(auth.getId().toString(), email);
-        RefreshToken refreshToken = jwtUtil.generateRefreshToken(auth.getId().toString());
+        AccessToken accessToken = jwtUtil.generateAccessToken(String.valueOf(auth.getMemberId()));
+        RefreshToken refreshToken = jwtUtil.generateRefreshToken(String.valueOf(auth.getId().toString()));
 
         auth.withUpdatedToken(refreshToken.getToken());
         authRepository.save(auth);
@@ -71,7 +71,7 @@ public class AuthService implements AuthUseCase {
         return new AuthResult(accessToken, refreshToken, member, isNewUser);
     }
 
-    @Transactional
+
     private MemberAuth createNewMember(String platformId, AuthProvider provider) {
         Member newMember = memberRepository.save(Member.createNew());
         MemberAuth newAuth = MemberAuth.of(newMember.getId(), provider, platformId, "");
@@ -80,7 +80,6 @@ public class AuthService implements AuthUseCase {
         return authRepository.save(newAuth);
     }
 
-    @Transactional
     private AuthProvider getAuthProvider(final String providerName) {
         try {
             return AuthProvider.valueOf(providerName.toUpperCase());
@@ -89,7 +88,6 @@ public class AuthService implements AuthUseCase {
         }
     }
 
-    @Transactional
     private Map<String, Object> verifyIdToken(final AuthProvider provider, final String idToken) {
         final AuthClientOutputPort clientAdapter = authClientAdapters.get(provider);
         if (clientAdapter == null) {
