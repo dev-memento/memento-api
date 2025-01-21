@@ -5,8 +5,8 @@ import com.official.memento.schedule.conntroller.dto.request.RepeatScheduleCreat
 import com.official.memento.schedule.conntroller.dto.request.ScheduleCreateRequest;
 import com.official.memento.schedule.conntroller.dto.request.ScheduleUpdateGroupRequest;
 import com.official.memento.schedule.conntroller.dto.request.ScheduleUpdateRequest;
-import com.official.memento.schedule.service.*;
 import com.official.memento.schedule.service.command.*;
+import com.official.memento.schedule.service.usecase.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

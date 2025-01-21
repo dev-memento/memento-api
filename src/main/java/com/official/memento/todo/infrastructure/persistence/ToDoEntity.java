@@ -29,7 +29,8 @@ public class ToDoEntity extends BaseTimeEntity {
     private Double priorityUrgency;
     private Double priorityImportance;
     private Double priorityValue;
-    private String priorityType;
+    @Enumerated(EnumType.STRING)
+    private PriorityType priorityType;
     @Enumerated(EnumType.STRING)
     private ToDoType type;
 
@@ -49,7 +50,7 @@ public class ToDoEntity extends BaseTimeEntity {
             final Double priorityUrgency,
             final Double priorityImportance,
             final Double priorityValue,
-            final String priorityType,
+            final PriorityType priorityType,
             final ToDoType type,
             final LocalDateTime createdAt,
             final LocalDateTime updatedAt
@@ -84,7 +85,7 @@ public class ToDoEntity extends BaseTimeEntity {
             final Double priorityUrgency,
             final Double priorityImportance,
             final Double priorityValue,
-            final String priorityType,
+            final PriorityType priorityType,
             final ToDoType type,
             final LocalDateTime createdAt,
             final LocalDateTime updatedAt
@@ -113,7 +114,7 @@ public class ToDoEntity extends BaseTimeEntity {
                 toDo.getDate(),
                 toDo.getDescription(),
                 toDo.getDeadline(),
-                toDo.isCompleted(),
+                toDo.getIsCompleted(),
                 toDo.getRepeatOption(),
                 toDo.getRepeatExpiredDate(),
                 toDo.getPriorityUrgency(),
@@ -134,7 +135,7 @@ public class ToDoEntity extends BaseTimeEntity {
                 toDo.getDate(),
                 toDo.getDescription(),
                 toDo.getDeadline(),
-                toDo.isCompleted(),
+                toDo.getIsCompleted(),
                 toDo.getRepeatOption(),
                 toDo.getRepeatExpiredDate(),
                 toDo.getPriorityUrgency(),
@@ -186,7 +187,7 @@ public class ToDoEntity extends BaseTimeEntity {
         return deadline;
     }
 
-    public boolean isCompleted() {
+    public boolean getIsCompleted() {
         return isCompleted;
     }
 
@@ -210,7 +211,7 @@ public class ToDoEntity extends BaseTimeEntity {
         return priorityValue;
     }
 
-    public String getPriorityType() {
+    public PriorityType getPriorityType() {
         return priorityType;
     }
 

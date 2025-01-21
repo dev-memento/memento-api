@@ -8,6 +8,7 @@ import com.official.memento.todo.controller.dto.ToDoUpdateRequest;
 import com.official.memento.todo.service.ToDoCreateUseCase;
 import com.official.memento.todo.service.ToDoDeleteUseCase;
 import com.official.memento.todo.service.ToDoUpdateUseCase;
+import com.official.memento.todo.service.command.ToDoCompletionUpdateCommand;
 import com.official.memento.todo.service.command.ToDoCreateCommand;
 import com.official.memento.todo.service.command.ToDoDeleteCommand;
 import com.official.memento.todo.service.command.ToDoUpdateCommand;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/todos")
-public class ToDoApiController {
+public class ToDoApiController implements ToDoApiDocs {
 
     private final ToDoCreateUseCase toDoCreateUseCase;
     private final ToDoDeleteUseCase toDoDeleteUseCase;
@@ -34,13 +35,11 @@ public class ToDoApiController {
     }
 
     @PostMapping
+    @Override
     public ResponseEntity<SuccessResponse<?>> createToDo(
-            //@Authorization final AuthorizationUser authorizationUser,
+            @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final ToDoCreateRequest request
     ) {
-        //test용, 로그인 구현되면 지우기
-        final AuthorizationUser authorizationUser = new AuthorizationUser(2L);
-
         toDoCreateUseCase.create(ToDoCreateCommand.of(
                         authorizationUser.memberId(),
                         request.date(),
@@ -60,12 +59,16 @@ public class ToDoApiController {
     }
 
     @DeleteMapping("/{toDoId}")
-    ResponseEntity<SuccessResponse<?>> deleteToDo(
-            //@Authorization final AuthorizationUser authorizationUser,
+    @Override
+    public ResponseEntity<SuccessResponse<?>> deleteToDo(
+            @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId
     ) {
         // todo: 로그인 후 추후 삭제 예정
-        toDoDeleteUseCase.delete(ToDoDeleteCommand.of(2L, toDoId));
+        toDoDeleteUseCase.delete(ToDoDeleteCommand.of(
+                authorizationUser.memberId(),
+                toDoId)
+        );
         return SuccessResponse.of(
                 HttpStatus.OK,
                 "단일 스케줄 삭제 성공"
@@ -74,12 +77,12 @@ public class ToDoApiController {
 
     @PatchMapping("/{toDoId}")
     ResponseEntity<SuccessResponse<?>> updateToDo(
-            //@Authorization final AuthorizationUser authorizationUser,
+            @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId,
             @RequestBody final ToDoUpdateRequest request
     ) {
         toDoUpdateUseCase.update(ToDoUpdateCommand.of(
-                2,
+                authorizationUser.memberId(),
                 toDoId,
                 request.date(),
                 request.description(),
@@ -94,4 +97,21 @@ public class ToDoApiController {
         );
     }
 
+    @PatchMapping("/{toDoId}/completion")
+    ResponseEntity<SuccessResponse<Boolean>> updateToDoCompletion(
+            @Authorization final AuthorizationUser authorizationUser,
+            @PathVariable final long toDoId
+    ) {
+
+        boolean currentCompletion = toDoUpdateUseCase.updateCompletion(ToDoCompletionUpdateCommand.of(
+                authorizationUser.memberId(),
+                toDoId
+        ));
+
+        return SuccessResponse.of(
+                HttpStatus.OK,
+                "단일 투두 완료 상태 업데이트 성공",
+                currentCompletion
+        );
+    }
 }

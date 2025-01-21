@@ -22,7 +22,7 @@ public class ToDo extends BaseTimeEntity {
     private Double priorityUrgency;
     private Double priorityImportance;
     private Double priorityValue;
-    private String priorityType;
+    private PriorityType priorityType;
     private ToDoType type;
 
     private ToDo(
@@ -38,7 +38,7 @@ public class ToDo extends BaseTimeEntity {
             final Double priorityUrgency,
             final Double priorityImportance,
             final Double priorityValue,
-            final String priorityType,
+            final PriorityType priorityType,
             final ToDoType type,
             final LocalDateTime createdAt,
             final LocalDateTime updatedAt
@@ -73,7 +73,7 @@ public class ToDo extends BaseTimeEntity {
             final Double priorityUrgency,
             final Double priorityImportance,
             final Double priorityValue,
-            final String priorityType,
+            final PriorityType priorityType,
             final ToDoType type
     ) {
         this.memberId = memberId;
@@ -104,7 +104,7 @@ public class ToDo extends BaseTimeEntity {
             final Double priorityUrgency,
             final Double priorityImportance,
             final Double priorityValue,
-            final String priorityType,
+            final PriorityType priorityType,
             final ToDoType type,
             final LocalDateTime createdAt,
             final LocalDateTime updatedAt
@@ -141,7 +141,7 @@ public class ToDo extends BaseTimeEntity {
             final Double priorityUrgency,
             final Double priorityImportance,
             final Double priorityValue,
-            final String priorityType,
+            final PriorityType priorityType,
             final ToDoType type
     ) {
         return new ToDo(
@@ -176,23 +176,11 @@ public class ToDo extends BaseTimeEntity {
 
     }
 
-    /*
-    private Long id;
-    private long memberId;
-    private String groupId;
-    private LocalDate date;
-    private String description;
-    private LocalDate deadline;
-    private boolean isCompleted;
-    private RepeatOption repeatOption;
-    private LocalDate repeatExpiredDate;
-    private Double priorityUrgency;
-    private Double priorityImportance;
-    private Double priorityValue;
-    private String priorityType;
-    private ToDoType type;
-     */
-
+    public void updateCompletion(
+            final boolean isCompleted
+    ){
+        this.isCompleted=isCompleted;
+    }
 
     public Long getId() {
         return id;
@@ -218,7 +206,7 @@ public class ToDo extends BaseTimeEntity {
         return deadline;
     }
 
-    public boolean isCompleted() {
+    public boolean getIsCompleted() {
         return isCompleted;
     }
 
@@ -242,7 +230,7 @@ public class ToDo extends BaseTimeEntity {
         return priorityValue;
     }
 
-    public String getPriorityType() {
+    public PriorityType getPriorityType() {
         return priorityType;
     }
 

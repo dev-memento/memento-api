@@ -5,6 +5,7 @@ import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.stereotype.Adapter;
 import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.domain.port.MemberPersonalInfoRepository;
+import com.official.memento.member.domain.port.MemberRepository;
 import com.official.memento.member.infrastructure.persistence.MemberPersonalInfoEntity;
 import com.official.memento.member.infrastructure.persistence.MemberPersonalInfoEntityJpaRepository;
 import com.official.memento.member.infrastructure.persistence.MemberPersonalInfoMapper;
@@ -14,9 +15,14 @@ import java.util.Optional;
 @Adapter
 public class MemberPersonalInfoRepositoryAdapter implements MemberPersonalInfoRepository {
     private final MemberPersonalInfoEntityJpaRepository memberPersonalInfoEntityJpaRepository;
+    private final MemberRepository memberRepository;
 
-    public MemberPersonalInfoRepositoryAdapter(final MemberPersonalInfoEntityJpaRepository memberPersonalInfoEntityJpaRepository) {
+
+    public MemberPersonalInfoRepositoryAdapter(
+            final MemberPersonalInfoEntityJpaRepository memberPersonalInfoEntityJpaRepository,
+            final MemberRepository memberRepository) {
         this.memberPersonalInfoEntityJpaRepository = memberPersonalInfoEntityJpaRepository;
+        this.memberRepository = memberRepository;
     }
 
     @Override
@@ -36,7 +42,8 @@ public class MemberPersonalInfoRepositoryAdapter implements MemberPersonalInfoRe
 
     @Override
     public MemberPersonalInfo update(final MemberPersonalInfo memberPersonalInfo) {
-        MemberPersonalInfoEntity entity = memberPersonalInfoEntityJpaRepository.findByMemberId(memberPersonalInfo.getMemberId())
+        MemberPersonalInfoEntity entity = memberPersonalInfoEntityJpaRepository
+                .findByMemberId(memberPersonalInfo.getMemberId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY));
         entity.updatePersonalInfo(
                 memberPersonalInfo.getWakeUpTime(),
@@ -48,6 +55,7 @@ public class MemberPersonalInfoRepositoryAdapter implements MemberPersonalInfoRe
                 memberPersonalInfo.getIsPreferReminder(),
                 memberPersonalInfo.getIsImportantBreaks()
         );
-        return MemberPersonalInfoMapper.toDomain(entity);
+        MemberPersonalInfoEntity savedEntity = memberPersonalInfoEntityJpaRepository.save(entity);
+        return MemberPersonalInfoMapper.toDomain(savedEntity);
     }
 }

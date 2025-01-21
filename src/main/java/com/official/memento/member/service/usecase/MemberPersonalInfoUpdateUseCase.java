@@ -5,5 +5,5 @@ import com.official.memento.member.service.command.MemberPersonalInfoCommand;
 
 @FunctionalInterface
 public interface MemberPersonalInfoUpdateUseCase {
-    MemberPersonalInfo update(final MemberPersonalInfoCommand command);
+    void update(final MemberPersonalInfoCommand command);
 }

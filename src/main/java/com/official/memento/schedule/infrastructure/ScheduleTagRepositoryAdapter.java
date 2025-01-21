@@ -1,7 +1,7 @@
 package com.official.memento.schedule.infrastructure;
 
 import com.official.memento.global.stereotype.Adapter;
-import com.official.memento.schedule.domain.ScheduleTag;
+import com.official.memento.schedule.domain.entity.ScheduleTag;
 import com.official.memento.schedule.domain.ScheduleTagRepository;
 import com.official.memento.schedule.infrastructure.persistence.ScheduleTagEntity;
 import com.official.memento.schedule.infrastructure.persistence.ScheduleTagEntityJpaRepository;

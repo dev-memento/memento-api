@@ -1,4 +1,4 @@
-package com.official.memento.schedule.domain;
+package com.official.memento.schedule.domain.entity;
 
 import com.official.memento.global.entity.BaseTimeEntity;
 import com.official.memento.global.entity.enums.RepeatOption;
