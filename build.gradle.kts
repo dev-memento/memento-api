@@ -45,6 +45,7 @@ dependencies {
 
     // WebFlux
     implementation(libs.spring.boot.starter.webflux)
+    runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.104.Final:osx-aarch_64")
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
