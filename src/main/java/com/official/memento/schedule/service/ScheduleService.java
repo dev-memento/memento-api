@@ -179,13 +179,6 @@ public class ScheduleService implements
     @Override
     @Transactional(readOnly = true)
     public List<Schedule> getSchedules(final long memberId, final LocalDate date) {
-        MemberPersonalInfo memberPersonalInfo = memberPersonalInfoRepository.findByMemberId(memberId);
-        //만약에 date가 16일이야 그럼 memberPersonalInfo에 windDownTime을 가져와서 비교를 하는거지 그결과가 예를들어 windDownTime이 2시면
-        //startdateTime이 16일 2시부터 endDateTime이 17일 2시가 나올 수 있어야 해
-        //근데 windDownTime이 22시면 startDateTime이 15일 22시부터 16일 22가 나올 수 있어야 해
-//        LocalTime windDownTime = memberPersonalInfo.getWindDownTime();
-//        LocalDateTime startDateTime = date.minusDays(windDownTime.getHour() > 12 ? 1 : 0).atTime(windDownTime.getHour(), windDownTime.getMinute());
-//        LocalDateTime endDateTime = startDateTime.plusDays(1);
         return scheduleRepository.findAllByStartDateAndMemberId(date, memberId);
     }
 
