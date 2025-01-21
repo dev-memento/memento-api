@@ -1,7 +1,5 @@
 package com.official.memento.auth.service.command;
 
-import com.official.memento.auth.domain.AuthProvider;
-
 public record AuthCommand(
         String providerName,
         String idToken
