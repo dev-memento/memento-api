@@ -38,10 +38,9 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
                                              WebDataBinderFactory binderFactory) throws Exception {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         String authorizationHeaderValue = request.getHeader(HttpHeaders.AUTHORIZATION);
-        String token = parseToken(authorizationHeaderValue);
-        // Token 검증 로직
-        Long memberId = validateToken(token); // 토큰 검증 후 사용자 ID 추출
-        return new AuthorizationUser(memberId); // 주입될 객체 생성
+        final String token = parseToken(authorizationHeaderValue);
+        Long memberId = validateToken(token);
+        return new AuthorizationUser(memberId);
     }
 
     private Long validateToken(String token) {
@@ -58,6 +57,7 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
         if (token == null || !token.startsWith(AUTHORIZATION_HEADER_PREFIX)) {
             throw new MementoException(ErrorCode.INVALID_ACCESS_TOKEN);
         }
+        System.out.println("token : " + token);
         return token.replace(AUTHORIZATION_HEADER_PREFIX, EMPTY);
     }
 }

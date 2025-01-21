@@ -27,7 +27,7 @@ public class MemberPersonalInfoApiController implements MemberPersonalInfoApiDoc
     @PatchMapping
     @Override
     public ResponseEntity<SuccessResponse<?>> updatePersonalInfo(
-            @Authorization final AuthorizationUser authorizationUser,
+            @Authorization AuthorizationUser authorizationUser,
             @RequestBody final MemberPersonalInfoRequest request) {
         memberPersonalInfoUpdateUseCase.update(
                 MemberPersonalInfoCommand.of(

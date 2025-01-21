@@ -23,10 +23,9 @@ public class JwtUtil {
         this.refreshTokenExpiration = refreshTokenExpiration;
     }
 
-    public AccessToken generateAccessToken(final String userId, final String email) {
+    public AccessToken generateAccessToken(final String userId) {
         return new AccessToken(Jwts.builder()
                 .setSubject(userId)
-                .claim("email", email)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiration))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
@@ -35,11 +34,11 @@ public class JwtUtil {
 
     public RefreshToken generateRefreshToken(final String userId) {
         return new RefreshToken(Jwts.builder()
-                        .setSubject(userId)
-                        .setIssuedAt(new Date())
-                        .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
-                        .signWith(secretKey, SignatureAlgorithm.HS256)
-                        .compact());
+                .setSubject(userId)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
+                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .compact());
     }
 
     public boolean validateToken(final String token) {
