@@ -1,10 +1,12 @@
 package com.official.memento.schedule.service;
 
 import com.official.memento.global.entity.enums.RepeatOption;
-import com.official.memento.orderinfo.domain.PlanType;
+import com.official.memento.member.domain.MemberPersonalInfo;
+import com.official.memento.member.domain.port.MemberPersonalInfoRepository;
 import com.official.memento.orderinfo.domain.OrderInfo;
 import com.official.memento.orderinfo.domain.OrderInfoRepository;
 import com.official.memento.orderinfo.domain.OrderWithScheduleOrToDo;
+import com.official.memento.orderinfo.domain.PlanType;
 import com.official.memento.schedule.domain.ScheduleRepository;
 import com.official.memento.schedule.domain.ScheduleTagRepository;
 import com.official.memento.schedule.domain.entity.Schedule;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -30,23 +33,26 @@ public class ScheduleService implements
         ScheduleDeleteUseCase,
         ScheduleDeleteGroupUseCase,
         ScheduleUpdateUseCase,
-        ScheduleUpdateGroupUseCase {
+        ScheduleUpdateGroupUseCase,
+        ScheduleGetUseCase {
 
     private final ScheduleTagRepository scheduleTagRepository;
     private final ScheduleRepository scheduleRepository;
     private final TagRepository tagRepository;
     private final OrderInfoRepository orderInfoRepository;
+    private final MemberPersonalInfoRepository memberPersonalInfoRepository;
 
     public ScheduleService(
             final ScheduleRepository scheduleRepository,
             final ScheduleTagRepository scheduleTagRepository,
             final TagRepository tagRepository,
-            final OrderInfoRepository orderInfoRepository
-    ) {
+            final OrderInfoRepository orderInfoRepository,
+            MemberPersonalInfoRepository memberPersonalInfoRepository) {
         this.scheduleRepository = scheduleRepository;
         this.scheduleTagRepository = scheduleTagRepository;
         this.tagRepository = tagRepository;
         this.orderInfoRepository = orderInfoRepository;
+        this.memberPersonalInfoRepository = memberPersonalInfoRepository;
     }
 
     @Override
@@ -146,6 +152,41 @@ public class ScheduleService implements
         if (command.tagId() != null) {
             connectTags(command.tagId(), newSchedules);
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Schedule> getAllSchedules(final long memberId) {
+        return scheduleRepository.findNonAllDaySchedulesWithOrderInfo(memberId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Schedule> getAllAllDaysSchedules(long memberId) {
+        return scheduleRepository.findAllAlDaysByMemberId(memberId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Schedule getDetail(final long memberId, final long scheduleId) {
+        Schedule schedule = scheduleRepository.findById(scheduleId);
+        checkOwn(memberId, schedule);
+        ScheduleTag scheduleTag = scheduleTagRepository.findByScheduleId(scheduleId);
+        schedule.setTagId(scheduleTag.getTagId());
+        return schedule;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Schedule> getSchedules(final long memberId, final LocalDate date) {
+        MemberPersonalInfo memberPersonalInfo = memberPersonalInfoRepository.findByMemberId(memberId);
+        //만약에 date가 16일이야 그럼 memberPersonalInfo에 windDownTime을 가져와서 비교를 하는거지 그결과가 예를들어 windDownTime이 2시면
+        //startdateTime이 16일 2시부터 endDateTime이 17일 2시가 나올 수 있어야 해
+        //근데 windDownTime이 22시면 startDateTime이 15일 22시부터 16일 22가 나올 수 있어야 해
+//        LocalTime windDownTime = memberPersonalInfo.getWindDownTime();
+//        LocalDateTime startDateTime = date.minusDays(windDownTime.getHour() > 12 ? 1 : 0).atTime(windDownTime.getHour(), windDownTime.getMinute());
+//        LocalDateTime endDateTime = startDateTime.plusDays(1);
+        return scheduleRepository.findAllByStartDateAndMemberId(date, memberId);
     }
 
     private Schedule createSchedule(final ScheduleCreateCommand command, final String scheduleGroupId) {
