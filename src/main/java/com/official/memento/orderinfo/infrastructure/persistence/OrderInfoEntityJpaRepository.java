@@ -19,8 +19,8 @@ public interface OrderInfoEntityJpaRepository extends JpaRepository<OrderInfoEnt
                    o.planType AS planType,
                    o.createdAt As createdAt
             FROM OrderInfoEntity o
-            LEFT JOIN ToDoEntity t ON o.toDoId = t.id AND o.planType = 'ToDo'
-            LEFT JOIN ScheduleEntity s ON o.scheduleId = s.id AND o.planType = 'Schedule'
+            LEFT JOIN ToDoEntity t ON o.toDoId = t.id AND o.planType = 'TODO'
+            LEFT JOIN ScheduleEntity s ON o.scheduleId = s.id AND o.planType = 'SCHEDULE'
             WHERE DATE(o.date) = :startDate
             ORDER BY o.orderNum ASC, o.createdAt ASC
             """)

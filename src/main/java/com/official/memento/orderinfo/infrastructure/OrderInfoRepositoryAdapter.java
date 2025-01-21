@@ -47,7 +47,7 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
                         projection.getEndDate(),
                         projection.getPriorityValue(),
                         projection.getOrderNum(),
-                        projection.getEventType(),
+                        projection.getPlanType(),
                         projection.getCreatedAt()
                 ))
                 .toList();

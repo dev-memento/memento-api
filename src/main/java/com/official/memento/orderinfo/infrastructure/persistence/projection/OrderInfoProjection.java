@@ -19,7 +19,7 @@ public interface OrderInfoProjection {
 
     int getOrderNum();
 
-    PlanType getEventType();
+    PlanType getPlanType();
 
     LocalDateTime getCreatedAt();
 
