@@ -1,5 +1,6 @@
 package com.official.memento.schedule.infrastructure;
 
+import com.official.memento.global.entity.enums.RepeatOption;
 import com.official.memento.global.exception.EntityNotFoundException;
 import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.stereotype.Adapter;
@@ -7,7 +8,9 @@ import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.schedule.domain.ScheduleRepository;
 import com.official.memento.schedule.infrastructure.persistence.ScheduleEntity;
 import com.official.memento.schedule.infrastructure.persistence.ScheduleEntityJpaRepository;
+import com.official.memento.schedule.infrastructure.persistence.projection.ScheduleOrderInfoProjection;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -80,6 +83,73 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
         );
     }
 
+
+    @Override
+    public List<Schedule> findNonAllDaySchedulesWithOrderInfo(long memberId) {
+        List<ScheduleOrderInfoProjection> schedulesWithOrderInfo = scheduleEntityJpaRepository
+                .findNonAllDaySchedulesWithOrderInfo(memberId);
+        return schedulesWithOrderInfo.stream().map(scheduleEntity -> Schedule.withIdAndOrderAndTag(
+                scheduleEntity.getScheduleId(),
+                scheduleEntity.getMemberId(),
+                scheduleEntity.getDescription(),
+                scheduleEntity.getStartDate(),
+                scheduleEntity.getEndDate(),
+                scheduleEntity.getIsAllDay(),
+                scheduleEntity.getRepeatOption(),
+                scheduleEntity.getRepeatExpiredDate(),
+                scheduleEntity.getType(),
+                scheduleEntity.getScheduleGroupId(),
+                scheduleEntity.getCreatedAt(),
+                scheduleEntity.getUpdatedAt(),
+                scheduleEntity.getOrderNum(),
+                scheduleEntity.getTagName(),
+                scheduleEntity.getTagColor()
+        )).toList();
+    }
+
+    @Override
+    public List<Schedule> findAllAlDaysByMemberId(long memberId) {
+        List<ScheduleOrderInfoProjection> scheduleEntities = scheduleEntityJpaRepository.findAllDaySchedulesByMemberIdOrderedByStartDate(memberId);
+        return scheduleEntities.stream().map(scheduleEntity -> Schedule.withIdAndTag(
+                scheduleEntity.getScheduleId(),
+                scheduleEntity.getMemberId(),
+                scheduleEntity.getDescription(),
+                scheduleEntity.getStartDate(),
+                scheduleEntity.getEndDate(),
+                scheduleEntity.getIsAllDay(),
+                scheduleEntity.getRepeatOption(),
+                scheduleEntity.getRepeatExpiredDate(),
+                scheduleEntity.getType(),
+                scheduleEntity.getScheduleGroupId(),
+                scheduleEntity.getEndDate(),
+                scheduleEntity.getUpdatedAt(),
+                scheduleEntity.getTagName(),
+                scheduleEntity.getTagColor()
+        )).toList();
+    }
+
+    @Override
+    public List<Schedule> findAllByStartDateAndMemberId(final LocalDate startDate, final long memberId) {
+        List<ScheduleOrderInfoProjection> schedules = scheduleEntityJpaRepository.findSchedulesByMemberIdAndDateOrderedByOrderNum(memberId, startDate);
+        return schedules.stream().map(scheduleEntity -> Schedule.withIdAndOrderAndTag(
+                scheduleEntity.getScheduleId(),
+                scheduleEntity.getMemberId(),
+                scheduleEntity.getDescription(),
+                scheduleEntity.getStartDate(),
+                scheduleEntity.getEndDate(),
+                scheduleEntity.getIsAllDay(),
+                scheduleEntity.getRepeatOption(),
+                scheduleEntity.getRepeatExpiredDate(),
+                scheduleEntity.getType(),
+                scheduleEntity.getScheduleGroupId(),
+                scheduleEntity.getCreatedAt(),
+                scheduleEntity.getUpdatedAt(),
+                scheduleEntity.getOrderNum(),
+                scheduleEntity.getTagName(),
+                scheduleEntity.getTagColor()
+        )).toList();
+    }
+
     @Override
     public List<Schedule> findAllByScheduleGroupId(final String scheduleGroupId) {
         List<ScheduleEntity> scheduleEntities = scheduleEntityJpaRepository.findAllByScheduleGroupId(scheduleGroupId);
@@ -128,4 +198,5 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
         List<ScheduleEntity> scheduleEntities = schedules.stream().map(ScheduleEntity::withId).toList();
         scheduleEntityJpaRepository.deleteAll(scheduleEntities);
     }
+
 }
