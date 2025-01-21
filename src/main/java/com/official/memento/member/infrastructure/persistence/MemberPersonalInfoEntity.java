@@ -13,7 +13,7 @@ public class MemberPersonalInfoEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long memberId;
+    private long memberId;
 
     private LocalTime wakeUpTime;
 
@@ -36,7 +36,7 @@ public class MemberPersonalInfoEntity {
     }
 
     private MemberPersonalInfoEntity(
-            final Long memberId,
+            final long memberId,
             final LocalTime wakeUpTime,
             final LocalTime windDownTime,
             final JobType job,
@@ -58,7 +58,7 @@ public class MemberPersonalInfoEntity {
     }
 
     public static MemberPersonalInfoEntity of(
-            final Long memberId,
+            final long memberId,
             final LocalTime wakeUpTime,
             final LocalTime windDownTime,
             final JobType job,
@@ -83,7 +83,7 @@ public class MemberPersonalInfoEntity {
         return id;
     }
 
-    public Long getMemberId() {
+    public long getMemberId() {
         return memberId;
     }
 

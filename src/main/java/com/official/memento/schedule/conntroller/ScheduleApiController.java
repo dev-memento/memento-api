@@ -1,5 +1,7 @@
 package com.official.memento.schedule.conntroller;
 
+import com.official.memento.global.annotation.Authorization;
+import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
 import com.official.memento.schedule.conntroller.dto.request.RepeatScheduleCreateRequest;
 import com.official.memento.schedule.conntroller.dto.request.ScheduleCreateRequest;
@@ -20,7 +22,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/schedules")
-public class ScheduleApiController {
+public class ScheduleApiController implements ScheduleApiDocs {
 
     private final ScheduleCreateUseCase scheduleCreateUseCase;
     private final RepeatScheduleCreateUseCase repeatScheduleCreateUseCase;
@@ -50,8 +52,9 @@ public class ScheduleApiController {
     }
 
     @PostMapping
-    ResponseEntity<SuccessResponse<?>> createSchedule(
-            //@Authorization final AuthorizationUser authorizationUser,
+    @Override
+    public ResponseEntity<SuccessResponse<?>> createSchedule(
+            @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final ScheduleCreateRequest scheduleCreateRequest
     ) {
         scheduleCreateUseCase.create(
@@ -71,8 +74,9 @@ public class ScheduleApiController {
     }
 
     @PostMapping("/repetition")
-    ResponseEntity<SuccessResponse<?>> createScheduleMultiple(
-            //@Authorization final AuthorizationUser authorizationUser,
+    @Override
+    public ResponseEntity<SuccessResponse<?>> createScheduleMultiple(
+            @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final RepeatScheduleCreateRequest repeatScheduleCreateRequest
     ) {
         repeatScheduleCreateUseCase.createRepeat(
@@ -94,8 +98,9 @@ public class ScheduleApiController {
     }
 
     @DeleteMapping("/{scheduleId}")
-    ResponseEntity<SuccessResponse<?>> deleteSchedule(
-            //@Authorization final AuthorizationUser authorizationUser,
+    @Override
+    public ResponseEntity<SuccessResponse<?>> deleteSchedule(
+            @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long scheduleId
     ) {
         scheduleDeleteUseCase.delete(ScheduleDeleteCommand.of(1, scheduleId));
@@ -106,8 +111,9 @@ public class ScheduleApiController {
     }
 
     @DeleteMapping("/{scheduleId}/group")
-    ResponseEntity<SuccessResponse<?>> deleteScheduleGroup(
-            //@Authorization final AuthorizationUser authorizationUser,
+    @Override
+    public ResponseEntity<SuccessResponse<?>> deleteScheduleGroup(
+            @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long scheduleId,
             @RequestParam final String scheduleGroupId
     ) {
@@ -119,8 +125,9 @@ public class ScheduleApiController {
     }
 
     @PatchMapping("/{scheduleId}")
-    ResponseEntity<SuccessResponse<?>> updateSchedule(
-            //@Authorization final AuthorizationUser authorizationUser,
+    @Override
+    public ResponseEntity<SuccessResponse<?>> updateSchedule(
+            @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long scheduleId,
             @RequestBody final ScheduleUpdateRequest scheduleUpdateRequest
     ) {
@@ -140,8 +147,9 @@ public class ScheduleApiController {
     }
 
     @PatchMapping("/{scheduleId}/group")
-    ResponseEntity<SuccessResponse<?>> updateScheduleGroup(
-            //@Authorization final AuthorizationUser authorizationUser,
+    @Override
+    public ResponseEntity<SuccessResponse<?>> updateScheduleGroup(
+            @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long scheduleId,
             @RequestBody final ScheduleUpdateGroupRequest scheduleUpdateGroupRequest
     ) {

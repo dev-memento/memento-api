@@ -31,9 +31,9 @@ public class AuthApiController {
 
         final AuthApiResponse response = new AuthApiResponse(
                 "소셜 로그인 성공",
-                authResult.getAccessToken().getToken(), // Access Token
-                authResult.getAuthorizationMember().getRefreshToken().getToken(),
-                authResult.getAuthorizationMember().isNewUser()
+                authResult.getAccessToken().getToken(),
+                authResult.getRefreshToken().getToken(),
+                authResult.isNewUser()
         );
         return SuccessResponse.of(HttpStatus.OK, "소셜 로그인 성공", response);
     }
