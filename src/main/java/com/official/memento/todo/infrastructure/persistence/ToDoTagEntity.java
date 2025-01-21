@@ -1,6 +1,7 @@
 package com.official.memento.todo.infrastructure.persistence;
 
 import com.official.memento.global.entity.BaseTimeEntity;
+import com.official.memento.tag.infrastructure.persistence.TagEntity;
 import com.official.memento.todo.domain.ToDoTag;
 import jakarta.persistence.*;
 

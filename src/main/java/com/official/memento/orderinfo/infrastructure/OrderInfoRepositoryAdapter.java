@@ -36,6 +36,11 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
     }
 
     @Override
+    public void deleteByToDoId(long toDoId){
+        orderInfoEntityJpaRepository.deleteByToDoId(toDoId);
+    }
+
+    @Override
     public List<OrderWithScheduleOrToDo> findOrderInfoWithDetails(final LocalDate startDate) {
         List<OrderInfoProjection> projections = orderInfoEntityJpaRepository.findOrderInfoWithDetails(startDate);
         return projections.stream()
@@ -51,5 +56,12 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
                         projection.getCreatedAt()
                 ))
                 .toList();
+    }
+
+    @Override
+    public Integer findOrderByToDoId(Long toDoId) {
+        return orderInfoEntityJpaRepository.findOrderByToDoId(toDoId)
+                .map(orderInfo -> orderInfo.getOrderNum()) // 예: orderNum 필드 가져오기
+                .orElse(null); // 결과가 없을 경우 null 반환
     }
 }

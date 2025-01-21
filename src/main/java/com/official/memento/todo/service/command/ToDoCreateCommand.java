@@ -6,9 +6,9 @@ import java.time.LocalDate;
 
 public record ToDoCreateCommand(
         long memberId,
-        LocalDate date,
+        LocalDate startDate,
         String description,
-        LocalDate deadline,
+        LocalDate endDate,
         RepeatOption repeatOption,
         LocalDate repeatExpiredDate,
         Long tagId,
@@ -17,9 +17,9 @@ public record ToDoCreateCommand(
 ) {
     public static ToDoCreateCommand of(
             final long memberId,
-            final LocalDate date,
+            final LocalDate startDate,
             final String description,
-            final LocalDate deadline,
+            final LocalDate endDate,
             final RepeatOption repeatOption,
             final LocalDate repeatExpiredDate,
             final Long tagId,
@@ -28,9 +28,9 @@ public record ToDoCreateCommand(
     ) {
         return new ToDoCreateCommand(
                 memberId,
-                date,
+                startDate,
                 description,
-                deadline,
+                endDate,
                 repeatOption,
                 repeatExpiredDate,
                 tagId,

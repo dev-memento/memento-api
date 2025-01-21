@@ -7,14 +7,20 @@ import com.official.memento.todo.domain.ToDo;
 import com.official.memento.todo.domain.ToDoRepository;
 import com.official.memento.todo.infrastructure.persistence.ToDoEntity;
 import com.official.memento.todo.infrastructure.persistence.ToDoJpaRepository;
+import com.official.memento.todo.infrastructure.persistence.ToDoTagJpaRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Adapter
 public class ToDoRepositoryAdapter implements ToDoRepository {
 
     private final ToDoJpaRepository toDoJpaRepository;
+    private final ToDoTagJpaRepository toDoTagJpaRepository;
 
-    public ToDoRepositoryAdapter(final ToDoJpaRepository toDoJpaRepository) {
+    public ToDoRepositoryAdapter(ToDoJpaRepository toDoJpaRepository, ToDoTagJpaRepository toDoTagJpaRepository) {
         this.toDoJpaRepository = toDoJpaRepository;
+        this.toDoTagJpaRepository = toDoTagJpaRepository;
     }
 
     @Override
@@ -24,9 +30,9 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
                 toDoEntity.getId(),
                 toDoEntity.getMemberId(),
                 toDoEntity.getGroupId(),
-                toDoEntity.getDate(),
+                toDoEntity.getStartDate(),
                 toDoEntity.getDescription(),
-                toDoEntity.getDeadline(),
+                toDoEntity.getEndDate(),
                 toDoEntity.getIsCompleted(),
                 toDoEntity.getRepeatOption(),
                 toDoEntity.getRepeatExpiredDate(),
@@ -47,9 +53,9 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
                 toDoEntity.getId(),
                 toDoEntity.getMemberId(),
                 toDoEntity.getGroupId(),
-                toDoEntity.getDate(),
+                toDoEntity.getStartDate(),
                 toDoEntity.getDescription(),
-                toDoEntity.getDeadline(),
+                toDoEntity.getEndDate(),
                 toDoEntity.getIsCompleted(),
                 toDoEntity.getRepeatOption(),
                 toDoEntity.getRepeatExpiredDate(),
@@ -73,9 +79,9 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
                 toDoEntity.getId(),
                 toDoEntity.getMemberId(),
                 toDoEntity.getGroupId(),
-                toDoEntity.getDate(),
+                toDoEntity.getStartDate(),
                 toDoEntity.getDescription(),
-                toDoEntity.getDeadline(),
+                toDoEntity.getEndDate(),
                 toDoEntity.getIsCompleted(),
                 toDoEntity.getRepeatOption(),
                 toDoEntity.getRepeatExpiredDate(),
@@ -92,5 +98,32 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
     @Override
     public void deleteById(final long toDoId) {
         toDoJpaRepository.deleteById(toDoId);
+    }
+
+
+    @Override
+    public List<ToDo> findAllByMemberId(long memberId) {
+        List<ToDoEntity> toDoEntityList = toDoJpaRepository.findAllByMemberId(memberId);
+        return toDoEntityList.stream()
+                .map(
+                        t -> ToDo.withId(
+                                t.getId(),
+                                t.getMemberId(),
+                                t.getGroupId(),
+                                t.getStartDate(),
+                                t.getDescription(),
+                                t.getEndDate(),
+                                t.getIsCompleted(),
+                                t.getRepeatOption(),
+                                t.getRepeatExpiredDate(),
+                                t.getPriorityUrgency(),
+                                t.getPriorityImportance(),
+                                t.getPriorityValue(),
+                                t.getPriorityType(),
+                                t.getType(),
+                                t.getCreatedAt(),
+                                t.getUpdatedAt()
+                        )
+                ).toList();
     }
 }

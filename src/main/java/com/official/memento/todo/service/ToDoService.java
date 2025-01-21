@@ -1,12 +1,20 @@
 package com.official.memento.todo.service;
 
 import com.official.memento.global.entity.enums.RepeatOption;
+import com.official.memento.orderinfo.domain.OrderInfo;
+import com.official.memento.orderinfo.domain.OrderInfoRepository;
+import com.official.memento.orderinfo.domain.OrderWithScheduleOrToDo;
+import com.official.memento.orderinfo.domain.PlanType;
+import com.official.memento.schedule.domain.entity.Schedule;
+import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.TagRepository;
+import com.official.memento.todo.controller.dto.ToDoGetResponse;
 import com.official.memento.todo.domain.ToDo;
 import com.official.memento.todo.domain.ToDoRepository;
 import com.official.memento.todo.domain.ToDoTag;
 import com.official.memento.todo.domain.ToDoTagRepository;
 import com.official.memento.todo.domain.enums.PriorityType;
+import com.official.memento.todo.infrastructure.persistence.ToDoTagEntity;
 import com.official.memento.todo.service.command.ToDoCompletionUpdateCommand;
 import com.official.memento.todo.service.command.ToDoCreateCommand;
 import com.official.memento.todo.service.command.ToDoDeleteCommand;
@@ -16,25 +24,29 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static com.official.memento.todo.domain.enums.ToDoType.NORMAL;
 
 @Service
-public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUpdateUseCase {
+public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUpdateUseCase, ToDoGetUseCase{
 
     private final ToDoRepository toDoRepository;
     private final ToDoTagRepository toDoTagRepository;
     private final TagRepository tagRepository;
+    private final OrderInfoRepository orderInfoRepository;
 
     public ToDoService(
             final ToDoRepository toDoRepository,
             final ToDoTagRepository toDoTagRepository,
-            final TagRepository tagRepository
+            final TagRepository tagRepository,
+            final OrderInfoRepository orderInfoRepository
     ) {
         this.toDoRepository = toDoRepository;
         this.toDoTagRepository = toDoTagRepository;
         this.tagRepository = tagRepository;
+        this.orderInfoRepository = orderInfoRepository;
     }
 
     @Override
@@ -46,7 +58,6 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         } else {
             createRepeatToDos(command, toDoGroupId);
         }
-        //TODO 순서 관련 로직 추가
     }
 
     @Override
@@ -56,7 +67,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         checkOwn(toDoDeleteCommand.memberId(), toDo);
         toDoRepository.deleteById(toDo.getId());
         toDoTagRepository.deleteByToDoId(toDo.getId());
-        //TODO 순서 관련 로직 삭제
+        orderInfoRepository.deleteByToDoId(toDo.getId());
     }
 
     @Override
@@ -65,15 +76,19 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         ToDo toDo = toDoRepository.findById(command.toDoId());
         checkOwn(command.memberId(), toDo);
         toDo.update(
-                command.date(),
+                command.startDate(),
                 command.description(),
-                command.deadline(),
+                command.endDate(),
                 command.priorityUrgency(),
                 command.priorityImportance()
         );
         toDoRepository.update(toDo);
         updateOrDeleteTag(toDo, command.tagId());
-        //TODO 순서 관련 로직 수정
+
+        if (toDo.getStartDate() != command.startDate() || toDo.getEndDate() != command.endDate()) {
+            orderInfoRepository.deleteByToDoId(toDo.getId());
+            assignOrder(command.startDate(), toDo);
+        }
     }
 
     @Override
@@ -92,16 +107,16 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
     private void createSingleToDo(final ToDoCreateCommand command, final String toDoGroupId) {
         Double priorityValue = calculatePriorityValue(command.priorityUrgency(), command.priorityImportance());
         PriorityType priorityType = determinePriorityType(command.priorityUrgency(), command.priorityImportance());
-
-        ToDo toDo = createToDo(command, toDoGroupId, priorityValue, priorityType, command.date());
+        ToDo toDo = createToDo(command, toDoGroupId, priorityValue, priorityType, command.startDate());
 
         if (command.tagId() != null) {
             connectTag(command.tagId(), toDo);
         }
+        assignOrder(command.startDate(), toDo);
     }
 
     private void createRepeatToDos(final ToDoCreateCommand command, final String toDoGroupId) {
-        LocalDate currentDate = command.date();
+        LocalDate currentDate = command.startDate();
         LocalDate repeatExpiredDate = command.repeatExpiredDate();
 
         while (!currentDate.isAfter(repeatExpiredDate)) {
@@ -123,6 +138,8 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
             } else {
                 currentDate = currentDate.plusYears(1);
             }
+
+            assignOrder(command.startDate(), toDo);
         }
     }
 
@@ -131,14 +148,14 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
             final String toDoGroupId,
             final Double priorityValue,
             final PriorityType priorityType,
-            final LocalDate date
+            final LocalDate startDate
     ) {
         return toDoRepository.save(ToDo.of(
                 command.memberId(),
                 toDoGroupId,
-                date,
+                startDate,
                 command.description(),
-                command.deadline(),
+                command.endDate(),
                 false,
                 command.repeatOption(),
                 command.repeatExpiredDate(),
@@ -156,7 +173,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
 
     private Double calculatePriorityValue(Double priorityUrgency, Double priorityImportance) {
         if (priorityUrgency != null && priorityImportance != null) {
-            return (priorityUrgency * 0.7) + (priorityImportance * 0.3);
+            return (priorityUrgency * 0.3) + (priorityImportance * 0.7);
         } else {
             return -1.0;
         }
@@ -190,9 +207,91 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         }
     }
 
-
-    //TODO 순서 로직
-    private int determineOrder() {
-        return 0;
+    // 순서 관련 로직
+    private void assignOrder(LocalDate date, ToDo toDo) {
+        // 해당 날짜에 해당하는 ToDO 찾기
+        List<OrderWithScheduleOrToDo> toDoList = orderInfoRepository.findOrderInfoWithDetails(date);
+        // 순서 정렬
+        int insertOrder = getInsertOrder(date, toDoList, toDo);
+        // 순서 저장
+        createOrderInfo(date, toDo, insertOrder);
     }
+
+    private int getInsertOrder(final LocalDate date, final List<OrderWithScheduleOrToDo> toDoList, final ToDo toDo) {
+        int insertOrder = 1;
+        boolean isInserted = false;
+        for (OrderWithScheduleOrToDo existingOrder : toDoList) {
+
+            System.out.println("들어오는 것");
+            System.out.println(toDo.getPriorityValue());
+            System.out.println("원래 있던 것");
+            System.out.println(existingOrder.getPriorityValue());
+
+            //순서정보중 투두의 시간을 고려하여 삽입해야할 위치 선정
+            if (!isInserted && existingOrder.getType() == PlanType.TODO) {
+                if (toDo.getPriorityValue() > existingOrder.getPriorityValue()) {
+                    insertOrder = existingOrder.getOrder();
+                    isInserted = true;
+                    System.out.println(1);
+                }
+                // 2순위: priorityValue가 같다면 createdAt 비교
+                else if (toDo.getPriorityValue().equals(existingOrder.getPriorityValue())) {
+                    if (toDo.getCreatedAt().isBefore(existingOrder.getCreatedAt())) {
+                        insertOrder = existingOrder.getOrder();
+                        isInserted = true;
+                    }
+                    System.out.println(2);
+                }
+            }
+
+            //삽입 된 곳 이후의 순서정보들을 1씩 증가
+            if (isInserted) {
+                existingOrder.shiftBack();
+                orderInfoRepository.update(
+                        OrderInfo.withId(
+                                existingOrder.getOrderInfoId(),
+                                existingOrder.getScheduleId(),
+                                existingOrder.getToDoId(),
+                                existingOrder.getOrder(),
+                                date,
+                                existingOrder.getType(),
+                                existingOrder.getCreatedAt()
+                        ));
+                System.out.println(3);
+            }
+        }
+
+        //위 로직에 걸리지 않았을 경우 -> 빈리스트거나 가장 마지막에 추가되는 순서정보
+        if (!isInserted) {
+            insertOrder = toDoList.isEmpty() ? 1 : toDoList.get(toDoList.size() - 1).getOrder() + 1;
+            System.out.println(4);
+        }
+        return insertOrder;
+    }
+
+    private void createOrderInfo(final LocalDate date, final ToDo toDo, final int insertOrder) {
+        orderInfoRepository.save(OrderInfo.of(
+                null,
+                toDo.getId(),
+                insertOrder,
+                date,
+                PlanType.TODO,
+                LocalDateTime.now()
+        ));
+    }
+
+    public List<ToDo> getToDos(final long memberId) {
+        List<ToDo> todos = toDoRepository.findAllByMemberId(memberId);
+        return todos.stream()
+                .peek(todo -> {
+                    Integer order = orderInfoRepository.findOrderByToDoId(todo.getId());
+                    ToDoTag toDoTag = toDoTagRepository.findByToDoId(todo.getId());
+                    Tag tag = tagRepository.findById(toDoTag.getTagId());
+
+                    todo.setOrderNum(order);
+                    todo.setTag(tag);
+                })
+                .toList();
+    }
+
 }
