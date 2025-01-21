@@ -40,3 +40,4 @@ out/
 .kotlin
 
 application-secret.yml
+braindump-prompt.txt

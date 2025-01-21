@@ -4,6 +4,7 @@ import com.official.memento.global.entity.BaseTimeEntity;
 import com.official.memento.global.entity.enums.RepeatOption;
 import com.official.memento.todo.domain.enums.PriorityType;
 import com.official.memento.todo.domain.enums.ToDoType;
+import com.official.memento.todo.domain.vo.BrainDump;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
