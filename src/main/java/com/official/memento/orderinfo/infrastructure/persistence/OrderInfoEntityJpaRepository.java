@@ -1,11 +1,14 @@
 package com.official.memento.orderinfo.infrastructure.persistence;
 
+import aj.org.objectweb.asm.commons.Remapper;
 import com.official.memento.orderinfo.infrastructure.persistence.projection.OrderInfoProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderInfoEntityJpaRepository extends JpaRepository<OrderInfoEntity, Long> {
     @Query("""
@@ -19,12 +22,17 @@ public interface OrderInfoEntityJpaRepository extends JpaRepository<OrderInfoEnt
                    o.planType AS planType,
                    o.createdAt As createdAt
             FROM OrderInfoEntity o
-            LEFT JOIN ToDoEntity t ON o.toDoId = t.id AND o.planType = 'ToDo'
-            LEFT JOIN ScheduleEntity s ON o.scheduleId = s.id AND o.planType = 'Schedule'
+            LEFT JOIN ToDoEntity t ON o.toDoId = t.id AND o.planType = 'TODO'
+            LEFT JOIN ScheduleEntity s ON o.scheduleId = s.id AND o.planType = 'SCHEDULE'
             WHERE DATE(o.date) = :startDate
             ORDER BY o.orderNum ASC, o.createdAt ASC
             """)
     List<OrderInfoProjection> findOrderInfoWithDetails(final LocalDate startDate);
 
     void deleteByScheduleId(final long scheduleId);
+
+    void deleteByToDoId(final long toDoId);
+
+    @Query("SELECT o FROM OrderInfoEntity o WHERE o.toDoId = :toDoId")
+    Optional<OrderInfoEntity> findOrderByToDoId(@Param("toDoId") Long toDoId);
 }

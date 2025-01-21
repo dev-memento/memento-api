@@ -19,9 +19,9 @@ public class ToDoEntity extends BaseTimeEntity {
     private Long id;
     private long memberId;
     private String groupId;
-    private LocalDate date;
+    private LocalDate startDate;
     private String description;
-    private LocalDate deadline;
+    private LocalDate endDate;
     private boolean isCompleted;
     @Enumerated(EnumType.STRING)
     private RepeatOption repeatOption;
@@ -41,9 +41,9 @@ public class ToDoEntity extends BaseTimeEntity {
             final long id,
             final long memberId,
             final String groupId,
-            final LocalDate date,
+            final LocalDate startDate,
             final String description,
-            final LocalDate deadline,
+            final LocalDate endDate,
             final boolean isCompleted,
             final RepeatOption repeatOption,
             final LocalDate repeatExpiredDate,
@@ -58,9 +58,9 @@ public class ToDoEntity extends BaseTimeEntity {
         this.id=id;
         this.memberId = memberId;
         this.groupId = groupId;
-        this.date = date;
+        this.startDate = startDate;
         this.description = description;
-        this.deadline = deadline;
+        this.endDate = endDate;
         this.isCompleted = isCompleted;
         this.repeatOption = repeatOption;
         this.repeatExpiredDate = repeatExpiredDate;
@@ -76,9 +76,9 @@ public class ToDoEntity extends BaseTimeEntity {
     private ToDoEntity(
             final long memberId,
             final String groupId,
-            final LocalDate date,
+            final LocalDate startDate,
             final String description,
-            final LocalDate deadline,
+            final LocalDate endDate,
             final boolean isCompleted,
             final RepeatOption repeatOption,
             final LocalDate repeatExpiredDate,
@@ -92,9 +92,9 @@ public class ToDoEntity extends BaseTimeEntity {
     ){
         this.memberId = memberId;
         this.groupId = groupId;
-        this.date = date;
+        this.startDate = startDate;
         this.description = description;
-        this.deadline = deadline;
+        this.endDate = endDate;
         this.isCompleted = isCompleted;
         this.repeatOption = repeatOption;
         this.repeatExpiredDate = repeatExpiredDate;
@@ -111,9 +111,9 @@ public class ToDoEntity extends BaseTimeEntity {
         return new ToDoEntity(
                 toDo.getMemberId(),
                 toDo.getGroupId(),
-                toDo.getDate(),
+                toDo.getStartDate(),
                 toDo.getDescription(),
-                toDo.getDeadline(),
+                toDo.getEndDate(),
                 toDo.getIsCompleted(),
                 toDo.getRepeatOption(),
                 toDo.getRepeatExpiredDate(),
@@ -132,9 +132,9 @@ public class ToDoEntity extends BaseTimeEntity {
                 toDo.getId(),
                 toDo.getMemberId(),
                 toDo.getGroupId(),
-                toDo.getDate(),
+                toDo.getStartDate(),
                 toDo.getDescription(),
-                toDo.getDeadline(),
+                toDo.getEndDate(),
                 toDo.getIsCompleted(),
                 toDo.getRepeatOption(),
                 toDo.getRepeatExpiredDate(),
@@ -149,15 +149,15 @@ public class ToDoEntity extends BaseTimeEntity {
     }
 
     public void update(
-            final LocalDate date,
+            final LocalDate startDate,
             final String description,
-            final LocalDate deadline,
+            final LocalDate endDate,
             final Double priorityUrgency,
             final Double priorityImportance
     ){
-        this.date=date;
+        this.startDate=startDate;
         this.description=description;
-        this.deadline=deadline;
+        this.endDate =endDate;
         this.priorityUrgency = priorityUrgency;
         this.priorityImportance=priorityImportance;
 
@@ -175,16 +175,16 @@ public class ToDoEntity extends BaseTimeEntity {
         return groupId;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public LocalDate getDeadline() {
-        return deadline;
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
     public boolean getIsCompleted() {
