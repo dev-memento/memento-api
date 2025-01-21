@@ -33,6 +33,7 @@ public class MemberPersonalInfoService implements MemberPersonalInfoUpdateUseCas
                         command.isPreferReminder(),
                         command.isImportantBreaks()
                 );
+        memberPersonalInfoRepository.update(memberPersonalInfo);
     }
 
     @Override
