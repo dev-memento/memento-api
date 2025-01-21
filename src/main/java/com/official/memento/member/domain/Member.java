@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 public class Member extends BaseTimeEntity {
     private final Long id;
+    private String email;
 
     public Member(Long id, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
@@ -16,6 +17,14 @@ public class Member extends BaseTimeEntity {
     public static Member createNew() {
         LocalDateTime now = LocalDateTime.now();
         return new Member(null, now, now);
+    }
+
+    private Member(Long id) {
+        this.id = id;
+    }
+
+    public static Member fromId(Long memberId) {
+        return new Member(memberId);
     }
 
     public static Member withId(Long id, LocalDateTime createdAt, LocalDateTime updatedAt) {

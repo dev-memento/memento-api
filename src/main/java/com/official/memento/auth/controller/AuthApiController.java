@@ -2,7 +2,6 @@ package com.official.memento.auth.controller;
 
 import com.official.memento.auth.controller.dto.AuthApiRequest;
 import com.official.memento.auth.controller.dto.AuthApiResponse;
-import com.official.memento.auth.domain.AuthorizationMember;
 import com.official.memento.auth.service.AuthResult;
 import com.official.memento.auth.service.AuthService;
 import com.official.memento.auth.service.command.AuthCommand;

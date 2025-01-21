@@ -45,7 +45,7 @@ public class AuthService implements AuthUseCase {
     @Override
     @Transactional
     public AuthResult authenticate(final AuthCommand command) {
-        final AuthProvider provider = getAuthProvider(command.providerName());
+        final AuthProvider provider = command.providerName();
         final Map<String, Object> tokenInfo = verifyIdToken(provider, command.idToken());
 
         final String platformId = (String) tokenInfo.get("sub");
@@ -56,19 +56,15 @@ public class AuthService implements AuthUseCase {
 
         boolean isNewUser = memberRepository.findPersonalInfoByMemberId(auth.getMemberId()).isEmpty();
 
-        AccessToken accessToken = jwtUtil.generateAccessToken(String.valueOf(auth.getMemberId()));
-        RefreshToken refreshToken = jwtUtil.generateRefreshToken(String.valueOf(auth.getMemberId()));
+        AccessToken accessToken = jwtUtil.generateAccessToken(auth.getMemberId());
+        RefreshToken refreshToken = jwtUtil.generateRefreshToken(auth.getMemberId());
 
         auth.withUpdatedToken(refreshToken.getToken());
         authRepository.save(auth);
 
-        Member member = new Member(
-                auth.getId(),
-                null,
-                null
-        );
+        Member member = Member.fromId(auth.getId());
 
-        return new AuthResult(accessToken, refreshToken, member, isNewUser);
+        return AuthResult.of(accessToken, refreshToken, member, isNewUser);
     }
 
     @Transactional
@@ -78,15 +74,6 @@ public class AuthService implements AuthUseCase {
         MemberPersonalInfo personalInfo = MemberPersonalInfo.of(newMember.getId());
         memberPersonalInfoRepository.create(personalInfo);
         return authRepository.save(newAuth);
-    }
-
-    @Transactional
-    private AuthProvider getAuthProvider(final String providerName) {
-        try {
-            return AuthProvider.valueOf(providerName.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new MementoException(ErrorCode.UNSUPPORTED_PROVIDER);
-        }
     }
 
     @Transactional

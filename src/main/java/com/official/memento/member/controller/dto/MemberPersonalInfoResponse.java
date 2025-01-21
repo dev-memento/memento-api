@@ -25,7 +25,6 @@ public record MemberPersonalInfoResponse(
         Boolean isImportantBreaks
 ) {
     public static MemberPersonalInfoResponse of(
-            final Long memberId,
             final LocalTime wakeUpTime,
             final LocalTime windDownTime,
             final JobType job,

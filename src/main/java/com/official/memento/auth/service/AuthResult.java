@@ -12,11 +12,20 @@ public class AuthResult {
     private final Member member;
     private final boolean isNewUser;
 
-    public AuthResult(AccessToken accessToken, RefreshToken refreshToken, Member member, boolean isNewUser) {
+    private AuthResult(AccessToken accessToken, RefreshToken refreshToken, Member member, boolean isNewUser) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.member = member;
         this.isNewUser = isNewUser;
+    }
+    
+    public static AuthResult of(
+            AccessToken accessToken,
+            RefreshToken refreshToken,
+            Member member,
+            boolean isNewUser
+    ) {
+        return new AuthResult(accessToken, refreshToken, member, isNewUser);
     }
 
     public AccessToken getAccessToken() {
