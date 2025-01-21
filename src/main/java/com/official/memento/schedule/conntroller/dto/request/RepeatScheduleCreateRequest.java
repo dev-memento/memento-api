@@ -11,19 +11,19 @@ import static com.official.memento.global.exception.ErrorCode.NULL_DATA_ERROR;
 
 @Schema(name = "반복 일정 생성 요청")
 public record RepeatScheduleCreateRequest(
-        @Schema(description = "일정 내용")
+        @Schema(description = "일정 내용", example = "일정디스크립션")
         String description,
-        @Schema(description = "일정 시작 날짜")
+        @Schema(description = "일정 시작 날짜", example = "2025-01-20T10:00:00")
         LocalDateTime startDate,
-        @Schema(description = "일정 종료 날짜")
+        @Schema(description = "일정 종료 날짜", example = "2025-01-20T12:00:00")
         LocalDateTime endDate,
-        @Schema(description = "AllDay 여부")
+        @Schema(description = "AllDay 여부", example = "true")
         boolean isAllDay,
-        @Schema(description = "반복 옵션")
+        @Schema(description = "반복 옵션", example = "NONE, DAILY, WEEKLY, MONTHLY, YEARLY")
         RepeatOption repeatOption,
-        @Schema(description = "반복 종료 날짜")
+        @Schema(description = "반복 종료 날짜", example = "2025-01-20")
         LocalDate repeatExpiredDate,
-        @Schema(description = "태그 아이디")
+        @Schema(description = "태그 아이디", example = "1")
         Long tagId
 ) {
     public RepeatScheduleCreateRequest(
