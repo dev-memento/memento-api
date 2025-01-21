@@ -2,6 +2,7 @@ package com.official.memento.tag.domain.enums;
 
 public enum TagColor {
 
+    GRAY05("#A9ADBB"),
     RED("#FF426E"),
     PINK("#EE8AAD"),
     ORANGE("#FF8162"),

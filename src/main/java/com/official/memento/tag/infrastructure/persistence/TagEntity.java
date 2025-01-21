@@ -20,6 +20,7 @@ public class TagEntity {
      태그 color
      */
     @Enumerated(EnumType.STRING)
+    @Column(name = "color")
     private TagColor color;
 
     /*

@@ -3,6 +3,8 @@ package com.official.memento.schedule.domain.entity;
 import com.official.memento.global.entity.BaseTimeEntity;
 import com.official.memento.global.entity.enums.RepeatOption;
 import com.official.memento.schedule.domain.enums.ScheduleType;
+import com.official.memento.tag.domain.Tag;
+import com.official.memento.tag.domain.enums.TagColor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,7 +20,10 @@ public class Schedule extends BaseTimeEntity {
     private LocalDate repeatExpiredDate;
     private ScheduleType type;
     private String scheduleGroupId;
-
+    private Integer orderNum;
+    private Long tagId;
+    private String tagName;
+    private TagColor tagColor;
 
     private Schedule(
             final Long id,
@@ -46,6 +51,72 @@ public class Schedule extends BaseTimeEntity {
         this.scheduleGroupId = scheduleGroupId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    private Schedule(
+            final Long id,
+            final long memberId,
+            final String description,
+            final LocalDateTime startDate,
+            final LocalDateTime endDate,
+            final boolean isAllDay,
+            final RepeatOption repeatOption,
+            final LocalDate repeatExpiredDate,
+            final ScheduleType type,
+            final String scheduleGroupId,
+            final LocalDateTime createdAt,
+            final LocalDateTime updatedAt,
+            final int orderNum,
+            final String tagName,
+            final TagColor tagColor
+            ) {
+        this.id = id;
+        this.memberId = memberId;
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.isAllDay = isAllDay;
+        this.repeatOption = repeatOption;
+        this.repeatExpiredDate = repeatExpiredDate;
+        this.type = type;
+        this.scheduleGroupId = scheduleGroupId;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.orderNum = orderNum;
+        this.tagName = tagName;
+        this.tagColor = tagColor;
+    }
+
+    private Schedule(
+            final Long id,
+            final long memberId,
+            final String description,
+            final LocalDateTime startDate,
+            final LocalDateTime endDate,
+            final boolean isAllDay,
+            final RepeatOption repeatOption,
+            final LocalDate repeatExpiredDate,
+            final ScheduleType type,
+            final String scheduleGroupId,
+            final LocalDateTime createdAt,
+            final LocalDateTime updatedAt,
+            final String tagName,
+            final TagColor tagColor
+    ) {
+        this.id = id;
+        this.memberId = memberId;
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.isAllDay = isAllDay;
+        this.repeatOption = repeatOption;
+        this.repeatExpiredDate = repeatExpiredDate;
+        this.type = type;
+        this.scheduleGroupId = scheduleGroupId;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.tagName = tagName;
+        this.tagColor = tagColor;
     }
 
     private Schedule(
@@ -97,6 +168,76 @@ public class Schedule extends BaseTimeEntity {
                 scheduleGroupId,
                 createdAt,
                 updatedAt
+        );
+    }
+
+    public static Schedule withIdAndTag(
+            final Long id,
+            final long memberId,
+            final String description,
+            final LocalDateTime startDate,
+            final LocalDateTime endDate,
+            final boolean isAllDay,
+            final RepeatOption repeatOption,
+            final LocalDate repeatExpiredDate,
+            final ScheduleType type,
+            final String scheduleGroupId,
+            final LocalDateTime createdAt,
+            final LocalDateTime updatedAt,
+            final String tagName,
+            final TagColor tagColor
+    ) {
+        return new Schedule(
+                id,
+                memberId,
+                description,
+                startDate,
+                endDate,
+                isAllDay,
+                repeatOption,
+                repeatExpiredDate,
+                type,
+                scheduleGroupId,
+                createdAt,
+                updatedAt,
+                tagName,
+                tagColor
+        );
+    }
+
+    public static Schedule withIdAndOrderAndTag(
+            final Long id,
+            final long memberId,
+            final String description,
+            final LocalDateTime startDate,
+            final LocalDateTime endDate,
+            final boolean isAllDay,
+            final RepeatOption repeatOption,
+            final LocalDate repeatExpiredDate,
+            final ScheduleType type,
+            final String scheduleGroupId,
+            final LocalDateTime createdAt,
+            final LocalDateTime updatedAt,
+            final int orderNum,
+            final String tagName,
+            final TagColor tagColor
+    ) {
+        return new Schedule(
+                id,
+                memberId,
+                description,
+                startDate,
+                endDate,
+                isAllDay,
+                repeatOption,
+                repeatExpiredDate,
+                type,
+                scheduleGroupId,
+                createdAt,
+                updatedAt,
+                orderNum,
+                tagName,
+                tagColor
         );
     }
 
@@ -168,11 +309,32 @@ public class Schedule extends BaseTimeEntity {
         return repeatExpiredDate;
     }
 
+
+    public String getTagName() {
+        return tagName;
+    }
+
+    public TagColor getTagColor() {
+        return tagColor;
+    }
+
     public ScheduleType getType() {
         return type;
     }
 
     public String getScheduleGroupId() {
         return scheduleGroupId;
+    }
+
+    public Integer getOrderNum() {
+        return orderNum;
+    }
+
+    public Long getTagId() {
+        return tagId;
+    }
+
+    public void setTagId(Long tagId) {
+        this.tagId = tagId;
     }
 }

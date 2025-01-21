@@ -7,11 +7,18 @@ import com.official.memento.schedule.conntroller.dto.request.RepeatScheduleCreat
 import com.official.memento.schedule.conntroller.dto.request.ScheduleCreateRequest;
 import com.official.memento.schedule.conntroller.dto.request.ScheduleUpdateGroupRequest;
 import com.official.memento.schedule.conntroller.dto.request.ScheduleUpdateRequest;
+import com.official.memento.schedule.conntroller.dto.response.ScheduleAllAllDaysGetResponse;
+import com.official.memento.schedule.conntroller.dto.response.ScheduleAllGetResponse;
+import com.official.memento.schedule.conntroller.dto.response.ScheduleDetailResponse;
+import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.schedule.service.command.*;
 import com.official.memento.schedule.service.usecase.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/schedules")
@@ -23,6 +30,7 @@ public class ScheduleApiController implements ScheduleApiDocs {
     private final ScheduleDeleteGroupUseCase scheduleDeleteGroupUseCase;
     private final ScheduleUpdateUseCase scheduleUpdateUseCase;
     private final ScheduleUpdateGroupUseCase scheduleUpdateGroupUseCase;
+    private final ScheduleGetUseCase scheduleGetUseCase;
 
     public ScheduleApiController(
             final ScheduleCreateUseCase scheduleCreateUseCase,
@@ -30,7 +38,8 @@ public class ScheduleApiController implements ScheduleApiDocs {
             final ScheduleDeleteUseCase scheduleDeleteUseCase,
             final ScheduleDeleteGroupUseCase scheduleDeleteGroupUseCase,
             final ScheduleUpdateUseCase scheduleUpdateUseCase,
-            final ScheduleUpdateGroupUseCase scheduleUpdateGroupUseCase
+            final ScheduleUpdateGroupUseCase scheduleUpdateGroupUseCase,
+            final ScheduleGetUseCase scheduleGetUseCase
     ) {
 
         this.scheduleCreateUseCase = scheduleCreateUseCase;
@@ -39,6 +48,7 @@ public class ScheduleApiController implements ScheduleApiDocs {
         this.scheduleDeleteGroupUseCase = scheduleDeleteGroupUseCase;
         this.scheduleUpdateUseCase = scheduleUpdateUseCase;
         this.scheduleUpdateGroupUseCase = scheduleUpdateGroupUseCase;
+        this.scheduleGetUseCase = scheduleGetUseCase;
     }
 
     @PostMapping
@@ -49,7 +59,7 @@ public class ScheduleApiController implements ScheduleApiDocs {
     ) {
         scheduleCreateUseCase.create(
                 ScheduleCreateCommand.of(
-                        1,
+                        authorizationUser.memberId(),
                         scheduleCreateRequest.description(),
                         scheduleCreateRequest.startDate(),
                         scheduleCreateRequest.endDate(),
@@ -71,7 +81,7 @@ public class ScheduleApiController implements ScheduleApiDocs {
     ) {
         repeatScheduleCreateUseCase.createRepeat(
                 RepeatScheduleCreateCommand.of(
-                        1,
+                        authorizationUser.memberId(),
                         repeatScheduleCreateRequest.description(),
                         repeatScheduleCreateRequest.startDate(),
                         repeatScheduleCreateRequest.endDate(),
@@ -93,7 +103,7 @@ public class ScheduleApiController implements ScheduleApiDocs {
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long scheduleId
     ) {
-        scheduleDeleteUseCase.delete(ScheduleDeleteCommand.of(1, scheduleId));
+        scheduleDeleteUseCase.delete(ScheduleDeleteCommand.of(authorizationUser.memberId(), scheduleId));
         return SuccessResponse.of(
                 HttpStatus.OK,
                 "단일 스케줄 삭제 성공"
@@ -107,7 +117,7 @@ public class ScheduleApiController implements ScheduleApiDocs {
             @PathVariable final long scheduleId,
             @RequestParam final String scheduleGroupId
     ) {
-        scheduleDeleteGroupUseCase.deleteGroup(ScheduleDeleteGroupCommand.of(1, scheduleId, scheduleGroupId));
+        scheduleDeleteGroupUseCase.deleteGroup(ScheduleDeleteGroupCommand.of(authorizationUser.memberId(), scheduleId, scheduleGroupId));
         return SuccessResponse.of(
                 HttpStatus.OK,
                 "반복 스케줄 삭제 성공"
@@ -122,7 +132,7 @@ public class ScheduleApiController implements ScheduleApiDocs {
             @RequestBody final ScheduleUpdateRequest scheduleUpdateRequest
     ) {
         scheduleUpdateUseCase.update(ScheduleUpdateCommand.of(
-                1,
+                authorizationUser.memberId(),
                 scheduleId,
                 scheduleUpdateRequest.description(),
                 scheduleUpdateRequest.startDate(),
@@ -144,7 +154,7 @@ public class ScheduleApiController implements ScheduleApiDocs {
             @RequestBody final ScheduleUpdateGroupRequest scheduleUpdateGroupRequest
     ) {
         scheduleUpdateGroupUseCase.updateGroup(ScheduleUpdateGroupCommand.of(
-                1,
+                authorizationUser.memberId(),
                 scheduleId,
                 scheduleUpdateGroupRequest.description(),
                 scheduleUpdateGroupRequest.startDate(),
@@ -158,6 +168,57 @@ public class ScheduleApiController implements ScheduleApiDocs {
         return SuccessResponse.of(
                 HttpStatus.OK,
                 "반복 스케줄 업데이트 성공"
+        );
+    }
+
+    @GetMapping
+    public ResponseEntity<SuccessResponse<ScheduleAllGetResponse>> getSchedulesByDate(
+            @Authorization final AuthorizationUser authorizationUser,
+            @RequestParam LocalDate date
+    ) {
+        List<Schedule> schedules = scheduleGetUseCase.getSchedules(authorizationUser.memberId(), date);
+        return SuccessResponse.of(
+                HttpStatus.CREATED,
+                "스케줄 반환 성공",
+                ScheduleAllGetResponse.of(schedules)
+        );
+    }
+
+
+    @GetMapping("/total")
+    public ResponseEntity<SuccessResponse<ScheduleAllGetResponse>> getAllSchedules(
+            @Authorization final AuthorizationUser authorizationUser
+    ) {
+        List<Schedule> allSchedules = scheduleGetUseCase.getAllSchedules(authorizationUser.memberId());
+        return SuccessResponse.of(
+                HttpStatus.OK,
+                "전체 스케줄 조회 성공",
+                ScheduleAllGetResponse.of(allSchedules)
+        );
+    }
+
+    @GetMapping("/all-days")
+    public ResponseEntity<SuccessResponse<ScheduleAllAllDaysGetResponse>> getAllDaysSchedules(
+            @Authorization final AuthorizationUser authorizationUser
+    ) {
+        List<Schedule> allSchedules = scheduleGetUseCase.getAllAllDaysSchedules(authorizationUser.memberId());
+        return SuccessResponse.of(
+                HttpStatus.OK,
+                "스케줄 조회 성공",
+                ScheduleAllAllDaysGetResponse.of(allSchedules)
+        );
+    }
+
+    @GetMapping("/{scheduleId}")
+    public ResponseEntity<SuccessResponse<ScheduleDetailResponse>> getDetailSchedules(
+            @Authorization final AuthorizationUser authorizationUser,
+            @PathVariable long scheduleId
+    ) {
+        Schedule schedule = scheduleGetUseCase.getDetail(authorizationUser.memberId(), scheduleId);
+        return SuccessResponse.of(
+                HttpStatus.OK,
+                "스케줄 조회 성공",
+                ScheduleDetailResponse.of(schedule)
         );
     }
 }

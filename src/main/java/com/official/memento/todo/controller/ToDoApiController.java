@@ -47,8 +47,7 @@ public class ToDoApiController implements ToDoApiDocs {
             @RequestBody final ToDoCreateRequest request
     ) {
         toDoCreateUseCase.create(ToDoCreateCommand.of(
-                        //authorizationUser.memberId(),
-                        2,
+                        authorizationUser.memberId(),
                         request.startDate(),
                         request.description(),
                         request.endDate(),
@@ -73,8 +72,7 @@ public class ToDoApiController implements ToDoApiDocs {
     ) {
         // todo: 로그인 후 추후 삭제 예정
         toDoDeleteUseCase.delete(ToDoDeleteCommand.of(
-                //authorizationUser.memberId(),
-                2,
+                authorizationUser.memberId(),
                 toDoId)
         );
         return SuccessResponse.of(
@@ -85,13 +83,12 @@ public class ToDoApiController implements ToDoApiDocs {
 
     @PatchMapping("/{toDoId}")
     ResponseEntity<SuccessResponse<?>> updateToDo(
-            //@Authorization final AuthorizationUser authorizationUser,
+            @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId,
             @RequestBody final ToDoUpdateRequest request
     ) {
         toDoUpdateUseCase.update(ToDoUpdateCommand.of(
-                //authorizationUser.memberId(),
-                2,
+                authorizationUser.memberId(),
                 toDoId,
                 request.startDate(),
                 request.description(),
@@ -108,13 +105,12 @@ public class ToDoApiController implements ToDoApiDocs {
 
     @PatchMapping("/{toDoId}/completion")
     ResponseEntity<SuccessResponse<ToDoCompletionResponse>> updateToDoCompletion(
-            //@Authorization final AuthorizationUser authorizationUser,
+            @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId
     ) {
 
         boolean currentCompletion = toDoUpdateUseCase.updateCompletion(ToDoCompletionUpdateCommand.of(
-                //authorizationUser.memberId(),
-                2,
+                authorizationUser.memberId(),
                 toDoId
         ));
 
@@ -127,9 +123,9 @@ public class ToDoApiController implements ToDoApiDocs {
 
     @GetMapping
     public ResponseEntity<SuccessResponse<ToDoAllGetResponse>> getToDos(
-            //@Authorization final AuthorizationUser authorizationUser
+            @Authorization final AuthorizationUser authorizationUser
     ) {
-        List<ToDo> allToDos = toDoGetUseCase.getToDos(2);
+        List<ToDo> allToDos = toDoGetUseCase.getToDos(authorizationUser.memberId());
         return SuccessResponse.of(
                 HttpStatus.OK,
                 "ToDo 조회 목록 성공",

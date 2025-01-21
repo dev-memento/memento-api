@@ -7,10 +7,12 @@ import com.official.memento.global.exception.MementoException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
 
+@Component
 public class JwtUtil {
 
     private final Key secretKey;
@@ -23,23 +25,22 @@ public class JwtUtil {
         this.refreshTokenExpiration = refreshTokenExpiration;
     }
 
-    public AccessToken generateAccessToken(final String userId, final String email) {
+    public AccessToken generateAccessToken(final Long userId) {
         return new AccessToken(Jwts.builder()
-                .setSubject(userId)
-                .claim("email", email)
+                .setSubject(userId.toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiration))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact());
     }
 
-    public RefreshToken generateRefreshToken(final String userId) {
+    public RefreshToken generateRefreshToken(final Long userId) {
         return new RefreshToken(Jwts.builder()
-                        .setSubject(userId)
-                        .setIssuedAt(new Date())
-                        .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
-                        .signWith(secretKey, SignatureAlgorithm.HS256)
-                        .compact());
+                .setSubject(userId.toString())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
+                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .compact());
     }
 
     public boolean validateToken(final String token) {

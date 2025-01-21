@@ -2,6 +2,7 @@ package com.official.memento.schedule.domain;
 
 import com.official.memento.schedule.domain.entity.Schedule;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,4 +20,10 @@ public interface ScheduleRepository {
     void deleteById(final long scheduleId);
 
     void deleteAll(final List<Schedule> schedules);
+
+    List<Schedule> findNonAllDaySchedulesWithOrderInfo(final long memberId);
+
+    List<Schedule> findAllAlDaysByMemberId(final long memberId);
+
+    List<Schedule> findAllByStartDateAndMemberId(final LocalDate startDate, final long memberId);
 }

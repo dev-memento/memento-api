@@ -1,9 +1,6 @@
 package com.official.memento.member.infrastructure.persistence;
 
-import com.official.memento.global.exception.EntityNotFoundException;
-import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.member.domain.MemberPersonalInfo;
-import com.official.memento.member.domain.port.MemberRepository;
 
 public class MemberPersonalInfoMapper {
     public static MemberPersonalInfo toDomain(final MemberPersonalInfoEntity entity) {
