@@ -54,7 +54,7 @@ public class AuthService implements AuthUseCase {
         MemberAuth auth = authRepository.findByPlatformIdAndProvider(platformId, provider)
                 .orElseGet(() -> createNewMember(platformId, provider));
 
-        boolean isNewUser = memberRepository.findPersonalInfoByMemberId(auth.getId()).isEmpty();
+        boolean isNewUser = memberRepository.findPersonalInfoByMemberId(auth.getMemberId()).isEmpty();
 
         AccessToken accessToken = jwtUtil.generateAccessToken(auth.getMemberId());
         RefreshToken refreshToken = jwtUtil.generateRefreshToken(auth.getMemberId());
@@ -67,7 +67,7 @@ public class AuthService implements AuthUseCase {
         return AuthResult.of(accessToken, refreshToken, member, isNewUser);
     }
 
-
+    @Transactional
     private MemberAuth createNewMember(String platformId, AuthProvider provider) {
         Member newMember = memberRepository.save(Member.createNew());
         MemberAuth newAuth = MemberAuth.of(newMember.getId(), provider, platformId, "");
@@ -76,7 +76,7 @@ public class AuthService implements AuthUseCase {
         return authRepository.save(newAuth);
     }
 
-
+    @Transactional
     private Map<String, Object> verifyIdToken(final AuthProvider provider, final String idToken) {
         final AuthClientOutputPort clientAdapter = authClientAdapters.get(provider);
         if (clientAdapter == null) {
@@ -87,6 +87,27 @@ public class AuthService implements AuthUseCase {
         } catch (Exception e) {
             throw new MementoException(ErrorCode.INVALID_ID_TOKEN);
         }
+    }
+
+    @Transactional
+    public AuthResult refreshTokens(String refreshToken) {
+        if (!jwtUtil.validateToken(refreshToken)) {
+            throw new MementoException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+        String memberId = jwtUtil.getUserIdFromToken(refreshToken);
+        MemberAuth memberAuth = authRepository.findByMemberId(Long.parseLong(memberId))
+                .orElseThrow(() -> new MementoException(ErrorCode.INVALID_REFRESH_TOKEN));
+        if (!memberAuth.getRefreshToken().equals(refreshToken)) {
+            throw new MementoException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+        AccessToken newAccessToken = jwtUtil.generateAccessToken(memberId);
+        RefreshToken newRefreshToken = jwtUtil.generateRefreshToken(memberId);
+
+        memberAuth.withUpdatedToken(newRefreshToken.getToken());
+        authRepository.save(memberAuth);
+
+        return new AuthResult(newAccessToken, newRefreshToken, null, false);
+
     }
 }
 
