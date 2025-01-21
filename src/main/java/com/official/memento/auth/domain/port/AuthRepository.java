@@ -7,4 +7,5 @@ import java.util.Optional;
 public interface AuthRepository {
     MemberAuth save(MemberAuth auth);
     Optional<MemberAuth> findByPlatformIdAndProvider(String platformId, AuthProvider provider);
+    Optional<MemberAuth> findByMemberId(Long memberId);
 }

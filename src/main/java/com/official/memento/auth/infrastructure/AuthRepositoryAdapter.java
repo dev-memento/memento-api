@@ -48,4 +48,16 @@ public class AuthRepositoryAdapter implements AuthRepository {
                         entity.getRefreshToken()
                 ));
     }
+
+    @Override
+    public Optional<MemberAuth> findByMemberId(final Long memberId) {
+        return memberAuthJpaRepository.findByMemberId(memberId)
+                .map(entity -> MemberAuth.withId(
+                        entity.getId(),
+                        entity.getMemberId(),
+                        entity.getProvider(),
+                        entity.getPlatformId(),
+                        entity.getRefreshToken()
+                ));
+    }
 }
