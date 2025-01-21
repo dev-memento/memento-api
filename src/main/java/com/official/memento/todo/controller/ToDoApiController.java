@@ -1,13 +1,10 @@
 package com.official.memento.todo.controller;
 
-import com.official.memento.global.annotation.Authorization;
 import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
 import com.official.memento.global.entity.enums.RepeatOption;
-import com.official.memento.schedule.service.command.ScheduleDeleteCommand;
 import com.official.memento.todo.controller.dto.ToDoCreateRequest;
 import com.official.memento.todo.controller.dto.ToDoUpdateRequest;
-import com.official.memento.todo.domain.ToDo;
 import com.official.memento.todo.service.ToDoCreateUseCase;
 import com.official.memento.todo.service.ToDoDeleteUseCase;
 import com.official.memento.todo.service.ToDoUpdateUseCase;

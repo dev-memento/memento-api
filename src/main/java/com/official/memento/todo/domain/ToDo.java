@@ -4,6 +4,7 @@ import com.official.memento.global.entity.BaseTimeEntity;
 import com.official.memento.global.entity.enums.RepeatOption;
 import com.official.memento.todo.domain.enums.PriorityType;
 import com.official.memento.todo.domain.enums.ToDoType;
+import com.official.memento.todo.domain.vo.BrainDump;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -174,6 +175,24 @@ public class ToDo extends BaseTimeEntity {
         this.priorityImportance=priorityImportance;
 
     }
+
+    /*
+    private Long id;
+    private long memberId;
+    private String groupId;
+    private LocalDate date;
+    private String description;
+    private LocalDate deadline;
+    private boolean isCompleted;
+    private RepeatOption repeatOption;
+    private LocalDate repeatExpiredDate;
+    private Double priorityUrgency;
+    private Double priorityImportance;
+    private Double priorityValue;
+    private String priorityType;
+    private ToDoType type;
+     */
+
 
     public Long getId() {
         return id;
