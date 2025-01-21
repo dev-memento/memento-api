@@ -45,7 +45,7 @@ public class AuthService implements AuthUseCase {
     @Override
     @Transactional
     public AuthResult authenticate(final AuthCommand command) {
-        final AuthProvider provider = getAuthProvider(command.providerName());
+        final AuthProvider provider = command.providerName();
         final Map<String, Object> tokenInfo = verifyIdToken(provider, command.idToken());
 
         final String platformId = (String) tokenInfo.get("sub");
@@ -80,13 +80,6 @@ public class AuthService implements AuthUseCase {
         return authRepository.save(newAuth);
     }
 
-    private AuthProvider getAuthProvider(final String providerName) {
-        try {
-            return AuthProvider.valueOf(providerName.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new MementoException(ErrorCode.UNSUPPORTED_PROVIDER);
-        }
-    }
 
     private Map<String, Object> verifyIdToken(final AuthProvider provider, final String idToken) {
         final AuthClientOutputPort clientAdapter = authClientAdapters.get(provider);
