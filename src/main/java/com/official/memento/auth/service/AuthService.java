@@ -56,19 +56,15 @@ public class AuthService implements AuthUseCase {
 
         boolean isNewUser = memberRepository.findPersonalInfoByMemberId(auth.getId()).isEmpty();
 
-        AccessToken accessToken = jwtUtil.generateAccessToken(String.valueOf(auth.getMemberId()));
-        RefreshToken refreshToken = jwtUtil.generateRefreshToken(String.valueOf(auth.getId().toString()));
+        AccessToken accessToken = jwtUtil.generateAccessToken(auth.getMemberId());
+        RefreshToken refreshToken = jwtUtil.generateRefreshToken(auth.getMemberId());
 
         auth.withUpdatedToken(refreshToken.getToken());
         authRepository.save(auth);
 
-        Member member = new Member(
-                auth.getId(),
-                null,
-                null
-        );
+        Member member = Member.fromId(auth.getId());
 
-        return new AuthResult(accessToken, refreshToken, member, isNewUser);
+        return AuthResult.of(accessToken, refreshToken, member, isNewUser);
     }
 
 
