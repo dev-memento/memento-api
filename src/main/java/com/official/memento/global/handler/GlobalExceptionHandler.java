@@ -16,7 +16,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> exception(Exception exception) {
-        logger.error("Unhandled exception occurred2 ", exception);
+        logger.error("Unhandled exception occurred ", exception);
+        return ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(MementoException.class)
+    public ResponseEntity<ErrorResponse> mementoException(MementoException exception) {
+        logger.error("MementoException", exception);
         return ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR);
     }
 
