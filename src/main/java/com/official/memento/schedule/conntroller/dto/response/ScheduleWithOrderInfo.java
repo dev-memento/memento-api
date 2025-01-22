@@ -35,8 +35,8 @@ public record ScheduleWithOrderInfo(
                 schedule.isAllDay(),
                 schedule.getType(),
                 schedule.getOrderNum(),
-                schedule.getTagName(),
-                schedule.getTagColor().getHexCode()
+                schedule.getTagName() == null ? "" : schedule.getTagName(),
+                schedule.getTagColor() == null ? "" : schedule.getTagColor().getHexCode()
         );
     }
 }
