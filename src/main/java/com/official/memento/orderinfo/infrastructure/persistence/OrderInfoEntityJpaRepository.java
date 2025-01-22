@@ -1,6 +1,5 @@
 package com.official.memento.orderinfo.infrastructure.persistence;
 
-import aj.org.objectweb.asm.commons.Remapper;
 import com.official.memento.orderinfo.infrastructure.persistence.projection.OrderInfoProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -35,4 +34,29 @@ public interface OrderInfoEntityJpaRepository extends JpaRepository<OrderInfoEnt
 
     @Query("SELECT o FROM OrderInfoEntity o WHERE o.toDoId = :toDoId")
     Optional<OrderInfoEntity> findOrderByToDoId(@Param("toDoId") Long toDoId);
+
+    @Query("""
+    SELECT o FROM OrderInfoEntity o
+    WHERE o.date = :date AND o.orderNum BETWEEN :startOrder AND :endOrder
+    ORDER BY o.orderNum ASC
+""")
+    List<OrderInfoEntity> findOrdersBetween(
+            @Param("date") LocalDate date,
+            @Param("startOrder") int startOrder,
+            @Param("endOrder") int endOrder
+    );
+
+    @Query("""
+    SELECT o.orderNum
+    FROM OrderInfoEntity o
+    WHERE o.toDoId = :toDoId
+""")
+    Optional<Integer> findOrderNumByToDoId(@Param("toDoId") Long toDoId);
+
+    @Query("""
+    SELECT o.date 
+    FROM OrderInfoEntity o 
+    WHERE o.toDoId = :toDoId
+""")
+    LocalDate findDateByToDoId(@Param("toDoId") Long toDoId);
 }

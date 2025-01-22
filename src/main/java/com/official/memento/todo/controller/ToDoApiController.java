@@ -7,10 +7,7 @@ import com.official.memento.global.entity.enums.RepeatOption;
 import com.official.memento.todo.controller.dto.*;
 import com.official.memento.todo.domain.ToDo;
 import com.official.memento.todo.service.*;
-import com.official.memento.todo.service.command.ToDoCompletionUpdateCommand;
-import com.official.memento.todo.service.command.ToDoCreateCommand;
-import com.official.memento.todo.service.command.ToDoDeleteCommand;
-import com.official.memento.todo.service.command.ToDoUpdateCommand;
+import com.official.memento.todo.service.command.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -117,7 +114,7 @@ public class ToDoApiController implements ToDoApiDocs {
         return SuccessResponse.of(
                 HttpStatus.OK,
                 "단일 투두 완료 상태 업데이트 성공",
-                ToDoCompletionResponse.of(toDoId,currentCompletion)
+                ToDoCompletionResponse.of(toDoId, currentCompletion)
         );
     }
 
@@ -132,4 +129,19 @@ public class ToDoApiController implements ToDoApiDocs {
                 ToDoAllGetResponse.of(allToDos)
         );
     }
+
+    @PatchMapping("/{toDoId}/position")
+    public ResponseEntity<SuccessResponse<?>> updateToDoPosition(
+            @Authorization final AuthorizationUser authorizationUser,
+            @PathVariable final long toDoId,
+            @RequestBody final ToDoDragAndDropRequest request
+    ) {
+        toDoUpdateUseCase.updatePosition(ToDoPositionUpdateCommand.of(authorizationUser.memberId(), toDoId, request.targetOrderNum()));
+
+        return SuccessResponse.of(
+                HttpStatus.OK,
+                "투두 드래그앤드랍 성공"
+        );
+    }
+
 }

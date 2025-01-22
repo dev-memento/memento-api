@@ -8,9 +8,9 @@ import com.official.memento.todo.domain.ToDoRepository;
 import com.official.memento.todo.infrastructure.persistence.ToDoEntity;
 import com.official.memento.todo.infrastructure.persistence.ToDoJpaRepository;
 import com.official.memento.todo.infrastructure.persistence.ToDoTagJpaRepository;
+import com.official.memento.todo.infrastructure.persistence.projection.ToDoWithOrderProjection;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Adapter
 public class ToDoRepositoryAdapter implements ToDoRepository {

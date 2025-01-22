@@ -15,22 +15,20 @@ import com.official.memento.todo.domain.ToDoTag;
 import com.official.memento.todo.domain.ToDoTagRepository;
 import com.official.memento.todo.domain.enums.PriorityType;
 import com.official.memento.todo.infrastructure.persistence.ToDoTagEntity;
-import com.official.memento.todo.service.command.ToDoCompletionUpdateCommand;
-import com.official.memento.todo.service.command.ToDoCreateCommand;
-import com.official.memento.todo.service.command.ToDoDeleteCommand;
-import com.official.memento.todo.service.command.ToDoUpdateCommand;
+import com.official.memento.todo.service.command.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.official.memento.todo.domain.enums.ToDoType.NORMAL;
 
 @Service
-public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUpdateUseCase, ToDoGetUseCase{
+public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUpdateUseCase, ToDoGetUseCase {
 
     private final ToDoRepository toDoRepository;
     private final ToDoTagRepository toDoTagRepository;
@@ -102,6 +100,35 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
             toDo.updateCompletion(true);
         }
         return toDoRepository.update(toDo).getIsCompleted();
+    }
+
+    @Override
+    @Transactional
+    public void updatePosition(final ToDoPositionUpdateCommand command) {
+        ToDo toDo = toDoRepository.findById(command.toDoId());
+        checkOwn(command.memberId(), toDo);
+
+        LocalDate date = orderInfoRepository.findDateByToDoId(command.toDoId());
+        int currentOrderNum = orderInfoRepository.findOrderByToDoId(command.toDoId());
+        int targetOrderNum = command.targetOrderNum();
+
+        if (currentOrderNum > targetOrderNum) {
+            List<OrderInfo> ordersToUpdate = orderInfoRepository.findOrdersBetween(date,targetOrderNum, currentOrderNum - 1);
+            for (OrderInfo order : ordersToUpdate) {
+                order.incrementOrder();
+                orderInfoRepository.update(order);
+            }
+        } else if (currentOrderNum < targetOrderNum) {
+            List<OrderInfo> ordersToUpdate = orderInfoRepository.findOrdersBetween(date,currentOrderNum + 1, targetOrderNum);
+            for (OrderInfo order : ordersToUpdate) {
+                order.decrementOrder();
+                orderInfoRepository.update(order);
+            }
+        }
+
+        OrderInfo orderInfo = orderInfoRepository.findByToDoId(command.toDoId());
+        orderInfo.setOrderNum(targetOrderNum);
+        orderInfoRepository.update(orderInfo);
     }
 
     private void createSingleToDo(final ToDoCreateCommand command, final String toDoGroupId) {
@@ -207,13 +234,9 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         }
     }
 
-    // 순서 관련 로직
     private void assignOrder(LocalDate date, ToDo toDo) {
-        // 해당 날짜에 해당하는 ToDO 찾기
         List<OrderWithScheduleOrToDo> toDoList = orderInfoRepository.findOrderInfoWithDetails(date);
-        // 순서 정렬
         int insertOrder = getInsertOrder(date, toDoList, toDo);
-        // 순서 저장
         createOrderInfo(date, toDo, insertOrder);
     }
 
@@ -222,19 +245,13 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         boolean isInserted = false;
         for (OrderWithScheduleOrToDo existingOrder : toDoList) {
 
-            System.out.println("들어오는 것");
-            System.out.println(toDo.getPriorityValue());
-            System.out.println("원래 있던 것");
-            System.out.println(existingOrder.getPriorityValue());
-
-            //순서정보중 투두의 시간을 고려하여 삽입해야할 위치 선정
             if (!isInserted && existingOrder.getType() == PlanType.TODO) {
                 if (toDo.getPriorityValue() > existingOrder.getPriorityValue()) {
                     insertOrder = existingOrder.getOrder();
                     isInserted = true;
                     System.out.println(1);
                 }
-                // 2순위: priorityValue가 같다면 createdAt 비교
+
                 else if (toDo.getPriorityValue().equals(existingOrder.getPriorityValue())) {
                     if (toDo.getCreatedAt().isBefore(existingOrder.getCreatedAt())) {
                         insertOrder = existingOrder.getOrder();
@@ -244,7 +261,6 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
                 }
             }
 
-            //삽입 된 곳 이후의 순서정보들을 1씩 증가
             if (isInserted) {
                 existingOrder.shiftBack();
                 orderInfoRepository.update(
@@ -261,7 +277,6 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
             }
         }
 
-        //위 로직에 걸리지 않았을 경우 -> 빈리스트거나 가장 마지막에 추가되는 순서정보
         if (!isInserted) {
             insertOrder = toDoList.isEmpty() ? 1 : toDoList.get(toDoList.size() - 1).getOrder() + 1;
             System.out.println(4);
@@ -293,5 +308,4 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
                 })
                 .toList();
     }
-
 }
