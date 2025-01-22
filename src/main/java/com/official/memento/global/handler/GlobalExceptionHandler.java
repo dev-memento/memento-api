@@ -1,10 +1,7 @@
 package com.official.memento.global.handler;
 
 import com.official.memento.global.dto.ErrorResponse;
-import com.official.memento.global.exception.EntityNotFoundException;
-import com.official.memento.global.exception.ErrorCode;
-import com.official.memento.global.exception.InvalidRequestBodyException;
-import com.official.memento.global.exception.UnauthorizedException;
+import com.official.memento.global.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -36,8 +33,14 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ErrorResponse> entityNotFoundException(UnauthorizedException exception) {
-        logger.info("Entity not found: {}", exception.getMessage());
+    public ResponseEntity<ErrorResponse> entityNotFoundException(EntityNotFoundException exception) {
+        logger.error("Entity not found:", exception);
+        return ErrorResponse.of(HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND_ENTITY);
+    }
+
+    @ExceptionHandler(NullPointException.class)
+    public ResponseEntity<ErrorResponse> nullPointException(NullPointException exception) {
+        logger.error("Invalid request:", exception);
         return ErrorResponse.of(HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND_ENTITY);
     }
 }
