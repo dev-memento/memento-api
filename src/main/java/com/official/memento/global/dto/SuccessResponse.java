@@ -23,6 +23,6 @@ public record SuccessResponse<T>(
             throw new MementoException(NULL_DATA_ERROR);
         }
         return ResponseEntity.status(status.value())
-                .body(new SuccessResponse<>(message, ""));
+                .body(new SuccessResponse<>(message, null));
     }
 }
