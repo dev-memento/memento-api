@@ -128,9 +128,29 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
     }
 
     @Override
-    public List<ToDo> findAllByMemberIdAndTodayDate(long memberId, LocalDate startDate) {
+    public List<ToDo> findAllByMemberIdAndStartDate(long memberId, LocalDate startDate) {
         List<ToDoEntity> toDoEntityList = toDoJpaRepository.findAllByMemberIdAndStartDate(memberId, startDate);
-        toDoEntityList
-        return List.of();
+        return toDoEntityList.stream()
+                .map(
+                        t -> ToDo.withId(
+                                t.getId(),
+                                t.getMemberId(),
+                                t.getGroupId(),
+                                t.getStartDate(),
+                                t.getDescription(),
+                                t.getEndDate(),
+                                t.getIsCompleted(),
+                                t.getRepeatOption(),
+                                t.getRepeatExpiredDate(),
+                                t.getPriorityUrgency(),
+                                t.getPriorityImportance(),
+                                t.getPriorityValue(),
+                                t.getPriorityType(),
+                                t.getType(),
+                                t.getCreatedAt(),
+                                t.getUpdatedAt()
+                        )
+                ).toList();
     }
+
 }
