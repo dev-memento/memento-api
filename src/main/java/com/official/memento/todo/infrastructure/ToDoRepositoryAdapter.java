@@ -9,8 +9,8 @@ import com.official.memento.todo.infrastructure.persistence.ToDoEntity;
 import com.official.memento.todo.infrastructure.persistence.ToDoJpaRepository;
 import com.official.memento.todo.infrastructure.persistence.ToDoTagJpaRepository;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Adapter
 public class ToDoRepositoryAdapter implements ToDoRepository {
@@ -125,5 +125,12 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
                                 t.getUpdatedAt()
                         )
                 ).toList();
+    }
+
+    @Override
+    public List<ToDo> findAllByMemberIdAndTodayDate(long memberId, LocalDate startDate) {
+        List<ToDoEntity> toDoEntityList = toDoJpaRepository.findAllByMemberIdAndStartDate(memberId, startDate);
+        toDoEntityList
+        return List.of();
     }
 }

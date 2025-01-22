@@ -16,4 +16,8 @@ public interface OrderInfoRepository {
     List<OrderWithScheduleOrToDo> findOrderInfoWithDetails(final LocalDate startDate);
 
     Integer findOrderByToDoId(final Long toDoId);
+
+    OrderInfo findByToDoIdAndDate(final Long toDoId, final LocalDate date);
+
+    OrderInfo updateOrderNum(final OrderInfo orderInfo , final int orderNum);
 }

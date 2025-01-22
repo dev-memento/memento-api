@@ -70,6 +70,10 @@ public class OrderInfo {
         return new OrderInfo(id, scheduleId, toDoId, order, date, planType, createdAt);
     }
 
+    public void updateOrderNum(final int orderNum) {
+        this.orderNum = orderNum;
+    }
+
     public Long getId() {
         return id;
     }

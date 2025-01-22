@@ -17,6 +17,7 @@ public class OrderInfoEntity {
     private Long scheduleId;
     private Long toDoId;
     private int orderNum;
+    // fixme: 오늘 날짜라는 의미를 담도록 변수명 변경
     private LocalDate date;
     @Enumerated(EnumType.STRING)
     private PlanType planType;
@@ -83,6 +84,10 @@ public class OrderInfoEntity {
                 orderInfo.getEventType(),
                 orderInfo.getCreatedAt()
         );
+    }
+
+    public void updateOrderNum(final int orderNum) {
+        this.orderNum = orderNum;
     }
 
     public Long getId() {

@@ -437,8 +437,17 @@ public class ToDo extends BaseTimeEntity {
         this.tagColor = tagColor;
     }
 
-    public void setTag(Tag tag){
-        this.tagName=tag.getName();
-        this.tagColor=tag.getColor();
+    public void setTag(Tag tag) {
+        this.tagName = tag.getName();
+        this.tagColor = tag.getColor();
+    }
+
+    public String toTaskDescription() {
+        return "Task: " + this.getDescription() +
+                ", id: " + this.getId() +
+                ", Urgency : " + this.getPriorityUrgency() +
+                ", Importance: " + this.getPriorityImportance() +
+                ", Created Date: " + this.getCreatedAt() +
+                ", Deadline: " + this.getEndDate();
     }
 }
