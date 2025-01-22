@@ -70,6 +70,16 @@ public class OrderInfo {
         return new OrderInfo(id, scheduleId, toDoId, order, date, planType, createdAt);
     }
 
+    // 순서를 증가
+    public void incrementOrder() {
+        this.orderNum += 1;
+    }
+
+    // 순서를 감소
+    public void decrementOrder() {
+        this.orderNum -= 1;
+    }
+
     public Long getId() {
         return id;
     }
@@ -90,11 +100,15 @@ public class OrderInfo {
         return date;
     }
 
-    public PlanType getEventType() {
+    public PlanType getPlanType() {
         return planType;
     }
 
     public int getOrderNum() {
         return orderNum;
+    }
+
+    public void setOrderNum(int orderNum){
+        this.orderNum = orderNum;
     }
 }

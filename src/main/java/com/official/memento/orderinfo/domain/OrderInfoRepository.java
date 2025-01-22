@@ -2,6 +2,7 @@ package com.official.memento.orderinfo.domain;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderInfoRepository {
 
@@ -16,4 +17,13 @@ public interface OrderInfoRepository {
     List<OrderWithScheduleOrToDo> findOrderInfoWithDetails(final LocalDate startDate);
 
     Integer findOrderByToDoId(final Long toDoId);
+
+    List<OrderInfo> findOrdersBetween(LocalDate date, int startOrder, int endOrder);
+
+    Optional<Integer> findOrderNumByToDoId(final Long toDoId);
+
+    OrderInfo findByToDoId(Long toDoId);
+
+    LocalDate findDateByToDoId(Long toDoId);
+
 }
