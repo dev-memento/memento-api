@@ -301,10 +301,12 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
                 .peek(todo -> {
                     Integer order = orderInfoRepository.findOrderByToDoId(todo.getId());
                     ToDoTag toDoTag = toDoTagRepository.findByToDoId(todo.getId());
-                    Tag tag = tagRepository.findById(toDoTag.getTagId());
 
-                    todo.setOrderNum(order);
-                    todo.setTag(tag);
+                    if(toDoTag!=null) {
+                        Tag tag = tagRepository.findById(toDoTag.getTagId());
+                        todo.setOrderNum(order);
+                        todo.setTag(tag);
+                    }
                 })
                 .toList();
     }
