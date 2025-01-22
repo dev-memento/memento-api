@@ -132,7 +132,6 @@ public class ScheduleApiController implements ScheduleApiDocs {
     }
 
     @DeleteMapping("/{scheduleId}/group")
-    @Override
     public ResponseEntity<SuccessResponse<?>> deleteScheduleGroup(
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long scheduleId,
@@ -168,7 +167,6 @@ public class ScheduleApiController implements ScheduleApiDocs {
     }
 
     @PatchMapping("/{scheduleId}/group")
-    @Override
     public ResponseEntity<SuccessResponse<?>> updateScheduleGroup(
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long scheduleId,

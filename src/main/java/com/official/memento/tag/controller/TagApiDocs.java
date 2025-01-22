@@ -7,6 +7,8 @@ import com.official.memento.tag.controller.dto.TagCreateRequest;
 import com.official.memento.tag.controller.dto.TagCreateResponse;
 import com.official.memento.tag.controller.dto.TagGetResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,6 +27,7 @@ public interface TagApiDocs {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     ResponseEntity<SuccessResponse<TagCreateResponse>> createTag(
+            @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
             @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final TagCreateRequest request
     );
@@ -36,6 +39,7 @@ public interface TagApiDocs {
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     ResponseEntity<SuccessResponse<List<TagGetResponse>>> getTags(
+            @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
             @Authorization final AuthorizationUser authorizationUser
     );
 }
