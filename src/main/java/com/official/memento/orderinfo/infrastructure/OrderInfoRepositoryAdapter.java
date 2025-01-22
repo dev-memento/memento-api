@@ -69,8 +69,8 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
     }
 
     @Override
-    public List<OrderInfo> findOrdersBetween(int startOrder, int endOrder) {
-        List<OrderInfoEntity> entities = orderInfoEntityJpaRepository.findOrdersBetween(startOrder, endOrder);
+    public List<OrderInfo> findOrdersBetween(LocalDate date, int startOrder, int endOrder) {
+        List<OrderInfoEntity> entities = orderInfoEntityJpaRepository.findOrdersBetween(date, startOrder, endOrder);
         return entities.stream()
                 .map(entity -> OrderInfo.withId(
                         entity.getId(),
@@ -105,4 +105,10 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
                 orderInfoEntity.getCreatedAt()
         );
     }
+
+    @Override
+    public LocalDate findDateByToDoId(Long toDoId) {
+        return orderInfoEntityJpaRepository.findDateByToDoId(toDoId);
+    }
+
 }

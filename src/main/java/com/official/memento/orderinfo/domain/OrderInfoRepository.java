@@ -18,9 +18,12 @@ public interface OrderInfoRepository {
 
     Integer findOrderByToDoId(final Long toDoId);
 
-    List<OrderInfo> findOrdersBetween(int startOrder, int endOrder);
+    List<OrderInfo> findOrdersBetween(LocalDate date, int startOrder, int endOrder);
 
     Optional<Integer> findOrderNumByToDoId(final Long toDoId);
 
     OrderInfo findByToDoId(Long toDoId);
+
+    LocalDate findDateByToDoId(Long toDoId);
+
 }

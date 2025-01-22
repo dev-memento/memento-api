@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.official.memento.todo.domain.enums.ToDoType.NORMAL;
@@ -107,17 +108,18 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         ToDo toDo = toDoRepository.findById(command.toDoId());
         checkOwn(command.memberId(), toDo);
 
+        LocalDate date = orderInfoRepository.findDateByToDoId(command.toDoId());
         int currentOrderNum = orderInfoRepository.findOrderByToDoId(command.toDoId());
         int targetOrderNum = command.targetOrderNum();
 
         if (currentOrderNum > targetOrderNum) {
-            List<OrderInfo> ordersToUpdate = orderInfoRepository.findOrdersBetween(targetOrderNum, currentOrderNum - 1);
+            List<OrderInfo> ordersToUpdate = orderInfoRepository.findOrdersBetween(date,targetOrderNum, currentOrderNum - 1);
             for (OrderInfo order : ordersToUpdate) {
                 order.incrementOrder();
                 orderInfoRepository.update(order);
             }
         } else if (currentOrderNum < targetOrderNum) {
-            List<OrderInfo> ordersToUpdate = orderInfoRepository.findOrdersBetween(currentOrderNum + 1, targetOrderNum);
+            List<OrderInfo> ordersToUpdate = orderInfoRepository.findOrdersBetween(date,currentOrderNum + 1, targetOrderNum);
             for (OrderInfo order : ordersToUpdate) {
                 order.decrementOrder();
                 orderInfoRepository.update(order);
