@@ -304,9 +304,10 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
 
                     if(toDoTag!=null) {
                         Tag tag = tagRepository.findById(toDoTag.getTagId());
-                        todo.setOrderNum(order);
                         todo.setTag(tag);
                     }
+
+                    todo.setOrderNum(order);
                 })
                 .toList();
     }
