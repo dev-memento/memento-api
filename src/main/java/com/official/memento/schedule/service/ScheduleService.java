@@ -1,7 +1,6 @@
 package com.official.memento.schedule.service;
 
 import com.official.memento.global.entity.enums.RepeatOption;
-import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.domain.port.MemberPersonalInfoRepository;
 import com.official.memento.orderinfo.domain.OrderInfo;
 import com.official.memento.orderinfo.domain.OrderInfoRepository;
@@ -13,17 +12,19 @@ import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.schedule.domain.entity.ScheduleTag;
 import com.official.memento.schedule.service.command.*;
 import com.official.memento.schedule.service.usecase.*;
+import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.TagRepository;
+import com.official.memento.tag.domain.enums.TagColor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.official.memento.schedule.domain.enums.ScheduleType.APPLE;
 import static com.official.memento.schedule.domain.enums.ScheduleType.NORMAL;
 
 @Service
@@ -64,6 +65,17 @@ public class ScheduleService implements
             connectTag(command.tagId(), schedule);
         }
         assignOrder(command.startDate().toLocalDate(), schedule);
+    }
+
+    @Override
+    public void createAppleSchedules(final List<ScheduleCreateCommand> command) {
+        Tag tag = tagRepository.findByMemberIdAndTagColor(command.get(0).memberId(), TagColor.GRAY05);
+        for (ScheduleCreateCommand scheduleCreateCommand : command) {
+            String scheduleGroupId = UUID.randomUUID().toString();
+            Schedule schedule = createAppleSchedule(scheduleCreateCommand, scheduleGroupId);
+            connectTag(tag.getId(), schedule);
+            assignOrder(scheduleCreateCommand.startDate().toLocalDate(), schedule);
+        }
     }
 
     @Override
@@ -192,6 +204,20 @@ public class ScheduleService implements
                 RepeatOption.NONE,
                 null,
                 NORMAL,
+                scheduleGroupId
+        ));
+    }
+
+    private Schedule createAppleSchedule(final ScheduleCreateCommand command, final String scheduleGroupId) {
+        return scheduleRepository.save(Schedule.of(
+                command.memberId(),
+                command.description(),
+                command.startDate(),
+                command.endDate(),
+                command.isAllDay(),
+                RepeatOption.NONE,
+                null,
+                APPLE,
                 scheduleGroupId
         ));
     }
