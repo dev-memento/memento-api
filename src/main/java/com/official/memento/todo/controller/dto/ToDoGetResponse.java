@@ -54,8 +54,8 @@ public record ToDoGetResponse(
                 toDo.getIsCompleted(),
                 toDo.getPriorityValue(),
                 toDo.getPriorityType().name(),
-                toDo.getTagName(),
-                toDo.getTagColor().getHexCode(),
+                toDo.getTagName() == null ? "" : toDo.getTagName(),
+                toDo.getTagColor() == null ? "" : toDo.getTagColor().getHexCode(),
                 NORMAL,
                 toDo.getOrderNum()
         );
