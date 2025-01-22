@@ -1,5 +1,7 @@
 package com.official.memento.orderinfo.infrastructure;
 
+import com.official.memento.global.exception.EntityNotFoundException;
+import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.stereotype.Adapter;
 import com.official.memento.orderinfo.domain.OrderInfo;
 import com.official.memento.orderinfo.domain.OrderInfoRepository;
@@ -10,6 +12,7 @@ import com.official.memento.orderinfo.infrastructure.persistence.projection.Orde
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Adapter
 public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
@@ -63,5 +66,43 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
         return orderInfoEntityJpaRepository.findOrderByToDoId(toDoId)
                 .map(orderInfo -> orderInfo.getOrderNum()) // 예: orderNum 필드 가져오기
                 .orElse(null); // 결과가 없을 경우 null 반환
+    }
+
+    @Override
+    public List<OrderInfo> findOrdersBetween(int startOrder, int endOrder) {
+        List<OrderInfoEntity> entities = orderInfoEntityJpaRepository.findOrdersBetween(startOrder, endOrder);
+        return entities.stream()
+                .map(entity -> OrderInfo.withId(
+                        entity.getId(),
+                        entity.getScheduleId(),
+                        entity.getToDoId(),
+                        entity.getOrderNum(),
+                        entity.getDate(),
+                        entity.getPlanType(),
+                        entity.getCreatedAt()
+                ))
+                .toList();
+    }
+
+    @Override
+    public Optional<Integer> findOrderNumByToDoId(final Long toDoId) {
+        return orderInfoEntityJpaRepository.findOrderNumByToDoId(toDoId);
+    }
+
+    @Override
+    public OrderInfo findByToDoId(Long toDoId) {
+        OrderInfoEntity orderInfoEntity = orderInfoEntityJpaRepository.findOrderByToDoId(toDoId)
+                .orElseThrow(
+                        () -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY)
+                );
+        return OrderInfo.withId(
+                orderInfoEntity.getId(),
+                orderInfoEntity.getScheduleId(),
+                orderInfoEntity.getToDoId(),
+                orderInfoEntity.getOrderNum(),
+                orderInfoEntity.getDate(),
+                orderInfoEntity.getPlanType(),
+                orderInfoEntity.getCreatedAt()
+        );
     }
 }
