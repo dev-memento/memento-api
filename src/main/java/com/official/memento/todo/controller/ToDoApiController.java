@@ -79,7 +79,7 @@ public class ToDoApiController implements ToDoApiDocs {
     }
 
     @PatchMapping("/{toDoId}")
-    ResponseEntity<SuccessResponse<?>> updateToDo(
+    public ResponseEntity<SuccessResponse<?>> updateToDo(
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId,
             @RequestBody final ToDoUpdateRequest request
@@ -101,7 +101,7 @@ public class ToDoApiController implements ToDoApiDocs {
     }
 
     @PatchMapping("/{toDoId}/completion")
-    ResponseEntity<SuccessResponse<ToDoCompletionResponse>> updateToDoCompletion(
+    public ResponseEntity<SuccessResponse<ToDoCompletionResponse>> updateToDoCompletion(
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId
     ) {
