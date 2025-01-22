@@ -6,6 +6,5 @@ import com.official.memento.todo.service.command.ToDoUpdateCommand;
 
 public interface ToDoUpdateUseCase {
     void update(final ToDoUpdateCommand toDoUpdateCommand);
-
     boolean updateCompletion(final ToDoCompletionUpdateCommand toDoCompletionUpdateCommand);
 }

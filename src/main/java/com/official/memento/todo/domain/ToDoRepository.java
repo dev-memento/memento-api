@@ -3,6 +3,8 @@ package com.official.memento.todo.domain;
 import com.official.memento.todo.infrastructure.persistence.ToDoEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface ToDoRepository {
     ToDo save(final ToDo toDo);
 
@@ -11,4 +13,6 @@ public interface ToDoRepository {
     ToDo findById(final long toDoId);
 
     void deleteById(final long toDoId);
+
+    List<ToDo> findAllByMemberId(final long memberId);
 }

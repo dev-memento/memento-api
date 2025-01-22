@@ -11,11 +11,11 @@ import static com.official.memento.global.exception.ErrorCode.NULL_DATA_ERROR;
 @Schema(name = "ToDo 생성 요청")
 public record ToDoCreateRequest(
         @Schema(description = "ToDo 날짜 (Today or 사용자 지정)", example = "2025-01-20")
-        LocalDate date,
+        LocalDate startDate,
         @Schema(description = "ToDo 내용", maxLength = 30, example = "팀 프로젝트 준비")
         String description,
         @Schema(description = "마감 기한", example = "2025-01-25")
-        LocalDate deadline,
+        LocalDate endDate,
         @Schema(description = "태그 ID", example = "12345")
         Long tagId,
         @Schema(description = "긴급도 우선순위 (0~1)", example = "0.5")
@@ -24,32 +24,32 @@ public record ToDoCreateRequest(
         Double priorityImportance
 ) {
     public ToDoCreateRequest(
-            final LocalDate date,
+            final LocalDate startDate,
             final String description,
-            final LocalDate deadline,
+            final LocalDate endDate,
             final Long tagId,
             final Double priorityUrgency,
             final Double priorityImportance
     ) {
-        checkNullData(date, description);
+        checkNullData(startDate, description);
 
         if (description.length() > 30) {
             throw new IllegalArgumentException("30자 이하로만 작성이 가능합니다.");
         }
 
-        this.date = date;
+        this.startDate = startDate;
         this.description = description;
-        this.deadline = deadline;
+        this.endDate = endDate;
         this.tagId = tagId;
         this.priorityUrgency = priorityUrgency;
         this.priorityImportance = priorityImportance;
     }
 
     private static void checkNullData(
-            final LocalDate date,
+            final LocalDate startDate,
             final String description
     ) {
-        if (date == null || description == null) {
+        if (startDate == null || description == null) {
             throw new NullPointException(NULL_DATA_ERROR);
         }
     }

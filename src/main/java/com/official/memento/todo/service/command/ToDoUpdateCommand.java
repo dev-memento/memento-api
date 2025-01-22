@@ -7,9 +7,9 @@ import java.time.LocalDate;
 public record ToDoUpdateCommand(
         long memberId,
         long toDoId,
-        LocalDate date,
+        LocalDate startDate,
         String description,
-        LocalDate deadline,
+        LocalDate endDate,
         Long tagId,
         Double priorityUrgency,
         Double priorityImportance
@@ -17,9 +17,9 @@ public record ToDoUpdateCommand(
     public static ToDoUpdateCommand of(
             final long memberId,
             final long toDoId,
-            final LocalDate date,
+            final LocalDate startDate,
             final String description,
-            final LocalDate deadline,
+            final LocalDate endDate,
             final Long tagId,
             final Double priorityUrgency,
             final Double priorityImportance
@@ -27,9 +27,9 @@ public record ToDoUpdateCommand(
         return new ToDoUpdateCommand(
                 memberId,
                 toDoId,
-                date,
+                startDate,
                 description,
-                deadline,
+                endDate,
                 tagId,
                 priorityUrgency,
                 priorityImportance
