@@ -13,6 +13,7 @@ import com.official.memento.orderinfo.infrastructure.persistence.projection.Orde
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Adapter
 public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
@@ -81,5 +82,47 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
         entity.updateOrderNum(orderNum);
         orderInfo.updateOrderNum(orderNum);
         return orderInfo;
+    }
+  
+    public List<OrderInfo> findOrdersBetween(LocalDate date, int startOrder, int endOrder) {
+        List<OrderInfoEntity> entities = orderInfoEntityJpaRepository.findOrdersBetween(date, startOrder, endOrder);
+        return entities.stream()
+                .map(entity -> OrderInfo.withId(
+                        entity.getId(),
+                        entity.getScheduleId(),
+                        entity.getToDoId(),
+                        entity.getOrderNum(),
+                        entity.getDate(),
+                        entity.getPlanType(),
+                        entity.getCreatedAt()
+                ))
+                .toList();
+    }
+
+    @Override
+    public Optional<Integer> findOrderNumByToDoId(final Long toDoId) {
+        return orderInfoEntityJpaRepository.findOrderNumByToDoId(toDoId);
+    }
+
+    @Override
+    public OrderInfo findByToDoId(Long toDoId) {
+        OrderInfoEntity orderInfoEntity = orderInfoEntityJpaRepository.findOrderByToDoId(toDoId)
+                .orElseThrow(
+                        () -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY)
+                );
+        return OrderInfo.withId(
+                orderInfoEntity.getId(),
+                orderInfoEntity.getScheduleId(),
+                orderInfoEntity.getToDoId(),
+                orderInfoEntity.getOrderNum(),
+                orderInfoEntity.getDate(),
+                orderInfoEntity.getPlanType(),
+                orderInfoEntity.getCreatedAt()
+        );
+    }
+
+    @Override
+    public LocalDate findDateByToDoId(Long toDoId) {
+        return orderInfoEntityJpaRepository.findDateByToDoId(toDoId);
     }
 }

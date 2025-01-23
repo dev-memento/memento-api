@@ -5,6 +5,7 @@ import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.stereotype.Adapter;
 import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.TagRepository;
+import com.official.memento.tag.domain.enums.TagColor;
 import com.official.memento.tag.infrastructure.persistence.TagEntity;
 import com.official.memento.tag.infrastructure.persistence.TagJpaRepository;
 
@@ -58,5 +59,16 @@ public class TagRepositoryAdapter implements TagRepository {
                         entity.getMemberId()
                 ))
                 .toList();
+    }
+
+    @Override
+    public Tag findByMemberIdAndTagColor(Long memberId, TagColor tagColor) {
+        TagEntity entity = tagJpaRepository.findByMemberIdAndColor(memberId, tagColor);
+        return Tag.withId(
+                entity.getId(),
+                entity.getName(),
+                entity.getColor(),
+                entity.getMemberId()
+        );
     }
 }

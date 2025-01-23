@@ -36,4 +36,30 @@ public interface OrderInfoEntityJpaRepository extends JpaRepository<OrderInfoEnt
     Optional<OrderInfoEntity> findOrderByToDoId(@Param("toDoId") Long toDoId);
 
     Optional<OrderInfoEntity> findByToDoIdAndDate(Long toDoId, LocalDate date);
+
+    @Query("""
+    SELECT o FROM OrderInfoEntity o
+    WHERE o.date = :date AND o.orderNum BETWEEN :startOrder AND :endOrder
+    ORDER BY o.orderNum ASC
+""")
+    List<OrderInfoEntity> findOrdersBetween(
+            @Param("date") LocalDate date,
+            @Param("startOrder") int startOrder,
+            @Param("endOrder") int endOrder
+    );
+
+    @Query("""
+    SELECT o.orderNum
+    FROM OrderInfoEntity o
+    WHERE o.toDoId = :toDoId
+""")
+    Optional<Integer> findOrderNumByToDoId(@Param("toDoId") Long toDoId);
+
+    @Query("""
+    SELECT o.date 
+    FROM OrderInfoEntity o 
+    WHERE o.toDoId = :toDoId
+""")
+    LocalDate findDateByToDoId(@Param("toDoId") Long toDoId);
+
 }

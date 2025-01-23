@@ -4,6 +4,8 @@ import com.official.memento.auth.domain.AccessToken;
 import com.official.memento.auth.domain.RefreshToken;
 import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.exception.MementoException;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -47,8 +49,12 @@ public class JwtUtil {
         try {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
             return true;
-        } catch (Exception e) {
-            throw new MementoException(ErrorCode.INVALID_ID_TOKEN);
+        } catch (ExpiredJwtException exception) {
+            throw new MementoException(ErrorCode.EXPIRED_TOKEN);
+        } catch (JwtException exception) {
+            throw new MementoException(ErrorCode.EXPECTED_TOKEN_ERROR);
+        } catch (Exception exception) {
+            throw new MementoException(ErrorCode.UNEXPECTED_TOKEN_ERROR);
         }
     }
 

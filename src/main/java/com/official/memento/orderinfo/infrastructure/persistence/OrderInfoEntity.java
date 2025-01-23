@@ -67,7 +67,7 @@ public class OrderInfoEntity {
                 orderInfo.getToDoId(),
                 orderInfo.getOrderNum(),
                 orderInfo.getDate(),
-                orderInfo.getEventType(),
+                orderInfo.getPlanType(),
                 orderInfo.getCreatedAt()
         );
     }
@@ -81,7 +81,7 @@ public class OrderInfoEntity {
                 orderInfo.getToDoId(),
                 orderInfo.getOrderNum(),
                 orderInfo.getDate(),
-                orderInfo.getEventType(),
+                orderInfo.getPlanType(),
                 orderInfo.getCreatedAt()
         );
     }
@@ -110,7 +110,7 @@ public class OrderInfoEntity {
         return orderNum;
     }
 
-    public PlanType getEventType() {
+    public PlanType getPlanType() {
         return planType;
     }
 

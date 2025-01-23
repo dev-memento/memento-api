@@ -97,6 +97,27 @@ public class ScheduleApiController implements ScheduleApiDocs {
         );
     }
 
+    @PostMapping("/apple")
+    public ResponseEntity<SuccessResponse<?>> createAppleSchedules(
+            @Authorization final AuthorizationUser authorizationUser,
+            @RequestBody final List<ScheduleCreateRequest> request
+    ) {
+        scheduleCreateUseCase.createAppleSchedules(request.stream().map(scheduleCreateRequest ->
+                ScheduleCreateCommand.of(
+                        authorizationUser.memberId(),
+                        scheduleCreateRequest.description(),
+                        scheduleCreateRequest.startDate(),
+                        scheduleCreateRequest.endDate(),
+                        scheduleCreateRequest.isAllDay(),
+                        scheduleCreateRequest.tagId()
+                )
+        ).toList());
+        return SuccessResponse.of(
+                HttpStatus.CREATED,
+                "반복 스케줄 생성 성공"
+        );
+    }
+
     @DeleteMapping("/{scheduleId}")
     @Override
     public ResponseEntity<SuccessResponse<?>> deleteSchedule(
@@ -111,7 +132,6 @@ public class ScheduleApiController implements ScheduleApiDocs {
     }
 
     @DeleteMapping("/{scheduleId}/group")
-    @Override
     public ResponseEntity<SuccessResponse<?>> deleteScheduleGroup(
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long scheduleId,
@@ -147,7 +167,6 @@ public class ScheduleApiController implements ScheduleApiDocs {
     }
 
     @PatchMapping("/{scheduleId}/group")
-    @Override
     public ResponseEntity<SuccessResponse<?>> updateScheduleGroup(
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long scheduleId,

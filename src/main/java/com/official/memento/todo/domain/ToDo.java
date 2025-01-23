@@ -356,7 +356,6 @@ public class ToDo extends BaseTimeEntity {
         this.isCompleted = isCompleted;
     }
 
-
     public Long getId() {
         return id;
     }
