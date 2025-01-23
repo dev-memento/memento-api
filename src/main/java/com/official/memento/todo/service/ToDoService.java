@@ -5,16 +5,13 @@ import com.official.memento.orderinfo.domain.OrderInfo;
 import com.official.memento.orderinfo.domain.OrderInfoRepository;
 import com.official.memento.orderinfo.domain.OrderWithScheduleOrToDo;
 import com.official.memento.orderinfo.domain.PlanType;
-import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.TagRepository;
-import com.official.memento.todo.controller.dto.ToDoGetResponse;
 import com.official.memento.todo.domain.ToDo;
 import com.official.memento.todo.domain.ToDoRepository;
 import com.official.memento.todo.domain.ToDoTag;
 import com.official.memento.todo.domain.ToDoTagRepository;
 import com.official.memento.todo.domain.enums.PriorityType;
-import com.official.memento.todo.infrastructure.persistence.ToDoTagEntity;
 import com.official.memento.todo.service.command.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.official.memento.todo.domain.enums.ToDoType.NORMAL;
@@ -78,7 +74,8 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
                 command.description(),
                 command.endDate(),
                 command.priorityUrgency(),
-                command.priorityImportance()
+                command.priorityImportance(),
+                null
         );
         toDoRepository.update(toDo);
         updateOrDeleteTag(toDo, command.tagId());
@@ -113,13 +110,13 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         int targetOrderNum = command.targetOrderNum();
 
         if (currentOrderNum > targetOrderNum) {
-            List<OrderInfo> ordersToUpdate = orderInfoRepository.findOrdersBetween(date,targetOrderNum, currentOrderNum - 1);
+            List<OrderInfo> ordersToUpdate = orderInfoRepository.findOrdersBetween(date, targetOrderNum, currentOrderNum - 1);
             for (OrderInfo order : ordersToUpdate) {
                 order.incrementOrder();
                 orderInfoRepository.update(order);
             }
         } else if (currentOrderNum < targetOrderNum) {
-            List<OrderInfo> ordersToUpdate = orderInfoRepository.findOrdersBetween(date,currentOrderNum + 1, targetOrderNum);
+            List<OrderInfo> ordersToUpdate = orderInfoRepository.findOrdersBetween(date, currentOrderNum + 1, targetOrderNum);
             for (OrderInfo order : ordersToUpdate) {
                 order.decrementOrder();
                 orderInfoRepository.update(order);
@@ -250,9 +247,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
                     insertOrder = existingOrder.getOrder();
                     isInserted = true;
                     System.out.println(1);
-                }
-
-                else if (toDo.getPriorityValue().equals(existingOrder.getPriorityValue())) {
+                } else if (toDo.getPriorityValue().equals(existingOrder.getPriorityValue())) {
                     if (toDo.getCreatedAt().isBefore(existingOrder.getCreatedAt())) {
                         insertOrder = existingOrder.getOrder();
                         isInserted = true;
@@ -302,7 +297,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
                     Integer order = orderInfoRepository.findOrderByToDoId(todo.getId());
                     ToDoTag toDoTag = toDoTagRepository.findByToDoId(todo.getId());
 
-                    if(toDoTag!=null) {
+                    if (toDoTag != null) {
                         Tag tag = tagRepository.findById(toDoTag.getTagId());
                         todo.setTag(tag);
                     }
@@ -317,7 +312,14 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         List<ToDo> toDos = toDoRepository.findAllByMemberIdAndStartDate(memberId, date);
         toDos.forEach(todo -> {
             int orderNum = orderInfoRepository.findByToDoId(todo.getId()).getOrderNum();
-            todo.setOrderNum(orderNum);
+            todo.update(
+                    todo.getStartDate(),
+                    todo.getDescription(),
+                    todo.getEndDate(),
+                    todo.getPriorityUrgency(),
+                    todo.getPriorityImportance(),
+                    orderNum
+            );
         });
         return toDos;
     }
