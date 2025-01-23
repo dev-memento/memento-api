@@ -8,6 +8,7 @@ import com.official.memento.orderinfo.domain.OrderInfoRepository;
 import com.official.memento.orderinfo.domain.OrderWithScheduleOrToDo;
 import com.official.memento.orderinfo.infrastructure.persistence.OrderInfoEntity;
 import com.official.memento.orderinfo.infrastructure.persistence.OrderInfoEntityJpaRepository;
+import com.official.memento.orderinfo.infrastructure.persistence.OrderInfoMapper;
 import com.official.memento.orderinfo.infrastructure.persistence.projection.OrderInfoProjection;
 
 import java.time.LocalDate;
@@ -39,7 +40,7 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
     }
 
     @Override
-    public void deleteByToDoId(long toDoId){
+    public void deleteByToDoId(long toDoId) {
         orderInfoEntityJpaRepository.deleteByToDoId(toDoId);
     }
 
@@ -69,6 +70,20 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
     }
 
     @Override
+    public OrderInfo findByToDoIdAndDate(Long toDoId, LocalDate date) {
+        return OrderInfoMapper.toDomain(orderInfoEntityJpaRepository.findByToDoIdAndDate(toDoId, date)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY)));
+    }
+
+    @Override
+    public OrderInfo updateOrderNum(OrderInfo orderInfo, int orderNum) {
+        OrderInfoEntity entity = orderInfoEntityJpaRepository.findById(orderInfo.getId())
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY));
+        entity.updateOrderNum(orderNum);
+        orderInfo.updateOrderNum(orderNum);
+        return orderInfo;
+    }
+  
     public List<OrderInfo> findOrdersBetween(LocalDate date, int startOrder, int endOrder) {
         List<OrderInfoEntity> entities = orderInfoEntityJpaRepository.findOrdersBetween(date, startOrder, endOrder);
         return entities.stream()
@@ -110,5 +125,4 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
     public LocalDate findDateByToDoId(Long toDoId) {
         return orderInfoEntityJpaRepository.findDateByToDoId(toDoId);
     }
-
 }

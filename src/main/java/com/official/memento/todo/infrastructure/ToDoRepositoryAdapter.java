@@ -10,6 +10,7 @@ import com.official.memento.todo.infrastructure.persistence.ToDoJpaRepository;
 import com.official.memento.todo.infrastructure.persistence.ToDoTagJpaRepository;
 import com.official.memento.todo.infrastructure.persistence.projection.ToDoWithOrderProjection;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Adapter
@@ -126,4 +127,31 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
                         )
                 ).toList();
     }
+
+    @Override
+    public List<ToDo> findAllByMemberIdAndStartDate(long memberId, LocalDate startDate) {
+        List<ToDoEntity> toDoEntityList = toDoJpaRepository.findAllByMemberIdAndStartDate(memberId, startDate);
+        return toDoEntityList.stream()
+                .map(
+                        t -> ToDo.withId(
+                                t.getId(),
+                                t.getMemberId(),
+                                t.getGroupId(),
+                                t.getStartDate(),
+                                t.getDescription(),
+                                t.getEndDate(),
+                                t.getIsCompleted(),
+                                t.getRepeatOption(),
+                                t.getRepeatExpiredDate(),
+                                t.getPriorityUrgency(),
+                                t.getPriorityImportance(),
+                                t.getPriorityValue(),
+                                t.getPriorityType(),
+                                t.getType(),
+                                t.getCreatedAt(),
+                                t.getUpdatedAt()
+                        )
+                ).toList();
+    }
+
 }

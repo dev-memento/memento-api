@@ -70,6 +70,9 @@ public class OrderInfo {
         return new OrderInfo(id, scheduleId, toDoId, order, date, planType, createdAt);
     }
 
+    public void updateOrderNum(final int orderNum) {
+        this.orderNum = orderNum;
+
     // 순서를 증가
     public void incrementOrder() {
         this.orderNum += 1;
@@ -78,6 +81,7 @@ public class OrderInfo {
     // 순서를 감소
     public void decrementOrder() {
         this.orderNum -= 1;
+
     }
 
     public Long getId() {

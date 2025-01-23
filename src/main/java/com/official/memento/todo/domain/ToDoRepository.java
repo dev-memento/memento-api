@@ -1,8 +1,6 @@
 package com.official.memento.todo.domain;
 
-import com.official.memento.todo.infrastructure.persistence.ToDoEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-
+import java.time.LocalDate;
 import java.util.List;
 
 public interface ToDoRepository {
@@ -15,4 +13,6 @@ public interface ToDoRepository {
     void deleteById(final long toDoId);
 
     List<ToDo> findAllByMemberId(final long memberId);
+
+    List<ToDo> findAllByMemberIdAndStartDate(final long memberId, final LocalDate startDate);
 }
