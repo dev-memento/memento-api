@@ -123,4 +123,18 @@ public interface ToDoApiDocs {
             @Authorization final AuthorizationUser authorizationUser,
             @RequestParam final LocalDate date
     );
+
+    @Operation(description = "ToDo 디테일 Get API")
+    @ApiResponses(
+            {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Bad Request"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    public ResponseEntity<SuccessResponse<ToDoDetailGetResponse>> getDetailToDos(
+            @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
+            @Authorization final AuthorizationUser authorizationUser,
+            @PathVariable final long toDoId
+    );
 }

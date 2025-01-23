@@ -80,6 +80,7 @@ public class ToDoApiController implements ToDoApiDocs {
     }
 
     @PatchMapping("/{toDoId}")
+    @Override
     public ResponseEntity<SuccessResponse<?>> updateToDo(
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId,
@@ -102,6 +103,7 @@ public class ToDoApiController implements ToDoApiDocs {
     }
 
     @PatchMapping("/{toDoId}/completion")
+    @Override
     public ResponseEntity<SuccessResponse<ToDoCompletionResponse>> updateToDoCompletion(
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId
@@ -120,6 +122,7 @@ public class ToDoApiController implements ToDoApiDocs {
     }
 
     @GetMapping
+    @Override
     public ResponseEntity<SuccessResponse<ToDoAllGetResponse>> getToDos(
             @Authorization final AuthorizationUser authorizationUser
     ) {
@@ -132,6 +135,7 @@ public class ToDoApiController implements ToDoApiDocs {
     }
 
     @PatchMapping("/{toDoId}/position")
+    @Override
     public ResponseEntity<SuccessResponse<?>> updateToDoPosition(
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId,
@@ -146,6 +150,7 @@ public class ToDoApiController implements ToDoApiDocs {
     }
 
     @GetMapping("/date")
+    @Override
     public ResponseEntity<SuccessResponse<ToDoAllGetResponse>> getTodoByDate(
             @Authorization final AuthorizationUser authorizationUser,
             @RequestParam final LocalDate date
@@ -158,7 +163,9 @@ public class ToDoApiController implements ToDoApiDocs {
         );
     }
 
+
     @GetMapping("/{toDoId}")
+    @Override
     public ResponseEntity<SuccessResponse<ToDoDetailGetResponse>> getDetailToDos(
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId
@@ -166,7 +173,7 @@ public class ToDoApiController implements ToDoApiDocs {
         ToDo toDo = toDoGetUseCase.getDetail(authorizationUser.memberId(),toDoId);
         return SuccessResponse.of(
                 HttpStatus.OK,
-                "ToDo 조회 목록 성공",
+                "ToDo 디테일 반환 성공",
                 ToDoDetailGetResponse.of(toDo)
         );
     }
