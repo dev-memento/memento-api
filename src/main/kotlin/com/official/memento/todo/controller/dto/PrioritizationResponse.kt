@@ -5,7 +5,7 @@ import com.official.memento.todo.domain.enums.ToDoType
 import io.swagger.v3.oas.annotations.media.Schema
 
 data class PrioritizationResponse(
-    val todos: List<List<ToDoGetResponse>>,
+    val todos: List<List<ToDoPrioritizedGetResponse>>,
 ) {
     companion object {
         fun of(todos: List<List<ToDo>>): PrioritizationResponse {
@@ -13,7 +13,7 @@ data class PrioritizationResponse(
                 todos =
                     todos.map { toDos ->
                         toDos.map { toDo ->
-                            ToDoGetResponse(
+                            ToDoPrioritizedGetResponse(
                                 id = toDo.id!!,
                                 groupId = toDo.groupId,
                                 description = toDo.description,
@@ -35,7 +35,7 @@ data class PrioritizationResponse(
 }
 
 @Schema(name = "ToDo 목록 응답")
-data class ToDoGetResponse(
+data class ToDoPrioritizedGetResponse(
     @Schema(description = "ToDo ID")
     val id: Long,
     @Schema(description = "그룹 ID")
