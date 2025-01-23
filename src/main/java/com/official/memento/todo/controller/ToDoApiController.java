@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-
 @RestController
 @RequestMapping("/api/v1/todos")
 public class ToDoApiController implements ToDoApiDocs {

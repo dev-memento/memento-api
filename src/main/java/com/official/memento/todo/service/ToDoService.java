@@ -355,8 +355,8 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
 
     private List<ToDo> sortToDosByStartDateAndOrder(List<ToDo> toDos) {
         return toDos.stream()
-                .sorted(Comparator.comparing(ToDo::getStartDate)
-                        .thenComparing(ToDo::getOrderNum))
+                .sorted(Comparator.comparing(ToDo::getStartDate, Comparator.nullsLast(Comparator.naturalOrder()))
+                        .thenComparing(ToDo::getOrderNum, Comparator.nullsLast(Comparator.naturalOrder())))
                 .collect(Collectors.toList());
     }
 }
