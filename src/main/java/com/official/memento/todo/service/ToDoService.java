@@ -5,6 +5,7 @@ import com.official.memento.orderinfo.domain.OrderInfo;
 import com.official.memento.orderinfo.domain.OrderInfoRepository;
 import com.official.memento.orderinfo.domain.OrderWithScheduleOrToDo;
 import com.official.memento.orderinfo.domain.PlanType;
+import com.official.memento.schedule.domain.entity.ScheduleTag;
 import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.TagRepository;
 import com.official.memento.todo.domain.ToDo;
@@ -322,5 +323,19 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
             );
         });
         return toDos;
+    }
+
+    @Override
+    public ToDo getDetail(long memberId, long toDoId){
+        ToDo toDo = toDoRepository.findById(toDoId);
+        checkOwn(memberId, toDo);
+        ToDoTag toDoTag = toDoTagRepository.findByToDoId(toDoId);
+        Tag tag = tagRepository.findById(toDoTag.getTagId());
+        if(toDoTag!=null) {
+            toDo.setTagId(toDoTag.getTagId());
+            toDo.setTagName(tag.getName());
+            toDo.setTagColor(tag.getColor());
+        }
+        return toDo;
     }
 }

@@ -26,6 +26,7 @@ public class ToDo extends BaseTimeEntity {
     private PriorityType priorityType;
     private ToDoType type;
     private Integer orderNum;
+    private Long tagId;
     private String tagName;
     private TagColor tagColor;
 
@@ -113,6 +114,7 @@ public class ToDo extends BaseTimeEntity {
             final LocalDateTime createdAt,
             final LocalDateTime updatedAt,
             final Integer orderNum,
+            final Long tagId,
             final String tagName,
             final TagColor tagColor
     ) {
@@ -133,6 +135,7 @@ public class ToDo extends BaseTimeEntity {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.orderNum = orderNum;
+        this.tagId=tagId;
         this.tagName = tagName;
         this.tagColor = tagColor;
     }
@@ -307,6 +310,7 @@ public class ToDo extends BaseTimeEntity {
             final LocalDateTime createdAt,
             final LocalDateTime updatedAt,
             final Integer orderNum,
+            final Long tagId,
             final String tagName,
             final TagColor tagColor
     ) {
@@ -328,11 +332,11 @@ public class ToDo extends BaseTimeEntity {
                 createdAt,
                 updatedAt,
                 orderNum,
+                tagId,
                 tagName,
                 tagColor
         );
     }
-
 
     public void update(
             final LocalDate startDate,
@@ -419,6 +423,10 @@ public class ToDo extends BaseTimeEntity {
     public void setOrderNum(Integer orderNum) {
         this.orderNum = orderNum;
     }
+
+    public Long getTagId(){return tagId;}
+
+    public void setTagId(Long tagId){this.tagId=tagId;}
 
     public String getTagName() {
         return tagName;

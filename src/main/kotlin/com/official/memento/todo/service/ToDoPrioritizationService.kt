@@ -51,6 +51,7 @@ class ToDoPrioritizationService(
                         toDo.createdAt,
                         toDo.updatedAt,
                         it.order,
+                        tag.id,
                         tag.name,
                         tag.color,
                     )
