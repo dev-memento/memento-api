@@ -157,4 +157,17 @@ public class ToDoApiController implements ToDoApiDocs {
                 ToDoAllGetResponse.of(todos)
         );
     }
+
+    @GetMapping("/{toDoId}")
+    public ResponseEntity<SuccessResponse<ToDoDetailGetResponse>> getDetailToDos(
+            @Authorization final AuthorizationUser authorizationUser,
+            @PathVariable final long toDoId
+    ) {
+        ToDo toDo = toDoGetUseCase.getDetail(authorizationUser.memberId(),toDoId);
+        return SuccessResponse.of(
+                HttpStatus.OK,
+                "ToDo 조회 목록 성공",
+                ToDoDetailGetResponse.of(toDo)
+        );
+    }
 }

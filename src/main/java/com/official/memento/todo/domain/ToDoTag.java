@@ -64,4 +64,16 @@ public class ToDoTag extends BaseTimeEntity {
     public long getToDoId() {
         return toDoId;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setTagId(long tagId) {
+        this.tagId = tagId;
+    }
+
+    public void setToDoId(long toDoId) {
+        this.toDoId = toDoId;
+    }
 }
