@@ -24,7 +24,7 @@ class AlarmSendClientAdapter(
             webClient.post()
                 .uri(uri)
                 .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .bodyValue(AlarmRequestBody(content))
+                .bodyValue(AlarmRequestBody(content= content, embeds = null))
                 .retrieve()
                 .awaitBodilessEntity()
         }
@@ -35,7 +35,16 @@ class AlarmSendClientAdapter(
             webClient.post()
                 .uri(discordErrorAlarmUri)
                 .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .bodyValue(AlarmRequestBody(e.message ?: "알 수 없는 에러 발생"))
+                .bodyValue(
+                    AlarmRequestBody(
+                    content = "에러 발생 : ${e.message} ( ${e.javaClass.simpleName} )",
+                    listOf(
+                        Embed(
+                            title = "Stack Trace",
+                            description = parseStackTrace(e),
+                        ),
+                    ),
+                ))
                 .retrieve()
                 .awaitBodilessEntity()
         }
@@ -43,5 +52,20 @@ class AlarmSendClientAdapter(
 
     data class AlarmRequestBody(
         val content: String,
+        val embeds: List<Embed>?
     )
+
+
+    data class Embed(
+        val title: String,
+        val description: String,
+    )
+
+    private fun parseStackTrace(exception: Exception): String {
+        val stackTrace = exception.stackTraceToString()
+        if (stackTrace.length > 2000) {
+            return stackTrace.substring(0, 2000)
+        }
+        return stackTrace
+    }
 }
