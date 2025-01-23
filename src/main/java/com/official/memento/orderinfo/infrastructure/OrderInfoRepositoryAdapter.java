@@ -65,7 +65,7 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
     @Override
     public Integer findOrderByToDoId(Long toDoId) {
         return orderInfoEntityJpaRepository.findOrderByToDoId(toDoId)
-                .map(orderInfo -> orderInfo.getOrderNum()) // 예: orderNum 필드 가져오기
+                .map(OrderInfoEntity::getOrderNum) // 예: orderNum 필드 가져오기
                 .orElse(null); // 결과가 없을 경우 null 반환
     }
 
