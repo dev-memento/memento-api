@@ -335,8 +335,8 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         ToDo toDo = toDoRepository.findById(toDoId);
         checkOwn(memberId, toDo);
         ToDoTag toDoTag = toDoTagRepository.findByToDoId(toDoId);
-        Tag tag = tagRepository.findById(toDoTag.getTagId());
         if(toDoTag!=null) {
+            Tag tag = tagRepository.findById(toDoTag.getTagId());
             toDo.setTagId(toDoTag.getTagId());
             toDo.setTagName(tag.getName());
             toDo.setTagColor(tag.getColor());
