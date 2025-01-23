@@ -344,7 +344,9 @@ public class ToDo extends BaseTimeEntity {
             final LocalDate endDate,
             final Double priorityUrgency,
             final Double priorityImportance,
-            final Integer orderNum
+            final Integer orderNum,
+            final PriorityType priorityType,
+            final Double priorityValue
     ) {
         this.startDate = startDate;
         this.description = description;
@@ -352,6 +354,8 @@ public class ToDo extends BaseTimeEntity {
         this.priorityUrgency = priorityUrgency;
         this.priorityImportance = priorityImportance;
         this.orderNum = orderNum;
+        this.priorityType = priorityType;
+        this.priorityValue = priorityValue;
     }
 
     public void updateCompletion(
@@ -447,6 +451,62 @@ public class ToDo extends BaseTimeEntity {
     public void setTag(Tag tag) {
         this.tagName = tag.getName();
         this.tagColor = tag.getColor();
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setMemberId(long memberId) {
+        this.memberId = memberId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public void setCompleted(boolean completed) {
+        isCompleted = completed;
+    }
+
+    public void setRepeatOption(RepeatOption repeatOption) {
+        this.repeatOption = repeatOption;
+    }
+
+    public void setRepeatExpiredDate(LocalDate repeatExpiredDate) {
+        this.repeatExpiredDate = repeatExpiredDate;
+    }
+
+    public void setPriorityUrgency(Double priorityUrgency) {
+        this.priorityUrgency = priorityUrgency;
+    }
+
+    public void setPriorityImportance(Double priorityImportance) {
+        this.priorityImportance = priorityImportance;
+    }
+
+    public void setPriorityValue(Double priorityValue) {
+        this.priorityValue = priorityValue;
+    }
+
+    public void setPriorityType(PriorityType priorityType) {
+        this.priorityType = priorityType;
+    }
+
+    public void setType(ToDoType type) {
+        this.type = type;
     }
 
     public String toTaskDescription() {
