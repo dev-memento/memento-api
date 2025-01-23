@@ -5,7 +5,6 @@ import com.official.memento.orderinfo.domain.OrderInfo;
 import com.official.memento.orderinfo.domain.OrderInfoRepository;
 import com.official.memento.orderinfo.domain.OrderWithScheduleOrToDo;
 import com.official.memento.orderinfo.domain.PlanType;
-import com.official.memento.schedule.domain.entity.ScheduleTag;
 import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.TagRepository;
 import com.official.memento.todo.domain.ToDo;
@@ -19,8 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.official.memento.todo.domain.enums.ToDoType.NORMAL;
 
@@ -70,8 +72,12 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
     public void update(final ToDoUpdateCommand command) {
         ToDo toDo = toDoRepository.findById(command.toDoId());
         checkOwn(command.memberId(), toDo);
-        String groupId = toDo.getGroupId();
-        PriorityType newPriorityType = determinePriorityType(command.priorityUrgency(), command.priorityImportance());
+        PriorityType newPriorityType = toDo.getPriorityType();
+        Double newPriorityValue = toDo.getPriorityValue();
+        if (!Objects.equals(command.priorityUrgency(), toDo.getPriorityUrgency()) || !Objects.equals(command.priorityImportance(), toDo.getPriorityImportance())) {
+            newPriorityType = determinePriorityType(command.priorityUrgency(), command.priorityImportance());
+            newPriorityValue = calculatePriorityValue(command.priorityUrgency(), command.priorityImportance());
+        }
         toDo.update(
                 command.startDate(),
                 command.description(),
@@ -79,12 +85,11 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
                 command.priorityUrgency(),
                 command.priorityImportance(),
                 null,
-                newPriorityType
+                newPriorityType,
+                newPriorityValue
         );
-        toDo.setGroupId(groupId);
         toDoRepository.update(toDo);
         updateOrDeleteTag(toDo, command.tagId());
-
         if (toDo.getStartDate() != command.startDate() || toDo.getEndDate() != command.endDate()) {
             orderInfoRepository.deleteByToDoId(toDo.getId());
             assignOrder(command.startDate(), toDo);
@@ -297,7 +302,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
 
     public List<ToDo> getToDos(final long memberId) {
         List<ToDo> todos = toDoRepository.findAllByMemberId(memberId);
-        return todos.stream()
+        List<ToDo> toDos = todos.stream()
                 .peek(todo -> {
                     Integer order = orderInfoRepository.findOrderByToDoId(todo.getId());
                     ToDoTag toDoTag = toDoTagRepository.findByToDoId(todo.getId());
@@ -310,6 +315,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
                     todo.setOrderNum(order);
                 })
                 .toList();
+        return sortToDosByStartDateAndOrder(toDos);
     }
 
     @Override
@@ -324,23 +330,31 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
                     todo.getPriorityUrgency(),
                     todo.getPriorityImportance(),
                     orderNum,
-                    todo.getPriorityType()
+                    todo.getPriorityType(),
+                    todo.getPriorityValue()
             );
         });
         return toDos;
     }
 
     @Override
-    public ToDo getDetail(long memberId, long toDoId){
+    public ToDo getDetail(long memberId, long toDoId) {
         ToDo toDo = toDoRepository.findById(toDoId);
         checkOwn(memberId, toDo);
         ToDoTag toDoTag = toDoTagRepository.findByToDoId(toDoId);
-        if(toDoTag!=null) {
+        if (toDoTag != null) {
             Tag tag = tagRepository.findById(toDoTag.getTagId());
             toDo.setTagId(toDoTag.getTagId());
             toDo.setTagName(tag.getName());
             toDo.setTagColor(tag.getColor());
         }
         return toDo;
+    }
+
+    private List<ToDo> sortToDosByStartDateAndOrder(List<ToDo> toDos) {
+        return toDos.stream()
+                .sorted(Comparator.comparing(ToDo::getStartDate)
+                        .thenComparing(ToDo::getOrderNum))
+                .collect(Collectors.toList());
     }
 }
