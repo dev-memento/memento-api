@@ -3,14 +3,11 @@ package com.official.memento.orderinfo.infrastructure.persistence;
 import com.official.memento.orderinfo.domain.PlanType;
 import com.official.memento.orderinfo.domain.OrderInfo;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "order_info")
 public class OrderInfoEntity {
 
@@ -58,6 +55,10 @@ public class OrderInfoEntity {
         this.date = date;
         this.planType = planType;
         this.createdAt = createdAt;
+    }
+
+    protected OrderInfoEntity() {
+
     }
 
     public static OrderInfoEntity of(final OrderInfo orderInfo) {

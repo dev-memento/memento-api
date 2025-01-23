@@ -51,7 +51,7 @@ public record ToDoGetResponse(
                 toDo.getDescription(),
                 toDo.getStartDate().toString(),
                 toDo.getEndDate().toString(),
-                toDo.getIsCompleted(),
+                toDo.isCompleted(),
                 toDo.getPriorityValue(),
                 toDo.getPriorityType().name(),
                 toDo.getTagName() == null ? "" : toDo.getTagName(),

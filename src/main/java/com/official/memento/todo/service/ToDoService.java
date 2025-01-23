@@ -15,7 +15,6 @@ import com.official.memento.todo.domain.ToDoTag;
 import com.official.memento.todo.domain.ToDoTagRepository;
 import com.official.memento.todo.domain.enums.PriorityType;
 import com.official.memento.todo.service.command.*;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,13 +29,19 @@ import java.util.stream.Collectors;
 import static com.official.memento.todo.domain.enums.ToDoType.NORMAL;
 
 @Service
-@RequiredArgsConstructor
 public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUpdateUseCase, ToDoGetUseCase {
 
     private final ToDoRepository toDoRepository;
     private final ToDoTagRepository toDoTagRepository;
     private final TagRepository tagRepository;
     private final OrderInfoRepository orderInfoRepository;
+
+    public ToDoService(ToDoRepository toDoRepository, ToDoTagRepository toDoTagRepository, TagRepository tagRepository, OrderInfoRepository orderInfoRepository) {
+        this.toDoRepository = toDoRepository;
+        this.toDoTagRepository = toDoTagRepository;
+        this.tagRepository = tagRepository;
+        this.orderInfoRepository = orderInfoRepository;
+    }
 
     @Override
     @Transactional
@@ -130,11 +135,11 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         orderInfoRepository.update(orderInfo);
     }
 
-
     @Transactional(readOnly = true)
+    @Override
     public List<ToDo> getToDos(final long memberId) {
         List<ToDo> todos = toDoRepository.findAllByMemberId(memberId);
-        return todos.stream()
+        List<ToDo> toDos = todos.stream()
                 .peek(todo -> {
                     Integer order = orderInfoRepository.findOrderByToDoId(todo.getId());
                     ToDoTag toDoTag = toDoTagRepository.findByToDoId(todo.getId());
@@ -147,8 +152,10 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
                     todo.updateOrderNum(order);
                 })
                 .toList();
+        return sortToDosByStartDateAndOrder(toDos);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<ToDo> getTodosByDate(long memberId, LocalDate date) {
         List<ToDo> toDos = toDoRepository.findAllByMemberIdAndStartDate(memberId, date);
@@ -160,24 +167,29 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
                     todo.getEndDate(),
                     todo.getPriorityUrgency(),
                     todo.getPriorityImportance(),
-                    orderNum
+                    orderNum,
+                    todo.getPriorityType(),
+                    todo.getPriorityValue()
             );
         });
         return toDos;
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public ToDo getDetail(long memberId, long toDoId){
+    public ToDo getDetail(long memberId, long toDoId) {
         ToDo toDo = toDoRepository.findById(toDoId);
         checkOwn(memberId, toDo);
         ToDoTag toDoTag = toDoTagRepository.findByToDoId(toDoId);
-        Tag tag = tagRepository.findById(toDoTag.getTagId());
-        if (toDoTag!=null) {
-            toDo.updateTagId(toDoTag.getTagId());
+        if (toDoTag != null) {
+            Tag tag = tagRepository.findById(toDoTag.getTagId());
             toDo.updateTag(tag);
+            toDo.updateTagId(toDoTag.getTagId());
         }
         return toDo;
     }
+
+
 
     private void createSingleToDo(final ToDoCreateCommand command, final String toDoGroupId) {
         Double priorityValue = calculatePriorityValue(command.priorityUrgency(), command.priorityImportance());
@@ -339,57 +351,6 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
                 PlanType.TODO,
                 LocalDateTime.now()
         ));
-    }
-
-    public List<ToDo> getToDos(final long memberId) {
-        List<ToDo> todos = toDoRepository.findAllByMemberId(memberId);
-        List<ToDo> toDos = todos.stream()
-                .peek(todo -> {
-                    Integer order = orderInfoRepository.findOrderByToDoId(todo.getId());
-                    ToDoTag toDoTag = toDoTagRepository.findByToDoId(todo.getId());
-
-                    if (toDoTag != null) {
-                        Tag tag = tagRepository.findById(toDoTag.getTagId());
-                        todo.setTag(tag);
-                    }
-
-                    todo.setOrderNum(order);
-                })
-                .toList();
-        return sortToDosByStartDateAndOrder(toDos);
-    }
-
-    @Override
-    public List<ToDo> getTodosByDate(long memberId, LocalDate date) {
-        List<ToDo> toDos = toDoRepository.findAllByMemberIdAndStartDate(memberId, date);
-        toDos.forEach(todo -> {
-            int orderNum = orderInfoRepository.findByToDoId(todo.getId()).getOrderNum();
-            todo.update(
-                    todo.getStartDate(),
-                    todo.getDescription(),
-                    todo.getEndDate(),
-                    todo.getPriorityUrgency(),
-                    todo.getPriorityImportance(),
-                    orderNum,
-                    todo.getPriorityType(),
-                    todo.getPriorityValue()
-            );
-        });
-        return toDos;
-    }
-
-    @Override
-    public ToDo getDetail(long memberId, long toDoId) {
-        ToDo toDo = toDoRepository.findById(toDoId);
-        checkOwn(memberId, toDo);
-        ToDoTag toDoTag = toDoTagRepository.findByToDoId(toDoId);
-        if (toDoTag != null) {
-            Tag tag = tagRepository.findById(toDoTag.getTagId());
-            toDo.setTagId(toDoTag.getTagId());
-            toDo.setTagName(tag.getName());
-            toDo.setTagColor(tag.getColor());
-        }
-        return toDo;
     }
 
     private List<ToDo> sortToDosByStartDateAndOrder(List<ToDo> toDos) {

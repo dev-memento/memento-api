@@ -18,7 +18,7 @@ class AlarmService(
     }
 
     override fun sendException(command: AlarmExceptionCommand) {
-        alarmOutputPort.sendExceptionAlarm(e)
+        alarmOutputPort.sendExceptionAlarm(command.e)
         TODO("Not yet implemented")
     }
 

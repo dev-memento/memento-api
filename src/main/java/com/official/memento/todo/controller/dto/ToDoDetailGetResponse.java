@@ -42,7 +42,7 @@ public record ToDoDetailGetResponse(
                 toDo.getDescription(),
                 toDo.getStartDate().toString(),
                 toDo.getEndDate().toString(),
-                toDo.getIsCompleted(),
+                toDo.isCompleted(),
                 toDo.getPriorityType().name(),
                 toDo.getTagId() == null ? 0L : toDo.getTagId(),
                 toDo.getTagName() == null ? "" : toDo.getTagName(),
