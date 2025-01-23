@@ -1,8 +1,10 @@
 package com.official.memento.todo.service
 
+import com.official.memento.global.entity.enums.RepeatOption
 import com.official.memento.todo.domain.BrainDumpClientOutputPort
 import com.official.memento.todo.domain.ToDo
 import com.official.memento.todo.domain.ToDoRepository
+import com.official.memento.todo.domain.enums.PriorityType
 import com.official.memento.todo.domain.enums.ToDoType
 import com.official.memento.todo.domain.vo.BrainDump
 import com.official.memento.todo.domain.vo.ToDoBrainDump
@@ -29,12 +31,12 @@ class BrainDumpService(
                 toDoBrainDump.task,
                 toDoBrainDump.deadline,
                 false,
-                null,
+                RepeatOption.NONE,
                 null,
                 toDoBrainDump.urgency.toDouble(),
                 toDoBrainDump.importance.toDouble(),
                 toDoBrainDump.urgency * 0.3 + toDoBrainDump.importance * 0.7,
-                null,
+                PriorityType.findPriorityType(toDoBrainDump.urgency.toDouble(), toDoBrainDump.importance.toDouble()),
                 ToDoType.NORMAL,
             )
         toDoRepository.save(toDo)
