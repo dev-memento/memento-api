@@ -29,7 +29,7 @@ public enum PriorityType {
         if (x > 1.0 || y > 1.0) {
             throw new IllegalArgumentException("좌표 값이 1을 초과할 수 없습니다: x=" + x + ", y=" + y);
         }
-        if (x == null && y == null) {
+        if (x == null || y == null) {
             return NONE;
         } else {
             return Arrays.stream(PriorityType.values())
