@@ -56,7 +56,7 @@ public record ToDoGetResponse(
                 toDo.getPriorityType().name(),
                 toDo.getTagName() == null ? "" : toDo.getTagName(),
                 toDo.getTagColor() == null ? "" : toDo.getTagColor().getHexCode(),
-                NORMAL,
+                toDo.getType(),
                 toDo.getOrderNum()
         );
     }

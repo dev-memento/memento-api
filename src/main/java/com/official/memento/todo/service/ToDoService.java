@@ -311,4 +311,14 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
                 })
                 .toList();
     }
+
+    @Override
+    public List<ToDo> getTodosByDate(long memberId, LocalDate date) {
+        List<ToDo> toDos = toDoRepository.findAllByMemberIdAndStartDate(memberId, date);
+        toDos.forEach(todo -> {
+            int orderNum = orderInfoRepository.findByToDoId(todo.getId()).getOrderNum();
+            todo.setOrderNum(orderNum);
+        });
+        return toDos;
+    }
 }
