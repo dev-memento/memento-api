@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -144,4 +145,16 @@ public class ToDoApiController implements ToDoApiDocs {
         );
     }
 
+    @GetMapping("/date")
+    public ResponseEntity<SuccessResponse<ToDoAllGetResponse>> getTodoByDate(
+            @Authorization final AuthorizationUser authorizationUser,
+            @RequestParam final LocalDate date
+    ) {
+        List<ToDo> todos = toDoGetUseCase.getTodosByDate(authorizationUser.memberId(), date);
+        return SuccessResponse.of(
+                HttpStatus.OK,
+                "당일 투두 불러오기 성공",
+                ToDoAllGetResponse.of(todos)
+        );
+    }
 }

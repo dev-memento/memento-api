@@ -72,6 +72,7 @@ public class OrderInfo {
 
     public void updateOrderNum(final int orderNum) {
         this.orderNum = orderNum;
+    }
 
     // 순서를 증가
     public void incrementOrder() {
@@ -112,7 +113,7 @@ public class OrderInfo {
         return orderNum;
     }
 
-    public void setOrderNum(int orderNum){
+    public void setOrderNum(int orderNum) {
         this.orderNum = orderNum;
     }
 }
