@@ -345,7 +345,8 @@ public class ToDo extends BaseTimeEntity {
             final Double priorityUrgency,
             final Double priorityImportance,
             final Integer orderNum,
-            final PriorityType priorityType
+            final PriorityType priorityType,
+            final Double priorityValue
     ) {
         this.startDate = startDate;
         this.description = description;
@@ -354,6 +355,7 @@ public class ToDo extends BaseTimeEntity {
         this.priorityImportance = priorityImportance;
         this.orderNum = orderNum;
         this.priorityType = priorityType;
+        this.priorityValue = priorityValue;
     }
 
     public void updateCompletion(
