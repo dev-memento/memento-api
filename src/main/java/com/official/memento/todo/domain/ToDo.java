@@ -6,14 +6,10 @@ import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.enums.TagColor;
 import com.official.memento.todo.domain.enums.PriorityType;
 import com.official.memento.todo.domain.enums.ToDoType;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@NoArgsConstructor
-@Getter
 public class ToDo extends BaseTimeEntity {
     private Long id;
     private long memberId;
@@ -33,6 +29,9 @@ public class ToDo extends BaseTimeEntity {
     private Long tagId;
     private String tagName;
     private TagColor tagColor;
+
+    public ToDo() {
+    }
 
     private ToDo(
             final Long id,
@@ -384,6 +383,79 @@ public class ToDo extends BaseTimeEntity {
 
     public void updateOrderNum(Integer orderNum) {
         this.orderNum = orderNum;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public long getMemberId() {
+        return memberId;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public boolean isCompleted() {
+        return isCompleted;
+    }
+
+    public RepeatOption getRepeatOption() {
+        return repeatOption;
+    }
+
+    public LocalDate getRepeatExpiredDate() {
+        return repeatExpiredDate;
+    }
+
+    public Double getPriorityUrgency() {
+        return priorityUrgency;
+    }
+
+    public Double getPriorityImportance() {
+        return priorityImportance;
+    }
+
+    public Double getPriorityValue() {
+        return priorityValue;
+    }
+
+    public PriorityType getPriorityType() {
+        return priorityType;
+    }
+
+    public ToDoType getType() {
+        return type;
+    }
+
+    public Integer getOrderNum() {
+        return orderNum;
+    }
+
+    public Long getTagId() {
+        return tagId;
+    }
+
+    public String getTagName() {
+        return tagName;
+    }
+
+    public TagColor getTagColor() {
+        return tagColor;
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -439,7 +511,6 @@ public class ToDo extends BaseTimeEntity {
 
     public void setType(ToDoType type) {
         this.type = type;
-
     }
 
     public String toTaskDescription() {
