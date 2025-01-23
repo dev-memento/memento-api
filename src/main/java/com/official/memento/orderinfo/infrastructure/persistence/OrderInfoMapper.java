@@ -11,7 +11,7 @@ public class OrderInfoMapper {
             entity.getToDoId(),
             entity.getOrderNum(),
             entity.getDate(),
-            entity.getEventType(),
+            entity.getPlanType(),
             entity.getCreatedAt()
         );
     }

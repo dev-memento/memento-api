@@ -6,7 +6,6 @@ import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.enums.TagColor;
 import com.official.memento.todo.domain.enums.PriorityType;
 import com.official.memento.todo.domain.enums.ToDoType;
-import com.official.memento.todo.domain.vo.BrainDump;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -340,14 +339,15 @@ public class ToDo extends BaseTimeEntity {
             final String description,
             final LocalDate endDate,
             final Double priorityUrgency,
-            final Double priorityImportance
+            final Double priorityImportance,
+            final Integer orderNum
     ) {
         this.startDate = startDate;
         this.description = description;
         this.endDate = endDate;
         this.priorityUrgency = priorityUrgency;
         this.priorityImportance = priorityImportance;
-
+        this.orderNum = orderNum;
     }
 
     public void updateCompletion(

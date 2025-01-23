@@ -4,15 +4,23 @@ import com.official.memento.global.annotation.Authorization;
 import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
 import com.official.memento.todo.controller.dto.*;
+import com.official.memento.todo.domain.ToDo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.time.LocalDate;
+import java.util.List;
+
 
 @Tag(name = "[ToDo API] 할 일 관련 API")
 public interface ToDoApiDocs {
@@ -25,7 +33,7 @@ public interface ToDoApiDocs {
                     @ApiResponse(responseCode = "500", description = "Internal Server Error")
             }
     )
-    ResponseEntity<SuccessResponse<?>> createToDo(
+    public ResponseEntity<SuccessResponse<?>> createToDo(
             @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
             @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final ToDoCreateRequest request
@@ -39,7 +47,7 @@ public interface ToDoApiDocs {
                     @ApiResponse(responseCode = "500", description = "Internal Server Error")
             }
     )
-    ResponseEntity<SuccessResponse<?>> deleteToDo(
+    public ResponseEntity<SuccessResponse<?>> deleteToDo(
             @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId
@@ -53,7 +61,7 @@ public interface ToDoApiDocs {
                     @ApiResponse(responseCode = "500", description = "Internal Server Error")
             }
     )
-    ResponseEntity<SuccessResponse<?>> updateToDo(
+    public ResponseEntity<SuccessResponse<?>> updateToDo(
             @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId,
@@ -68,7 +76,7 @@ public interface ToDoApiDocs {
                     @ApiResponse(responseCode = "500", description = "Internal Server Error")
             }
     )
-    ResponseEntity<SuccessResponse<ToDoCompletionResponse>> updateToDoCompletion(
+    public ResponseEntity<SuccessResponse<ToDoCompletionResponse>> updateToDoCompletion(
             @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId
@@ -82,7 +90,7 @@ public interface ToDoApiDocs {
                     @ApiResponse(responseCode = "500", description = "Internal Server Error")
             }
     )
-    ResponseEntity<SuccessResponse<ToDoAllGetResponse>> getToDos(
+    public ResponseEntity<SuccessResponse<ToDoAllGetResponse>> getToDos(
             @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
             @Authorization final AuthorizationUser authorizationUser
     );
@@ -100,5 +108,19 @@ public interface ToDoApiDocs {
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId,
             @RequestBody final ToDoDragAndDropRequest request
+    );
+
+    @Operation(description = "당일 ToDo Get API")
+    @ApiResponses(
+            {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Bad Request"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    public ResponseEntity<SuccessResponse<ToDoAllGetResponse>> getTodoByDate(
+            @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
+            @Authorization final AuthorizationUser authorizationUser,
+            @RequestParam final LocalDate date
     );
 }
