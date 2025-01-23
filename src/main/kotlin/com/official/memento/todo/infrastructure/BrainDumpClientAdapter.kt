@@ -29,13 +29,56 @@ class BrainDumpClientAdapter(
         private val BRAINDUMP_PROMPT_FILE_PATH = "src/main/resources/braindump-prompt.txt"
     }
 
-    private lateinit var brainDumpPrompt: String
+    private var brainDumpPrompt: String = """
+        You are an AI assistant designed to analyze user input and extract task information to create a structured task entry. Your goal is to process natural language input and organize it into a standardized format for task management.\n
+        Here is the user input you need to analyze: {{USER_INPUT}}\n
+        Please follow these steps to create a structured task entry:\n
+        1. Analyze the user input and extract the following information:\n
+           - Task description\n
+           - Deadline (if mentioned)\n
+           - Created date (if mentioned)\n
+           - Indicators of urgency and importance\n
+        2. Wrap your analysis inside <task_analysis> tags. Break down your thought process for each component as follows:\n
+           - Quote relevant parts of the user input for each component.\n
+           - For urgency and importance, explicitly consider and note down factors affecting the scores.\n
+           - When estimating deadlines not explicitly mentioned, show your reasoning. This analysis will not be included in the final output but will help ensure accurate information extraction.\n
+        3. After your analysis, create a structured task entry with the following components:\n
+           - Task: The main action or objective (concise description)\n
+           - Deadline: Due date for the task (format: YYYY-MM-DD)\n
+           - Created Date: Date the task was created or mentioned (format: YYYY-MM-DD)\n
+           - Urgency: Score from 0 to 1 (two decimal places)\n
+           - Importance: Score from 0 to 1 (two decimal places)\n
+           - Priority: Calculated score using the formula: (Urgency * 0.3) + (Importance * 0.7)\n
+        4. Guidelines for each component:\n
+           - Task: Extract the main action or objective from the input text.\n
+           - Deadline:
+             - If explicitly mentioned, use the date provided.\n
+             - If not mentioned, estimate a reasonable deadline based on the task's nature and context.\n
+           - Created Date:
+             - If mentioned in the text, use that date.\n
+             - If not mentioned, use today's date.\n
+           - Urgency and Importance:\n
+             - Analyze the text for keywords, phrases, and context indicating urgency and importance.\n
+             - Assign scores from 0 to 1 (two decimal places) for both.\n
+             - Consider factors such as deadline proximity, urgent language, and task significance.\n
+             - If unclear, default to 0.50 for either score.\n
+        5. Ensure all fields are filled with valid values. Do not leave any field empty or null.\n
+        6. Provide your output in the following format:\n
+           {\n
+             "task": "[Task description]",\n
+             "deadline": "[Deadline date in YYYY-MM-DD format]",\n
+             "created_date": "[Created date in YYYY-MM-DD format]",\n
+             "urgency": "[Urgency score from 0 to 1, two decimal places]",\n
+             "importance": "[Importance score from 0 to 1, two decimal places]",\n
+             "priority": "[Calculated priority score from 0 to 1, two decimal places]"\n
+           }\n
+        Remember, your analysis should be separate from the final task entry output. The user is only interested in the structured task entry.
+    """.trimIndent()
 
     private var userInput: String? = null
 
     override fun createByBrainDump(brainDump: BrainDump): ToDoBrainDump {
         userInput = brainDump.content
-        brainDumpPrompt = readPromptFromFile()
         val replacedPrompt = brainDumpPrompt.replace("{{USER_INPUT}}", userInput!!)
 
         val response =
@@ -127,11 +170,11 @@ class BrainDumpClientAdapter(
             priority = taskJsonResponse.priority,
         )
     }
-
-    private fun readPromptFromFile(): String {
-        val path = Paths.get(BRAINDUMP_PROMPT_FILE_PATH)
-        return Files.readString(path)
-    }
+//
+//    private fun readPromptFromFile(): String {
+//        val path = Paths.get(BRAINDUMP_PROMPT_FILE_PATH)
+//        return Files.readString(path)
+//    }
 
     data class ClaudeMessage(
         val role: String,
