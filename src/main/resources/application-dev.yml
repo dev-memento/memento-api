@@ -26,3 +26,6 @@ springdoc:
 claude:
   ai:
     api-key: ${CLAUDE.API-KEY.local}
+
+discord:
+  error-alert-url: ${DISCORD.ERROR_ALERT_URL.dev}

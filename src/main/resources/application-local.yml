@@ -11,7 +11,7 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
@@ -29,3 +29,6 @@ claude:
 logging:
   level:
     root: INFO
+
+discord:
+  error-alert-url: ${DISCORD.ERROR_ALERT_URL.local}

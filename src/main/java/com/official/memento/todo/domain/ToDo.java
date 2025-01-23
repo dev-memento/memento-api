@@ -6,10 +6,14 @@ import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.enums.TagColor;
 import com.official.memento.todo.domain.enums.PriorityType;
 import com.official.memento.todo.domain.enums.ToDoType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@NoArgsConstructor
+@Getter
 public class ToDo extends BaseTimeEntity {
     private Long id;
     private long memberId;
@@ -360,93 +364,21 @@ public class ToDo extends BaseTimeEntity {
         this.isCompleted = isCompleted;
     }
 
-    public Long getId() {
-        return id;
+    public void updateTagId(Long tagId) {
+        this.tagId = tagId;
     }
 
-    public long getMemberId() {
-        return memberId;
-    }
-
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public boolean getIsCompleted() {
-        return isCompleted;
-    }
-
-    public RepeatOption getRepeatOption() {
-        return repeatOption;
-    }
-
-    public LocalDate getRepeatExpiredDate() {
-        return repeatExpiredDate;
-    }
-
-    public Double getPriorityUrgency() {
-        return priorityUrgency;
-    }
-
-    public Double getPriorityImportance() {
-        return priorityImportance;
-    }
-
-    public Double getPriorityValue() {
-        return priorityValue;
-    }
-
-    public PriorityType getPriorityType() {
-        return priorityType;
-    }
-
-    public ToDoType getType() {
-        return type;
-    }
-
-    public Integer getOrderNum() {
-        return orderNum;
-    }
-
-    public void setOrderNum(Integer orderNum) {
-        this.orderNum = orderNum;
-    }
-
-    public Long getTagId(){return tagId;}
-
-    public void setTagId(Long tagId){this.tagId=tagId;}
-
-    public String getTagName() {
-        return tagName;
-    }
-
-    public void setTagName(String tagName) {
-        this.tagName = tagName;
-    }
-
-    public TagColor getTagColor() {
-        return tagColor;
-    }
-
-    public void setTagColor(TagColor tagColor) {
+    public void updateTagColor(TagColor tagColor) {
         this.tagColor = tagColor;
     }
 
-    public void setTag(Tag tag) {
+    public void updateTag(Tag tag) {
         this.tagName = tag.getName();
         this.tagColor = tag.getColor();
+    }
+
+    public void updateOrderNum(Integer orderNum) {
+        this.orderNum = orderNum;
     }
 
     public String toTaskDescription() {

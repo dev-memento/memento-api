@@ -1,11 +1,12 @@
 package com.official.memento.todo.service;
 
 import com.official.memento.global.entity.enums.RepeatOption;
+import com.official.memento.global.exception.ErrorCode;
+import com.official.memento.global.exception.UnauthorizedException;
 import com.official.memento.orderinfo.domain.OrderInfo;
 import com.official.memento.orderinfo.domain.OrderInfoRepository;
 import com.official.memento.orderinfo.domain.OrderWithScheduleOrToDo;
 import com.official.memento.orderinfo.domain.PlanType;
-import com.official.memento.schedule.domain.entity.ScheduleTag;
 import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.TagRepository;
 import com.official.memento.todo.domain.ToDo;
@@ -14,6 +15,7 @@ import com.official.memento.todo.domain.ToDoTag;
 import com.official.memento.todo.domain.ToDoTagRepository;
 import com.official.memento.todo.domain.enums.PriorityType;
 import com.official.memento.todo.service.command.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,24 +27,13 @@ import java.util.UUID;
 import static com.official.memento.todo.domain.enums.ToDoType.NORMAL;
 
 @Service
+@RequiredArgsConstructor
 public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUpdateUseCase, ToDoGetUseCase {
 
     private final ToDoRepository toDoRepository;
     private final ToDoTagRepository toDoTagRepository;
     private final TagRepository tagRepository;
     private final OrderInfoRepository orderInfoRepository;
-
-    public ToDoService(
-            final ToDoRepository toDoRepository,
-            final ToDoTagRepository toDoTagRepository,
-            final TagRepository tagRepository,
-            final OrderInfoRepository orderInfoRepository
-    ) {
-        this.toDoRepository = toDoRepository;
-        this.toDoTagRepository = toDoTagRepository;
-        this.tagRepository = tagRepository;
-        this.orderInfoRepository = orderInfoRepository;
-    }
 
     @Override
     @Transactional
@@ -92,12 +83,12 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
     public boolean updateCompletion(final ToDoCompletionUpdateCommand command) {
         ToDo toDo = toDoRepository.findById(command.toDoId());
         checkOwn(command.memberId(), toDo);
-        if (toDo.getIsCompleted()) {
+        if (toDo.isCompleted()) {
             toDo.updateCompletion(false);
         } else {
             toDo.updateCompletion(true);
         }
-        return toDoRepository.update(toDo).getIsCompleted();
+        return toDoRepository.update(toDo).isCompleted();
     }
 
     @Override
@@ -127,6 +118,55 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         OrderInfo orderInfo = orderInfoRepository.findByToDoId(command.toDoId());
         orderInfo.setOrderNum(targetOrderNum);
         orderInfoRepository.update(orderInfo);
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<ToDo> getToDos(final long memberId) {
+        List<ToDo> todos = toDoRepository.findAllByMemberId(memberId);
+        return todos.stream()
+                .peek(todo -> {
+                    Integer order = orderInfoRepository.findOrderByToDoId(todo.getId());
+                    ToDoTag toDoTag = toDoTagRepository.findByToDoId(todo.getId());
+
+                    if (toDoTag != null) {
+                        Tag tag = tagRepository.findById(toDoTag.getTagId());
+                        todo.updateTag(tag);
+                    }
+
+                    todo.updateOrderNum(order);
+                })
+                .toList();
+    }
+
+    @Override
+    public List<ToDo> getTodosByDate(long memberId, LocalDate date) {
+        List<ToDo> toDos = toDoRepository.findAllByMemberIdAndStartDate(memberId, date);
+        toDos.forEach(todo -> {
+            int orderNum = orderInfoRepository.findByToDoId(todo.getId()).getOrderNum();
+            todo.update(
+                    todo.getStartDate(),
+                    todo.getDescription(),
+                    todo.getEndDate(),
+                    todo.getPriorityUrgency(),
+                    todo.getPriorityImportance(),
+                    orderNum
+            );
+        });
+        return toDos;
+    }
+
+    @Override
+    public ToDo getDetail(long memberId, long toDoId){
+        ToDo toDo = toDoRepository.findById(toDoId);
+        checkOwn(memberId, toDo);
+        ToDoTag toDoTag = toDoTagRepository.findByToDoId(toDoId);
+        Tag tag = tagRepository.findById(toDoTag.getTagId());
+        if (toDoTag!=null) {
+            toDo.updateTagId(toDoTag.getTagId());
+            toDo.updateTag(tag);
+        }
+        return toDo;
     }
 
     private void createSingleToDo(final ToDoCreateCommand command, final String toDoGroupId) {
@@ -215,7 +255,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
 
     private static void checkOwn(final long memberId, final ToDo toDo) {
         if (toDo.getMemberId() != memberId) {
-            throw new IllegalArgumentException("해당 투두를 소유하지 않음");//커스텀으로 바꿔야함
+            throw new UnauthorizedException(ErrorCode.UNAUTHORIZED_USER);
         }
     }
 
@@ -291,51 +331,4 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         ));
     }
 
-    public List<ToDo> getToDos(final long memberId) {
-        List<ToDo> todos = toDoRepository.findAllByMemberId(memberId);
-        return todos.stream()
-                .peek(todo -> {
-                    Integer order = orderInfoRepository.findOrderByToDoId(todo.getId());
-                    ToDoTag toDoTag = toDoTagRepository.findByToDoId(todo.getId());
-
-                    if (toDoTag != null) {
-                        Tag tag = tagRepository.findById(toDoTag.getTagId());
-                        todo.setTag(tag);
-                    }
-
-                    todo.setOrderNum(order);
-                })
-                .toList();
-    }
-
-    @Override
-    public List<ToDo> getTodosByDate(long memberId, LocalDate date) {
-        List<ToDo> toDos = toDoRepository.findAllByMemberIdAndStartDate(memberId, date);
-        toDos.forEach(todo -> {
-            int orderNum = orderInfoRepository.findByToDoId(todo.getId()).getOrderNum();
-            todo.update(
-                    todo.getStartDate(),
-                    todo.getDescription(),
-                    todo.getEndDate(),
-                    todo.getPriorityUrgency(),
-                    todo.getPriorityImportance(),
-                    orderNum
-            );
-        });
-        return toDos;
-    }
-
-    @Override
-    public ToDo getDetail(long memberId, long toDoId){
-        ToDo toDo = toDoRepository.findById(toDoId);
-        checkOwn(memberId, toDo);
-        ToDoTag toDoTag = toDoTagRepository.findByToDoId(toDoId);
-        Tag tag = tagRepository.findById(toDoTag.getTagId());
-        if(toDoTag!=null) {
-            toDo.setTagId(toDoTag.getTagId());
-            toDo.setTagName(tag.getName());
-            toDo.setTagColor(tag.getColor());
-        }
-        return toDo;
-    }
 }
