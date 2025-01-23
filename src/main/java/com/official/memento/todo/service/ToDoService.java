@@ -70,14 +70,18 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
     public void update(final ToDoUpdateCommand command) {
         ToDo toDo = toDoRepository.findById(command.toDoId());
         checkOwn(command.memberId(), toDo);
+        String groupId = toDo.getGroupId();
+        PriorityType newPriorityType = determinePriorityType(command.priorityUrgency(), command.priorityImportance());
         toDo.update(
                 command.startDate(),
                 command.description(),
                 command.endDate(),
                 command.priorityUrgency(),
                 command.priorityImportance(),
-                null
+                null,
+                newPriorityType
         );
+        toDo.setGroupId(groupId);
         toDoRepository.update(toDo);
         updateOrDeleteTag(toDo, command.tagId());
 
@@ -319,7 +323,8 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
                     todo.getEndDate(),
                     todo.getPriorityUrgency(),
                     todo.getPriorityImportance(),
-                    orderNum
+                    orderNum,
+                    todo.getPriorityType()
             );
         });
         return toDos;
