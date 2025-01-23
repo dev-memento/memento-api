@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service
 
 interface AlarmSendUseCase {
     fun send(command: AlarmSendCommand)
+    fun sendException(command: AlarmExceptionCommand)
 }
 
 @Service
@@ -15,4 +16,10 @@ class AlarmService(
     override fun send(command: AlarmSendCommand) {
         alarmOutputPort.sendAlarm(command.uri, command.content)
     }
+
+    override fun sendException(command: AlarmExceptionCommand) {
+        alarmOutputPort.sendExceptionAlarm(e)
+        TODO("Not yet implemented")
+    }
+
 }

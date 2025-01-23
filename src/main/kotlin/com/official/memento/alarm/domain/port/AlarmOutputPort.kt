@@ -5,4 +5,8 @@ interface AlarmOutputPort {
         uri: String,
         content: String,
     )
+
+    fun sendExceptionAlarm(
+        e: Exception
+    )
 }
