@@ -6,7 +6,7 @@ import java.time.LocalDate;
 
 @Schema(name = "ToDo 드래그앤드랍 요청")
 public record ToDoDragAndDropRequest(
-        @Schema(description = "옮길 위치의 orderNum 순서")
+        @Schema(description = "옮길 위치의 orderNum 순서", example = "10")
         Integer targetOrderNum
 ) {
     public static ToDoDragAndDropRequest of(Integer targetOrderNum) {

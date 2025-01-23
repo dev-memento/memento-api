@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1")
 class BrainDumpApiController(
     private val brainDumpCreateUseCase: BrainDumpCreateUseCase,
-) {
+) : BrainDumpApiDocs {
     @PostMapping("/braindump")
-    fun createBrainDump(
+    override fun createBrainDump(
         @RequestBody request: BrainDumpCreateRequest,
         @Authorization authorizationUser: AuthorizationUser,
     ): ResponseEntity<SuccessResponse<*>>? {
