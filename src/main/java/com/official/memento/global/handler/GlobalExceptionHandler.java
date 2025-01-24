@@ -63,7 +63,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ErrorResponse> unauthorizedException(UnauthorizedException exception) {
         logger.error("Unauthorized access attempt", exception);
-        alarmSendUseCase.sendException(new AlarmExceptionCommand(exception));
         return ErrorResponse.of(HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED_USER);
     }
 
