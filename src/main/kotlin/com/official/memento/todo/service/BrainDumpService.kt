@@ -5,9 +5,13 @@ import com.official.memento.orderinfo.domain.OrderInfo
 import com.official.memento.orderinfo.domain.OrderInfoRepository
 import com.official.memento.orderinfo.domain.OrderWithScheduleOrToDo
 import com.official.memento.orderinfo.domain.PlanType
+import com.official.memento.tag.domain.Tag
+import com.official.memento.tag.domain.TagRepository
 import com.official.memento.todo.domain.BrainDumpClientOutputPort
 import com.official.memento.todo.domain.ToDo
 import com.official.memento.todo.domain.ToDoRepository
+import com.official.memento.todo.domain.ToDoTag
+import com.official.memento.todo.domain.ToDoTagRepository
 import com.official.memento.todo.domain.enums.PriorityType
 import com.official.memento.todo.domain.enums.ToDoType
 import com.official.memento.todo.domain.vo.BrainDump
@@ -21,8 +25,14 @@ import java.time.LocalDateTime
 class BrainDumpService(
     private val brainDumpClientOutputPort: BrainDumpClientOutputPort,
     private val toDoRepository: ToDoRepository,
+    private val tagRepository: TagRepository,
+    private val toDoTagRepository: ToDoTagRepository,
     private val orderInfoRepository: OrderInfoRepository
 ) : BrainDumpCreateUseCase {
+
+    companion object {
+        private const val DEFAULT_BRAINDUMP_TODO_TAG_ID: Long = 1
+    }
     override fun create(command: BrainDumpCreateCommand): ToDoBrainDump {
         val toDoBrainDump =
             brainDumpClientOutputPort.createByBrainDump(
@@ -47,6 +57,8 @@ class BrainDumpService(
                 ToDoType.NORMAL,
             )
         toDoRepository.save(toDo)
+        val tag = tagRepository.findById(DEFAULT_BRAINDUMP_TODO_TAG_ID)
+        toDoTagRepository.save(ToDoTag.of(toDo.id, tag.id))
         assignOrder(toDoBrainDump.createdDate, toDo)
         return toDoBrainDump
     }

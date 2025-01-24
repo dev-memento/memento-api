@@ -8,6 +8,8 @@ import com.official.memento.todo.domain.ToDo
 import com.official.memento.todo.domain.vo.ClaudeAiChatClientOutputPort
 import com.official.memento.todo.domain.vo.PrioritizedToDo
 import com.official.memento.todo.infrastructure.persistence.ToDoJpaRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
@@ -221,6 +223,7 @@ class ClaudeAiChatClientAdapter(
                         ),
                     ),
         )
+        // CoroutineScope(Dispatchers.IO)
         val response =
             webClient.post()
                 .uri(CLAUDE_AI_URL)

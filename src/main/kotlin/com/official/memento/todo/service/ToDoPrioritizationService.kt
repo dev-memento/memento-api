@@ -18,7 +18,7 @@ class ToDoPrioritizationService(
     private val orderInfoRepository: OrderInfoRepository,
     private val toDoTagRepository: ToDoTagRepository,
     private val tagRepository: TagRepository,
-) : ToDoPrioritizationUseCase {
+    ) : ToDoPrioritizationUseCase {
     override fun prioritizeWeekly(command: ToDoPrioritizationCommand) : List<List<ToDo>> {
         val prioritizedToDoList = mutableListOf<List<ToDo>>()
         for (i in 0..6) {
