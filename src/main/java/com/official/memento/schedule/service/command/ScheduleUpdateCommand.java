@@ -12,7 +12,7 @@ public record ScheduleUpdateCommand(
         LocalDateTime startDate,
         LocalDateTime endDate,
         boolean isAllDay,
-        Long tagId
+        long tagId
 ) {
     public static ScheduleUpdateCommand of(
             final long memberId,
@@ -21,7 +21,7 @@ public record ScheduleUpdateCommand(
             final LocalDateTime startDate,
             final LocalDateTime endDate,
             final boolean isAllDay,
-            final Long tagId
+            final long tagId
     ) {
         return new ScheduleUpdateCommand(
                 memberId,

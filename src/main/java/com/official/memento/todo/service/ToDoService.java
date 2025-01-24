@@ -190,15 +190,13 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
     }
 
 
-
     private void createSingleToDo(final ToDoCreateCommand command, final String toDoGroupId) {
         Double priorityValue = calculatePriorityValue(command.priorityUrgency(), command.priorityImportance());
         PriorityType priorityType = determinePriorityType(command.priorityUrgency(), command.priorityImportance());
         ToDo toDo = createToDo(command, toDoGroupId, priorityValue, priorityType, command.startDate());
 
-        if (command.tagId() != null) {
-            connectTag(command.tagId(), toDo);
-        }
+        connectTag(command.tagId(), toDo);
+
         assignOrder(command.startDate(), toDo);
     }
 
@@ -211,10 +209,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
             PriorityType priorityType = determinePriorityType(command.priorityUrgency(), command.priorityImportance());
 
             ToDo toDo = createToDo(command, toDoGroupId, priorityValue, priorityType, currentDate);
-
-            if (command.tagId() != null) {
-                connectTag(command.tagId(), toDo);
-            }
+            connectTag(command.tagId(), toDo);
 
             if (command.repeatOption() == RepeatOption.DAILY) {
                 currentDate = currentDate.plusDays(1);
@@ -282,11 +277,9 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         }
     }
 
-    private void updateOrDeleteTag(final ToDo toDo, final Long tagId) {
+    private void updateOrDeleteTag(final ToDo toDo, final long tagId) {
         ToDoTag toDoTag = toDoTagRepository.findByToDoId(toDo.getId());
-        if (tagId == null) {
-            toDoTagRepository.deleteByToDoId(toDo.getId());
-        } else if (toDoTag == null) {
+        if (toDoTag == null) {
             toDoTag = ToDoTag.of(tagId, toDo.getId());
             toDoTagRepository.save(toDoTag);
         } else if (toDoTag.getTagId() != tagId) {
@@ -341,7 +334,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
     }
 
     private OrderInfo createOrderInfo(final LocalDate date, final ToDo toDo, final int insertOrder) {
-         return orderInfoRepository.save(OrderInfo.of(
+        return orderInfoRepository.save(OrderInfo.of(
                 null,
                 toDo.getId(),
                 insertOrder,

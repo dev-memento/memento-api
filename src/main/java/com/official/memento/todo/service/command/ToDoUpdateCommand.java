@@ -10,7 +10,7 @@ public record ToDoUpdateCommand(
         LocalDate startDate,
         String description,
         LocalDate endDate,
-        Long tagId,
+        long tagId,
         Double priorityUrgency,
         Double priorityImportance
 ) {
@@ -20,7 +20,7 @@ public record ToDoUpdateCommand(
             final LocalDate startDate,
             final String description,
             final LocalDate endDate,
-            final Long tagId,
+            final long tagId,
             final Double priorityUrgency,
             final Double priorityImportance
     ) {
