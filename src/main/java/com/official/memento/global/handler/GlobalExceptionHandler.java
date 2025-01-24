@@ -45,6 +45,13 @@ public class GlobalExceptionHandler {
         return ErrorResponse.of(HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND_ENTITY);
     }
 
+    @ExceptionHandler(ClaudeException.class)
+    public ResponseEntity<ErrorResponse> claudeException(ClaudeException exception) {
+        logger.error("Claude exception occurred", exception);
+        alarmSendUseCase.sendException(new AlarmExceptionCommand(exception));
+        return ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.CLAUDE_ERROR);
+    }
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> MethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception) {
         logger.error("Invalid request:", exception);
