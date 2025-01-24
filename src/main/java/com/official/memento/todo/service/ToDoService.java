@@ -161,6 +161,11 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         List<ToDo> toDos = toDoRepository.findAllByMemberIdAndStartDate(memberId, date);
         toDos.forEach(todo -> {
             int orderNum = orderInfoRepository.findByToDoId(todo.getId()).getOrderNum();
+            ToDoTag toDoTag = toDoTagRepository.findByToDoId(todo.getId());
+            if (toDoTag != null) {
+                Tag tag = tagRepository.findById(toDoTag.getTagId());
+                todo.updateTag(tag);
+            }
             todo.update(
                     todo.getStartDate(),
                     todo.getDescription(),
