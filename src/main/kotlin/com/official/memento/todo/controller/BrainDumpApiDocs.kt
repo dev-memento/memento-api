@@ -5,6 +5,8 @@ import com.official.memento.global.annotation.AuthorizationUser
 import com.official.memento.global.dto.SuccessResponse
 import com.official.memento.todo.controller.dto.BrainDumpCreateRequest
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -21,6 +23,13 @@ interface BrainDumpApiDocs {
     )
     fun createBrainDump(
         @RequestBody request: BrainDumpCreateRequest,
+        @Parameter(
+            name = "Authorization",
+            `in` = ParameterIn.HEADER,
+            description = "Bearer accesstoken",
+            required = true,
+            example = "Bearer accesstoken"
+        )
         @Authorization authorizationUser: AuthorizationUser,
     ): ResponseEntity<SuccessResponse<*>>?
 }
