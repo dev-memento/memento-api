@@ -21,7 +21,7 @@ interface PrioritizationApiDocs {
         ApiResponse(responseCode = "200", description = "주간 할 일 우선순위 정렬 성공"),
         ApiResponse(responseCode = "500", description = "서버 에러"),
     )
-    fun prioritizeWeeklyToDo(
+    suspend fun prioritizeWeeklyToDo(
         @Authorization authorizationUser: AuthorizationUser,
         @RequestBody request: PrioritizationRequest,
     ): ResponseEntity<SuccessResponse<PrioritizationResponse>>
@@ -31,7 +31,7 @@ interface PrioritizationApiDocs {
         ApiResponse(responseCode = "200", description = "데일리 할 일 우선순위 정렬 성공"),
         ApiResponse(responseCode = "500", description = "서버 에러"),
     )
-    fun prioritizeDailyToDo(
+    suspend fun prioritizeDailyToDo(
         @Authorization authorizationUser: AuthorizationUser,
         @RequestBody request: PrioritizationRequest,
     ): ResponseEntity<SuccessResponse<PrioritizationDailyResponse>>

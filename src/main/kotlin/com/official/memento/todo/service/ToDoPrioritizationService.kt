@@ -10,6 +10,7 @@ import com.official.memento.todo.domain.ToDoTagRepository
 import com.official.memento.todo.domain.vo.ClaudeAiChatClientOutputPort
 import com.official.memento.todo.service.command.ToDoPrioritizationCommand
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class ToDoPrioritizationService(
@@ -19,7 +20,9 @@ class ToDoPrioritizationService(
     private val toDoTagRepository: ToDoTagRepository,
     private val tagRepository: TagRepository,
     ) : ToDoPrioritizationUseCase {
-    override fun prioritizeWeekly(command: ToDoPrioritizationCommand) : List<List<ToDo>> {
+
+    @Transactional
+    override suspend fun prioritizeWeekly(command: ToDoPrioritizationCommand) : List<List<ToDo>> {
         val prioritizedToDoList = mutableListOf<List<ToDo>>()
         for (i in 0..6) {
             val toDoList = toDoRepository.findAllByMemberIdAndStartDate(command.memberId, command.targetDate)
@@ -64,7 +67,8 @@ class ToDoPrioritizationService(
         return prioritizedToDoList
     }
 
-    override fun prioritizeDaily(command: ToDoPrioritizationCommand): List<ToDo> {
+    @Transactional
+    override suspend fun prioritizeDaily(command: ToDoPrioritizationCommand): List<ToDo> {
         val toDoList = toDoRepository.findAllByMemberIdAndStartDate(command.memberId, command.targetDate)
         if (toDoList.isEmpty()) {
             throw InvalidAiRequestException(ErrorCode.INVALID_AI_PRIORITIZATION_REQUEST)

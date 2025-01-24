@@ -8,8 +8,9 @@ import com.official.memento.todo.domain.ToDo
 import com.official.memento.todo.domain.vo.ClaudeAiChatClientOutputPort
 import com.official.memento.todo.domain.vo.PrioritizedToDo
 import com.official.memento.todo.infrastructure.persistence.ToDoJpaRepository
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.reactor.awaitSingleOrNull
+import kotlinx.coroutines.withContext
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
@@ -121,17 +122,15 @@ class ClaudeAiChatClientAdapter(
         Provide your final output as a valid JSON array enclosed in <json_output> tags.
     """.trimIndent()
 
-    override fun prioritizeTodo(
+    override suspend fun prioritizeTodo(
         todoList: List<ToDo>,
         orderList: List<Int>,
-    ): List<PrioritizedToDo> {
+    ): List<PrioritizedToDo> = withContext(Dispatchers.IO) {
         var taskPrompt = ""
 
         for (idx in todoList.indices) {
             taskPrompt += todoList[idx].toTaskDescription() + '\n' + orderList[idx] + '\n'
         }
-
-        println(taskPrompt)
 
         todoList.map { taskPrompt += it.toTaskDescription() + '\n' }
         val replacedPrompt = prioritizationPrompt.replace("{{TASKS_DATA}}", taskPrompt)
@@ -139,108 +138,91 @@ class ClaudeAiChatClientAdapter(
         val requestBody = mapOf(
             "model" to MODEL_NAME,
             "max_tokens" to MAX_TOKENS,
-            "tools" to
-                    listOf(
-                        mapOf(
-                            "name" to "get_task",
-                            "description" to "Get the task info given in the information",
-                            "input_schema" to
-                                    mapOf(
-                                        "type" to "object",
-                                        "properties" to
-                                                mapOf(
-                                                    "tasks" to
-                                                            mapOf(
-                                                                "type" to "array",
-                                                                "items" to
-                                                                        mapOf(
-                                                                            "type" to "object",
-                                                                            "properties" to
-                                                                                    mapOf(
-                                                                                        "task" to
-                                                                                                mapOf(
-                                                                                                    "type" to "string",
-                                                                                                    "description" to "task description",
-                                                                                                ),
-                                                                                        "id" to
-                                                                                                mapOf(
-                                                                                                    "type" to "number",
-                                                                                                    "description" to "task id mapped by requested task id",
-                                                                                                ),
-                                                                                        "deadline" to
-                                                                                                mapOf(
-                                                                                                    "type" to "string",
-                                                                                                    "description" to "task deadline date in YYYY-MM-DD format",
-                                                                                                ),
-                                                                                        "created_date" to
-                                                                                                mapOf(
-                                                                                                    "type" to "string",
-                                                                                                    "description" to "task created date in YYYY-MM-DD format",
-                                                                                                ),
-                                                                                        "urgency" to
-                                                                                                mapOf(
-                                                                                                    "type" to "number",
-                                                                                                    "description" to "task urgency level",
-                                                                                                ),
-                                                                                        "importance" to
-                                                                                                mapOf(
-                                                                                                    "type" to "number",
-                                                                                                    "description" to "task importance level",
-                                                                                                ),
-                                                                                        "priority" to
-                                                                                                mapOf(
-                                                                                                    "type" to "number",
-                                                                                                    "description" to "task priority level",
-                                                                                                ),
-                                                                                        "order" to
-                                                                                                mapOf(
-                                                                                                    "type" to "number",
-                                                                                                    "description" to "task order",
-                                                                                                ),
-                                                                                    ),
-                                                                        ),
-                                                            ),
-                                                ),
-                                        "required" to
-                                                listOf(
-                                                    "task",
-                                                    "id",
-                                                    "deadline",
-                                                    "created_date",
-                                                    "urgency",
-                                                    "importance",
-                                                    "priority",
-                                                    "order",
-                                                ),
+            "tools" to listOf(
+                mapOf(
+                    "name" to "get_task",
+                    "description" to "Get the task info given in the information",
+                    "input_schema" to mapOf(
+                        "type" to "object",
+                        "properties" to mapOf(
+                            "tasks" to mapOf(
+                                "type" to "array",
+                                "items" to mapOf(
+                                    "type" to "object",
+                                    "properties" to mapOf(
+                                        "task" to mapOf(
+                                            "type" to "string",
+                                            "description" to "task description",
+                                        ),
+                                        "id" to mapOf(
+                                            "type" to "number",
+                                            "description" to "task id mapped by requested task id",
+                                        ),
+                                        "deadline" to mapOf(
+                                            "type" to "string",
+                                            "description" to "task deadline date in YYYY-MM-DD format",
+                                        ),
+                                        "created_date" to mapOf(
+                                            "type" to "string",
+                                            "description" to "task created date in YYYY-MM-DD format",
+                                        ),
+                                        "urgency" to mapOf(
+                                            "type" to "number",
+                                            "description" to "task urgency level",
+                                        ),
+                                        "importance" to mapOf(
+                                            "type" to "number",
+                                            "description" to "task importance level",
+                                        ),
+                                        "priority" to mapOf(
+                                            "type" to "number",
+                                            "description" to "task priority level",
+                                        ),
+                                        "order" to mapOf(
+                                            "type" to "number",
+                                            "description" to "task order",
+                                        ),
                                     ),
+                                ),
+                            ),
+                        ),
+                        "required" to listOf(
+                            "task",
+                            "id",
+                            "deadline",
+                            "created_date",
+                            "urgency",
+                            "importance",
+                            "priority",
+                            "order",
                         ),
                     ),
-            "messages" to
-                    listOf(
-                        mapOf(
-                            "role" to "user",
-                            "content" to replacedPrompt,
-                        ),
-                    ),
+                ),
+            ),
+            "messages" to listOf(
+                mapOf(
+                    "role" to "user",
+                    "content" to replacedPrompt,
+                ),
+            ),
         )
-        // CoroutineScope(Dispatchers.IO)
-        val response =
-            webClient.post()
-                .uri(CLAUDE_AI_URL)
-                .header(CLAUDE_AI_API_KEY_HEADER, claudeAiApiKey)
-                .header(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .header(CLAUDE_AI_VERSION_HEADER, CLAUDE_AI_VERSION_VALUE)
-                .bodyValue(requestBody)
-                .retrieve()
-                .bodyToMono(ClaudeResponse::class.java)
-                .block()
-        println(response)
-        val taskResponse =
-            response?.content?.firstOrNull {
-                it.type == "tool_use"
-            }?.input ?: throw MementoException(ErrorCode.INTERNAL_SERVER_ERROR)
 
-        return taskResponse.tasks.map {
+        val response = webClient.post()
+            .uri(CLAUDE_AI_URL)
+            .header(CLAUDE_AI_API_KEY_HEADER, claudeAiApiKey)
+            .header(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
+            .header(CLAUDE_AI_VERSION_HEADER, CLAUDE_AI_VERSION_VALUE)
+            .bodyValue(requestBody)
+            .retrieve()
+            .bodyToMono(ClaudeResponse::class.java)
+            .awaitSingleOrNull()
+
+        println(response)
+        val taskResponse = response?.content?.firstOrNull {
+            it.type == "tool_use"
+        }?.input ?: throw MementoException(ErrorCode.INTERNAL_SERVER_ERROR)
+
+        taskResponse.tasks.map {
             PrioritizedToDo(
                 task = it.task,
                 id = it.id.toLong(),
@@ -251,7 +233,7 @@ class ClaudeAiChatClientAdapter(
                 importance = it.importance.toFloat(),
                 order = it.order,
             )
-        }.toList()
+        }
     }
 
     private fun readPromptFromFile(): String {
