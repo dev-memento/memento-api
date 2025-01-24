@@ -1,6 +1,7 @@
 package com.official.memento.schedule.service.command;
 
 import com.official.memento.global.entity.enums.RepeatOption;
+import com.official.memento.global.exception.InvalidRequestBodyException;
 import com.official.memento.global.exception.NullPointException;
 
 import java.time.LocalDate;
@@ -48,7 +49,7 @@ public record RepeatScheduleCreateCommand(
             final RepeatOption repeatOption
     ) {
         if (description == null | startDate == null || endDate == null || repeatOption == null) {
-            throw new NullPointException(NULL_DATA_ERROR);
+            throw new InvalidRequestBodyException(NULL_DATA_ERROR);
         }
     }
 }

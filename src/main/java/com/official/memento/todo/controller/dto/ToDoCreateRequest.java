@@ -1,6 +1,7 @@
 package com.official.memento.todo.controller.dto;
 
 import com.official.memento.global.entity.enums.RepeatOption;
+import com.official.memento.global.exception.InvalidRequestBodyException;
 import com.official.memento.global.exception.NullPointException;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -45,7 +46,7 @@ public record ToDoCreateRequest(
             final String description
     ) {
         if (startDate == null || description == null) {
-            throw new NullPointException(NULL_DATA_ERROR);
+            throw new InvalidRequestBodyException(NULL_DATA_ERROR);
         }
     }
 }
