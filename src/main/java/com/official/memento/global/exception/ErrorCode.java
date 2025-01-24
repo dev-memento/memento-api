@@ -13,6 +13,9 @@ public enum ErrorCode {
 
     /* 유효하지 않은 요청 */
     INVALID_REQUEST_BODY("유효하지 않은 요청입니다."),
+    INVALID_ARGUMENT_TYPE("잘못된 매개변수 타입입니다."),
+    INVALID_JSON_FORMAT("요청 JSON 형식이 올바르지 않습니다."),
+    DECODING_FAILURE("디코딩 실패로 인해 요청을 처리할 수 없습니다."),
 
     /* 소셜 로그인 관련 에러 */
     INVALID_ID_TOKEN("유효하지 않은 ID 토큰입니다."),
