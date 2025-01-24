@@ -9,8 +9,6 @@ import com.official.memento.todo.domain.vo.BrainDump
 import com.official.memento.todo.domain.vo.ToDoBrainDump
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.reactive.function.client.WebClient
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.time.LocalDate
 
 @Adapter
@@ -26,7 +24,6 @@ class BrainDumpClientAdapter(
         private val CLAUDE_ANTHROPIC_VERSION = "2023-06-01"
         private val MAX_TOKENS = 4096
         private val MODEL_NAME = "claude-3-5-haiku-20241022"
-        private val BRAINDUMP_PROMPT_FILE_PATH = "src/main/resources/braindump-prompt.txt"
     }
 
     private var brainDumpPrompt: String = """
@@ -170,11 +167,6 @@ class BrainDumpClientAdapter(
             priority = taskJsonResponse.priority,
         )
     }
-//
-//    private fun readPromptFromFile(): String {
-//        val path = Paths.get(BRAINDUMP_PROMPT_FILE_PATH)
-//        return Files.readString(path)
-//    }
 
     data class ClaudeMessage(
         val role: String,
