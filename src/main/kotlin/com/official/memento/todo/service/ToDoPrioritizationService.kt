@@ -1,5 +1,7 @@
 package com.official.memento.todo.service
 
+import com.official.memento.global.exception.ErrorCode
+import com.official.memento.global.exception.InvalidAiRequestException
 import com.official.memento.orderinfo.domain.OrderInfoRepository
 import com.official.memento.tag.domain.TagRepository
 import com.official.memento.todo.domain.ToDo
@@ -64,6 +66,9 @@ class ToDoPrioritizationService(
 
     override fun prioritizeDaily(command: ToDoPrioritizationCommand): List<ToDo> {
         val toDoList = toDoRepository.findAllByMemberIdAndStartDate(command.memberId, command.targetDate)
+        if (toDoList.isEmpty()) {
+            throw InvalidAiRequestException(ErrorCode.INVALID_AI_PRIORITIZATION_REQUEST)
+        }
         val orderList =
             toDoList.map {
                 orderInfoRepository.findByToDoIdAndDate(it.id, command.targetDate).orderNum
