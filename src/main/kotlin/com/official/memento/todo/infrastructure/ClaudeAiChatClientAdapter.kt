@@ -129,6 +129,8 @@ class ClaudeAiChatClientAdapter(
             taskPrompt += todoList[idx].toTaskDescription() + '\n' + orderList[idx] + '\n'
         }
 
+        println(taskPrompt)
+
         todoList.map { taskPrompt += it.toTaskDescription() + '\n' }
         val replacedPrompt = prioritizationPrompt.replace("{{TASKS_DATA}}", taskPrompt)
 
@@ -229,19 +231,21 @@ class ClaudeAiChatClientAdapter(
                 .retrieve()
                 .bodyToMono(ClaudeResponse::class.java)
                 .block()
-        val taskListResponse =
-            response?.content?.filter {
+        println(response)
+        val taskResponse =
+            response?.content?.firstOrNull {
                 it.type == "tool_use"
-            }?.firstOrNull()?.input ?: throw MementoException(ErrorCode.INTERNAL_SERVER_ERROR)
-        return taskListResponse.map {
+            }?.input ?: throw MementoException(ErrorCode.INTERNAL_SERVER_ERROR)
+
+        return taskResponse.tasks.map {
             PrioritizedToDo(
                 task = it.task,
-                id = it.id,
+                id = it.id.toLong(),
                 createdDate = LocalDate.parse(it.createdDate),
                 deadline = LocalDate.parse(it.deadline),
-                priority = it.priority,
-                urgency = it.urgency,
-                importance = it.importance,
+                priority = it.priority.toFloat(),
+                urgency = it.urgency.toFloat(),
+                importance = it.importance.toFloat(),
                 order = it.order,
             )
         }.toList()
@@ -271,19 +275,23 @@ data class Content(
     val text: String?,
     val id: String?,
     val name: String?,
-    val input: List<TaskInput>,
+    val input: TaskInput?,
 )
 
 data class TaskInput(
+    val tasks: List<Task>
+)
+
+data class Task(
     val task: String,
-    val id: Long,
+    val id: Int,
     val deadline: String,
     @JsonProperty("created_date")
     val createdDate: String,
-    val urgency: Float,
-    val importance: Float,
-    val priority: Float,
-    val order: Int,
+    val urgency: Double,
+    val importance: Double,
+    val priority: Double,
+    val order: Int
 )
 
 data class Usage(

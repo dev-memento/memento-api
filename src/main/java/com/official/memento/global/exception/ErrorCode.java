@@ -22,7 +22,9 @@ public enum ErrorCode {
     INVALID_REFRESH_TOKEN("유효하지 않은 리프레시 토큰입니다."),
     EXPIRED_TOKEN("토큰이 만료되었습니다"),
     EXPECTED_TOKEN_ERROR("토큰 에러입니다"),
-    UNEXPECTED_TOKEN_ERROR("예상치 못한 토큰 에러입니다")
+    UNEXPECTED_TOKEN_ERROR("예상치 못한 토큰 에러입니다"),
+
+    INVALID_AI_PRIORITIZATION_REQUEST("AI 우선순위 요청이 유효하지 않습니다.");
     ;
 
     private final String message;

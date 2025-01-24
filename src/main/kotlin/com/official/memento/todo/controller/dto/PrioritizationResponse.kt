@@ -39,7 +39,6 @@ data class PrioritizationDailyResponse(
     val todos: List<ToDoPrioritizedGetResponse>
 ) {
     companion object {
-
         fun of(todos: List<ToDo>): PrioritizationDailyResponse {
             return PrioritizationDailyResponse(
                 todos = todos.map { toDo ->

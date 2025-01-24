@@ -57,7 +57,8 @@ public record ToDoGetResponse(
                 toDo.getTagName() == null ? "" : toDo.getTagName(),
                 toDo.getTagColor() == null ? "" : toDo.getTagColor().getHexCode(),
                 toDo.getType(),
-                toDo.getOrderNum()
+                // FIXME: NPE나는 상황 찾아서, 수정
+                toDo.getOrderNum() == null ? 0 : toDo.getOrderNum()
         );
     }
 }
