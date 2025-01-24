@@ -11,7 +11,7 @@ public record ToDoCreateCommand(
         LocalDate endDate,
         RepeatOption repeatOption,
         LocalDate repeatExpiredDate,
-        Long tagId,
+        long tagId,
         Double priorityUrgency,
         Double priorityImportance
 ) {
@@ -22,7 +22,7 @@ public record ToDoCreateCommand(
             final LocalDate endDate,
             final RepeatOption repeatOption,
             final LocalDate repeatExpiredDate,
-            final Long tagId,
+            final long tagId,
             final Double priorityUrgency,
             final Double priorityImportance
     ) {

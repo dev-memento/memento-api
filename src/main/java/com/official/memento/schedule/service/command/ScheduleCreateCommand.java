@@ -12,7 +12,7 @@ public record ScheduleCreateCommand(
         LocalDateTime startDate,
         LocalDateTime endDate,
         boolean isAllDay,
-        Long tagId
+        long tagId
 ) {
     public static ScheduleCreateCommand of(
             final long memberId,
@@ -20,7 +20,7 @@ public record ScheduleCreateCommand(
             final LocalDateTime startDate,
             final LocalDateTime endDate,
             final boolean isAllDay,
-            final Long tagId
+            final long tagId
     ) {
         checkNullData(description, startDate, endDate);
         return new ScheduleCreateCommand(

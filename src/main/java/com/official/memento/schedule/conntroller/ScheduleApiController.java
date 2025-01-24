@@ -3,10 +3,7 @@ package com.official.memento.schedule.conntroller;
 import com.official.memento.global.annotation.Authorization;
 import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
-import com.official.memento.schedule.conntroller.dto.request.RepeatScheduleCreateRequest;
-import com.official.memento.schedule.conntroller.dto.request.ScheduleCreateRequest;
-import com.official.memento.schedule.conntroller.dto.request.ScheduleUpdateGroupRequest;
-import com.official.memento.schedule.conntroller.dto.request.ScheduleUpdateRequest;
+import com.official.memento.schedule.conntroller.dto.request.*;
 import com.official.memento.schedule.conntroller.dto.response.ScheduleAllAllDaysGetResponse;
 import com.official.memento.schedule.conntroller.dto.response.ScheduleAllGetResponse;
 import com.official.memento.schedule.conntroller.dto.response.ScheduleDetailResponse;
@@ -100,9 +97,9 @@ public class ScheduleApiController implements ScheduleApiDocs {
     @PostMapping("/apple")
     public ResponseEntity<SuccessResponse<?>> createAppleSchedules(
             @Authorization final AuthorizationUser authorizationUser,
-            @RequestBody final List<ScheduleCreateRequest> request
+            @RequestBody final AppleSchedulesCreateRequest request
     ) {
-        scheduleCreateUseCase.createAppleSchedules(request.stream().map(scheduleCreateRequest ->
+        scheduleCreateUseCase.createAppleSchedules(request.scheduleCreateRequest().stream().map(scheduleCreateRequest ->
                 ScheduleCreateCommand.of(
                         authorizationUser.memberId(),
                         scheduleCreateRequest.description(),

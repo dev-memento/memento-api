@@ -61,9 +61,7 @@ public class ScheduleService implements
     public void create(final ScheduleCreateCommand command) {
         String scheduleGroupId = UUID.randomUUID().toString();
         Schedule schedule = createSchedule(command, scheduleGroupId);
-        if (command.tagId() != null) {
-            connectTag(command.tagId(), schedule);
-        }
+        connectTag(command.tagId(), schedule);
         assignOrder(command.startDate().toLocalDate(), schedule);
     }
 
@@ -278,11 +276,9 @@ public class ScheduleService implements
         return schedules;
     }
 
-    private void updateOrDeleteTag(final Schedule schedule, final Long tagId) {
+    private void updateOrDeleteTag(final Schedule schedule, final long tagId) {
         ScheduleTag scheduleTag = scheduleTagRepository.findByScheduleId(schedule.getId());
-        if (tagId == null) {
-            scheduleTagRepository.deleteByScheduleId(schedule.getId());
-        } else if (scheduleTag == null) {
+       if (scheduleTag == null) {
             scheduleTag = ScheduleTag.of(tagId, schedule.getId());
             scheduleTagRepository.save(scheduleTag);
         } else if (scheduleTag.getTagId() != tagId) {

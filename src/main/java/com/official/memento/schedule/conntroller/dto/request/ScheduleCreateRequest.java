@@ -19,14 +19,14 @@ public record ScheduleCreateRequest(
         @Schema(description = "AllDay 여부", example = "true")
         boolean isAllDay,
         @Schema(description = "태그 아이디", example = "1")
-        Long tagId
+        long tagId
 ) {
     public ScheduleCreateRequest(
             final String description,
             final LocalDateTime startDate,
             final LocalDateTime endDate,
             final boolean isAllDay,
-            final Long tagId
+            final long tagId
     ) {
         checkNullData(description, startDate, endDate);
         this.description = description;

@@ -16,7 +16,7 @@ public record ToDoUpdateRequest(
         @Schema(description = "수정 마감 기한", example = "2025-01-25")
         LocalDate endDate,
         @Schema(description = "수정 태그 ID", example = "12345")
-        Long tagId,
+        long tagId,
         @Schema(description = "수정 긴급도 우선순위 (0~1)", example = "0.5")
         Double priorityUrgency,
         @Schema(description = "수정 중요도 우선순위 (0~1)", example = "0.5")
@@ -31,11 +31,6 @@ public record ToDoUpdateRequest(
             final Double priorityImportance
     ) {
         checkNullData(startDate, description);
-
-        if (description.length() > 30) {
-            throw new IllegalArgumentException("30자 이하로만 작성이 가능합니다.");
-        }
-
         return new ToDoUpdateRequest(startDate, description, endDate, tagId, priorityUrgency, priorityImportance);
     }
 

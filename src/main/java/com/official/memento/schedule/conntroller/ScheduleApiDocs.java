@@ -3,10 +3,7 @@ package com.official.memento.schedule.conntroller;
 import com.official.memento.global.annotation.Authorization;
 import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
-import com.official.memento.schedule.conntroller.dto.request.RepeatScheduleCreateRequest;
-import com.official.memento.schedule.conntroller.dto.request.ScheduleCreateRequest;
-import com.official.memento.schedule.conntroller.dto.request.ScheduleUpdateGroupRequest;
-import com.official.memento.schedule.conntroller.dto.request.ScheduleUpdateRequest;
+import com.official.memento.schedule.conntroller.dto.request.*;
 import com.official.memento.schedule.conntroller.dto.response.ScheduleAllAllDaysGetResponse;
 import com.official.memento.schedule.conntroller.dto.response.ScheduleAllGetResponse;
 import com.official.memento.schedule.conntroller.dto.response.ScheduleDetailResponse;
@@ -65,7 +62,7 @@ public interface ScheduleApiDocs {
     ResponseEntity<SuccessResponse<?>> createAppleSchedules(
             @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
             @Authorization final AuthorizationUser authorizationUser,
-            @RequestBody final List<ScheduleCreateRequest> request
+            @RequestBody final AppleSchedulesCreateRequest request
     );
 
     @Operation(summary = "일정 삭제")

@@ -16,8 +16,8 @@ public record ToDoCreateRequest(
         String description,
         @Schema(description = "마감 기한", example = "2025-01-25")
         LocalDate endDate,
-        @Schema(description = "태그 ID", example = "12345")
-        Long tagId,
+        @Schema(description = "태그 ID", example = "12")
+        long tagId,
         @Schema(description = "긴급도 우선순위 (0~1)", example = "0.5")
         Double priorityUrgency,
         @Schema(description = "중요도 우선순위 (0~1)", example = "0.5")
@@ -27,16 +27,11 @@ public record ToDoCreateRequest(
             final LocalDate startDate,
             final String description,
             final LocalDate endDate,
-            final Long tagId,
+            final long tagId,
             final Double priorityUrgency,
             final Double priorityImportance
     ) {
         checkNullData(startDate, description);
-
-        if (description.length() > 30) {
-            throw new IllegalArgumentException("30자 이하로만 작성이 가능합니다.");
-        }
-
         this.startDate = startDate;
         this.description = description;
         this.endDate = endDate;
