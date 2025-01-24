@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 
+@Schema(name = "스케줄 상세 응답")
 public record ScheduleDetailResponse(
         @Schema(description = "스케줄 아이디", example = "123")
         long id,

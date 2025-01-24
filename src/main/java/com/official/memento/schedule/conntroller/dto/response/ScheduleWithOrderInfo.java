@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+@Schema(name = "스케줄 상세 응답")
 public record ScheduleWithOrderInfo(
         @Schema(description = "스케줄 아이디", example = "123")
         long id,

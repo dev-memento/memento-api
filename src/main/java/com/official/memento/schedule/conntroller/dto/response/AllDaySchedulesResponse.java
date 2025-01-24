@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 
+@Schema(name = "하루 종일 일정 응답")
 public record AllDaySchedulesResponse(
         @Schema(description = "스케줄 아이디", example = "123")
         long id,
