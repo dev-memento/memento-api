@@ -56,6 +56,7 @@ class BrainDumpService(
         val insertOrder: Int = getInsertOrder(date, toDoList, toDo)
         val createdOrderInfo = createOrderInfo(date, toDo, insertOrder)
         createdOrderInfo?.updateOrderNum(insertOrder)
+        toDo.updateOrderNum(insertOrder)
     }
 
     private fun getInsertOrder(date: LocalDate, toDoList: List<OrderWithScheduleOrToDo>, toDo: ToDo): Int {
