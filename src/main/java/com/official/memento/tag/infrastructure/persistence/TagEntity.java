@@ -50,7 +50,7 @@ public class TagEntity {
         this.memberId = memberId;
     }
 
-    public TagEntity() {
+    private TagEntity() {
     }
 
     public static TagEntity of(String name, TagColor color, Long memberId) {
