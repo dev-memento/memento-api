@@ -46,6 +46,6 @@ class PrioritizationApiController(
                     targetDate = request.targetDate,
                 ),
             )
-        return SuccessResponse.of(HttpStatus.OK, "일주일 AI 우선 순위 정렬", PrioritizationDailyResponse.of(todosForWeek))
+        return SuccessResponse.of(HttpStatus.OK, "데일리 AI 우선 순위 정렬", PrioritizationDailyResponse.of(todosForDaily))
     }
 }
