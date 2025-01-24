@@ -32,6 +32,13 @@ public class GlobalExceptionHandler {
         return ErrorResponse.of(HttpStatus.NOT_FOUND, ErrorCode.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> runtimeException(RuntimeException exception) {
+        logger.error("Runtime exception occurred ", exception);
+        alarmSendUseCase.sendException(new AlarmExceptionCommand(exception));
+        return ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> exception(Exception exception) {
         logger.error("Unhandled exception occurred ", exception);
@@ -90,5 +97,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> HttpMessageNotReadableException(HttpMessageNotReadableException exception) {
         logger.error("Invalid request:", exception);
         return ErrorResponse.of(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_JSON_FORMAT);
+    }
+
+    @ExceptionHandler(InvalidAiRequestException.class)
+    public ResponseEntity<ErrorResponse> invalidAiRequestException(InvalidAiRequestException exception) {
+        logger.error("Invalid AI request:", exception);
+        return ErrorResponse.of(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_AI_PRIORITIZATION_REQUEST);
     }
 }
