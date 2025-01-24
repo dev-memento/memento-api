@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface OrderInfoRepository {
 
-    void save(final OrderInfo orderInfo);
+    OrderInfo save(final OrderInfo orderInfo);
 
     void update(final OrderInfo orderInfo);
 

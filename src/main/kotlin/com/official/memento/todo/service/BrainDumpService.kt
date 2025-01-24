@@ -54,7 +54,12 @@ class BrainDumpService(
     private fun assignOrder(date: LocalDate, toDo: ToDo) {
         val toDoList = orderInfoRepository.findOrderInfoWithDetails(date)
         val insertOrder: Int = getInsertOrder(date, toDoList, toDo)
+<<<<<<< Updated upstream
         createOrderInfo(date, toDo, insertOrder)
+=======
+        val createdOrderInfo = createOrderInfo(date, toDo, insertOrder)
+        createdOrderInfo?.updateOrderNum(insertOrder)
+>>>>>>> Stashed changes
     }
 
     private fun getInsertOrder(date: LocalDate, toDoList: List<OrderWithScheduleOrToDo>, toDo: ToDo): Int {
@@ -94,8 +99,13 @@ class BrainDumpService(
         }
         return insertOrder
     }
+<<<<<<< Updated upstream
     private fun createOrderInfo(date: LocalDate, toDo: ToDo, insertOrder: Int) {
         orderInfoRepository.save(
+=======
+    private fun createOrderInfo(date: LocalDate, toDo: ToDo, insertOrder: Int): OrderInfo? {
+        return orderInfoRepository.save(
+>>>>>>> Stashed changes
             OrderInfo.of(
                 null,
                 toDo.id,

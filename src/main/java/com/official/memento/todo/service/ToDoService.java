@@ -297,7 +297,8 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
     private void assignOrder(LocalDate date, ToDo toDo) {
         List<OrderWithScheduleOrToDo> toDoList = orderInfoRepository.findOrderInfoWithDetails(date);
         int insertOrder = getInsertOrder(date, toDoList, toDo);
-        createOrderInfo(date, toDo, insertOrder);
+        OrderInfo createdOrderInfo = createOrderInfo(date, toDo, insertOrder);
+        toDo.updateOrderNum(createdOrderInfo.getOrderNum());
     }
 
     private int getInsertOrder(final LocalDate date, final List<OrderWithScheduleOrToDo> toDoList, final ToDo toDo) {
@@ -338,8 +339,8 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         return insertOrder;
     }
 
-    private void createOrderInfo(final LocalDate date, final ToDo toDo, final int insertOrder) {
-        orderInfoRepository.save(OrderInfo.of(
+    private OrderInfo createOrderInfo(final LocalDate date, final ToDo toDo, final int insertOrder) {
+         return orderInfoRepository.save(OrderInfo.of(
                 null,
                 toDo.getId(),
                 insertOrder,

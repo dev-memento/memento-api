@@ -25,8 +25,8 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
     }
 
     @Override
-    public void save(final OrderInfo orderInfo) {
-        orderInfoEntityJpaRepository.save(OrderInfoEntity.of(orderInfo));
+    public OrderInfo save(final OrderInfo orderInfo) {
+        return OrderInfoMapper.toDomain(orderInfoEntityJpaRepository.save(OrderInfoEntity.of(orderInfo)));
     }
 
     @Override
