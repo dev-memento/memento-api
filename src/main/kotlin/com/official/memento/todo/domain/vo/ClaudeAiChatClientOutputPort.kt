@@ -3,8 +3,9 @@ package com.official.memento.todo.domain.vo
 import com.official.memento.todo.domain.ToDo
 
 interface ClaudeAiChatClientOutputPort {
-    suspend fun prioritizeTodo(
+    fun prioritizeTodo(
         todoList: List<ToDo>,
         orderList: List<Int>,
+        personalInfo: String
     ): List<PrioritizedToDo>
 }

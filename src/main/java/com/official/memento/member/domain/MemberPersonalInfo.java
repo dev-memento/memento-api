@@ -17,6 +17,19 @@ public class MemberPersonalInfo {
     private Boolean isPreferReminder;
     private Boolean isImportantBreaks;
 
+
+    public String toPersonalInfoString() {
+        return "MemberPersonalInfo" +
+                ", wakeUpTime=" + wakeUpTime +
+                ", windDownTime=" + windDownTime +
+                ", job=" + job +
+                ", stressed unorganized schedule isStressedUnorganizedSchedule=" + isStressedUnorganizedSchedule +
+                ", often forget important things =" + isForgetImportantThings +
+                ", prefer reminders =" + isPreferReminder +
+                ", break is important =" + isImportantBreaks +
+                '}';
+    }
+
     public static MemberPersonalInfo of(
             final Long memberId)
     {

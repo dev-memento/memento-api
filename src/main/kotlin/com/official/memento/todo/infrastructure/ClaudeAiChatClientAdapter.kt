@@ -31,13 +31,15 @@ class ClaudeAiChatClientAdapter(
         private const val CLAUDE_AI_API_KEY_HEADER = "x-api-key"
         private const val CLAUDE_AI_VERSION_HEADER = "anthropic-version"
         private const val CLAUDE_AI_VERSION_VALUE = "2023-06-01"
-        private const val MAX_TOKENS = 4096
+        private const val MAX_TOKENS = 8192
         private const val MODEL_NAME = "claude-3-5-haiku-20241022"
         private const val PRIORITIZE_PROMPT_FILE_PATH = "src/main/resources/prioritize-prompt.txt"
     }
 
     private var prioritizationPrompt: String = """
         You are an AI assistant specialized in task analysis and prioritization. Your goal is to process a list of tasks, calculate their priority scores, and output the results in a specific JSON format.
+        
+        {{PERSONAL_INFO}}
 
         Here is the list of tasks you need to analyze:
 
@@ -122,18 +124,19 @@ class ClaudeAiChatClientAdapter(
         Provide your final output as a valid JSON array enclosed in <json_output> tags.
     """.trimIndent()
 
-    override suspend fun prioritizeTodo(
+    override fun prioritizeTodo(
         todoList: List<ToDo>,
         orderList: List<Int>,
-    ): List<PrioritizedToDo> = withContext(Dispatchers.IO) {
+        personalInfo: String
+    ): List<PrioritizedToDo> {
         var taskPrompt = ""
 
         for (idx in todoList.indices) {
             taskPrompt += todoList[idx].toTaskDescription() + '\n' + orderList[idx] + '\n'
         }
 
-        todoList.map { taskPrompt += it.toTaskDescription() + '\n' }
         val replacedPrompt = prioritizationPrompt.replace("{{TASKS_DATA}}", taskPrompt)
+            .replace("{{PERSONAL_INFO}}", personalInfo)
 
         val requestBody = mapOf(
             "model" to MODEL_NAME,
@@ -215,14 +218,13 @@ class ClaudeAiChatClientAdapter(
             .bodyValue(requestBody)
             .retrieve()
             .bodyToMono(ClaudeResponse::class.java)
-            .awaitSingleOrNull()
+            .block()
 
-        println(response)
         val taskResponse = response?.content?.firstOrNull {
             it.type == "tool_use"
         }?.input ?: throw MementoException(ErrorCode.INTERNAL_SERVER_ERROR)
 
-        taskResponse.tasks.map {
+        return taskResponse.tasks.map {
             PrioritizedToDo(
                 task = it.task,
                 id = it.id.toLong(),
@@ -234,11 +236,6 @@ class ClaudeAiChatClientAdapter(
                 order = it.order,
             )
         }
-    }
-
-    private fun readPromptFromFile(): String {
-        val path = Paths.get(PRIORITIZE_PROMPT_FILE_PATH)
-        return Files.readString(path)
     }
 }
 

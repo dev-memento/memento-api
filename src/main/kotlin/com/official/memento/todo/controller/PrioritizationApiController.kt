@@ -21,7 +21,7 @@ class PrioritizationApiController(
     private val toDoPrioritizationUseCase: ToDoPrioritizationUseCase,
 ) : PrioritizationApiDocs {
     @PostMapping("/weekly")
-    override suspend fun prioritizeWeeklyToDo(
+    override fun prioritizeWeeklyToDo(
         @Authorization authorizationUser: AuthorizationUser,
         @RequestBody request: PrioritizationRequest,
     ): ResponseEntity<SuccessResponse<PrioritizationResponse>> {
@@ -36,7 +36,7 @@ class PrioritizationApiController(
     }
 
     @PostMapping("/daily")
-    override suspend fun prioritizeDailyToDo(
+    override fun prioritizeDailyToDo(
         @Authorization authorizationUser: AuthorizationUser,
         @RequestBody request: PrioritizationRequest,
     ): ResponseEntity<SuccessResponse<PrioritizationDailyResponse>> {

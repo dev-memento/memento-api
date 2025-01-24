@@ -2,6 +2,7 @@ package com.official.memento.todo.service
 
 import com.official.memento.global.exception.ErrorCode
 import com.official.memento.global.exception.InvalidAiRequestException
+import com.official.memento.member.domain.port.MemberPersonalInfoRepository
 import com.official.memento.orderinfo.domain.OrderInfoRepository
 import com.official.memento.tag.domain.TagRepository
 import com.official.memento.todo.domain.ToDo
@@ -19,10 +20,12 @@ class ToDoPrioritizationService(
     private val orderInfoRepository: OrderInfoRepository,
     private val toDoTagRepository: ToDoTagRepository,
     private val tagRepository: TagRepository,
+    private val memberPersonalInfoRepository: MemberPersonalInfoRepository
     ) : ToDoPrioritizationUseCase {
 
     @Transactional
-    override suspend fun prioritizeWeekly(command: ToDoPrioritizationCommand) : List<List<ToDo>> {
+    override fun prioritizeWeekly(command: ToDoPrioritizationCommand) : List<List<ToDo>> {
+        val memberPersonalInfo = memberPersonalInfoRepository.findByMemberId(command.memberId)
         val prioritizedToDoList = mutableListOf<List<ToDo>>()
         for (i in 0..6) {
             val toDoList = toDoRepository.findAllByMemberIdAndStartDate(command.memberId, command.targetDate)
@@ -32,7 +35,7 @@ class ToDoPrioritizationService(
                 }.toList()
             prioritizedToDoList.add(
                 i,
-                toDoAiChatClientOutputPort.prioritizeTodo(toDoList, orderList).map {
+                toDoAiChatClientOutputPort.prioritizeTodo(toDoList, orderList, memberPersonalInfo.toPersonalInfoString()).map {
                     val orderInfo = orderInfoRepository.findByToDoIdAndDate(it.id, command.targetDate)
                     orderInfoRepository.updateOrderNum(orderInfo, it.order)
                     val toDo = toDoRepository.findById(it.id)
@@ -68,16 +71,18 @@ class ToDoPrioritizationService(
     }
 
     @Transactional
-    override suspend fun prioritizeDaily(command: ToDoPrioritizationCommand): List<ToDo> {
+    override fun prioritizeDaily(command: ToDoPrioritizationCommand): List<ToDo> {
         val toDoList = toDoRepository.findAllByMemberIdAndStartDate(command.memberId, command.targetDate)
         if (toDoList.isEmpty()) {
             throw InvalidAiRequestException(ErrorCode.INVALID_AI_PRIORITIZATION_REQUEST)
         }
+        val memberPersonalInfo = memberPersonalInfoRepository.findByMemberId(command.memberId)
+
         val orderList =
             toDoList.map {
                 orderInfoRepository.findByToDoIdAndDate(it.id, command.targetDate).orderNum
             }.toList()
-        return toDoAiChatClientOutputPort.prioritizeTodo(toDoList, orderList).map {
+        return toDoAiChatClientOutputPort.prioritizeTodo(toDoList, orderList, memberPersonalInfo.toPersonalInfoString()).map {
                 val orderInfo = orderInfoRepository.findByToDoIdAndDate(it.id, command.targetDate)
                 orderInfoRepository.updateOrderNum(orderInfo, it.order)
                 val toDo = toDoRepository.findById(it.id)
