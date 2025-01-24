@@ -36,7 +36,7 @@ class PrioritizationApiController(
     }
 
     @PostMapping("/daily")
-    fun prioritizeDailyToDo(
+    override fun prioritizeDailyToDo(
         @Authorization authorizationUser: AuthorizationUser,
         @RequestBody request: PrioritizationRequest,
     ): ResponseEntity<SuccessResponse<PrioritizationDailyResponse>> {

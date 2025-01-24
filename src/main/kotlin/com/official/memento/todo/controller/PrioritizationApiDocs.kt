@@ -3,6 +3,7 @@ package com.official.memento.todo.controller
 import com.official.memento.global.annotation.Authorization
 import com.official.memento.global.annotation.AuthorizationUser
 import com.official.memento.global.dto.SuccessResponse
+import com.official.memento.todo.controller.dto.PrioritizationDailyResponse
 import com.official.memento.todo.controller.dto.PrioritizationRequest
 import com.official.memento.todo.controller.dto.PrioritizationResponse
 import io.swagger.v3.oas.annotations.Operation
@@ -24,4 +25,14 @@ interface PrioritizationApiDocs {
         @Authorization authorizationUser: AuthorizationUser,
         @RequestBody request: PrioritizationRequest,
     ): ResponseEntity<SuccessResponse<PrioritizationResponse>>
+
+    @Operation(summary = "데일리 todo 우선순위 정렬 API.", description = "데일리로 할 일 우선순위를 정렬합니다.")
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "데일리 할 일 우선순위 정렬 성공"),
+        ApiResponse(responseCode = "500", description = "서버 에러"),
+    )
+    fun prioritizeDailyToDo(
+        @Authorization authorizationUser: AuthorizationUser,
+        @RequestBody request: PrioritizationRequest,
+    ): ResponseEntity<SuccessResponse<PrioritizationDailyResponse>>
 }
