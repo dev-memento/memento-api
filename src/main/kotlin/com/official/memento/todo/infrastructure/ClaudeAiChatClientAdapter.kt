@@ -1,6 +1,7 @@
 package com.official.memento.todo.infrastructure
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.official.memento.global.exception.ClaudeException
 import com.official.memento.global.exception.ErrorCode
 import com.official.memento.global.exception.MementoException
 import com.official.memento.global.stereotype.Adapter
@@ -230,7 +231,7 @@ class ClaudeAiChatClientAdapter(
                 )
             }
         } catch (e: Exception) {
-            throw MementoException(ErrorCode.INTERNAL_SERVER_ERROR)
+            throw ClaudeException(ErrorCode.INTERNAL_SERVER_ERROR)
         }
 
     }
