@@ -9,30 +9,26 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
 
-    private final Key secretKey;
-    private final long accessTokenExpiration;
-    private final long refreshTokenExpiration;
+    @Value("${JWT.SECRET}")
+    private String secretKey;
+    private static final long accessTokenExpiration = 604800000L;
+    private static final long refreshTokenExpiration = 604800000L;
 
-    public JwtUtil(final String secret, final long accessTokenExpiration, final long refreshTokenExpiration) {
-        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
-        this.accessTokenExpiration = accessTokenExpiration;
-        this.refreshTokenExpiration = refreshTokenExpiration;
-    }
 
     public AccessToken generateAccessToken(final Long userId) {
         return new AccessToken(Jwts.builder()
                 .setSubject(userId.toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiration))
-                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS256)
                 .compact());
     }
 
@@ -41,7 +37,7 @@ public class JwtUtil {
                 .setSubject(userId.toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
-                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS256)
                 .compact());
     }
 
