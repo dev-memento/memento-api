@@ -8,6 +8,7 @@ data class PrioritizationResponse(
     val todos: List<List<ToDoPrioritizedGetResponse>>,
 ) {
     companion object {
+        @JvmStatic
         fun of(todos: List<List<ToDo>>): PrioritizationResponse {
             return PrioritizationResponse(
                 todos =
@@ -32,6 +33,36 @@ data class PrioritizationResponse(
             )
         }
     }
+}
+
+data class PrioritizationDailyResponse(
+    val todos: List<ToDoPrioritizedGetResponse>
+) {
+    companion object {
+
+        fun of(todos: List<ToDo>): PrioritizationDailyResponse {
+            return PrioritizationDailyResponse(
+                todos = todos.map { toDo ->
+                    ToDoPrioritizedGetResponse(
+                        id = toDo.id!!,
+                        groupId = toDo.groupId,
+                        description = toDo.description,
+                        startDate = toDo.startDate.toString(),
+                        endDate = toDo.endDate.toString(),
+                        isCompleted = toDo.isCompleted,
+                        priorityValue = toDo.priorityValue,
+                        priorityType = toDo.priorityType.name,
+                        tagName = toDo.tagName,
+                        tagColor = toDo.tagColor.hexCode,
+                        toDoType = toDo.type,
+                        orderNum = toDo.orderNum,
+                    )
+                }
+            )
+        }
+
+    }
+
 }
 
 @Schema(name = "ToDo 목록 응답")

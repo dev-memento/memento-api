@@ -5,5 +5,6 @@ import com.official.memento.todo.service.command.ToDoPrioritizationCommand
 
 @FunctionalInterface
 interface ToDoPrioritizationUseCase {
-    fun prioritize(command: ToDoPrioritizationCommand): List<List<ToDo>>
+    fun prioritizeWeekly (command: ToDoPrioritizationCommand): List<List<ToDo>>
+    fun prioritizeDaily (command: ToDoPrioritizationCommand): List<ToDo>
 }
