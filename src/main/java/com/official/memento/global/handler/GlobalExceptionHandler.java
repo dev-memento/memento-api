@@ -4,12 +4,15 @@ import com.official.memento.alarm.service.command.AlarmExceptionCommand;
 import com.official.memento.alarm.service.command.AlarmSendUseCase;
 import com.official.memento.global.dto.ErrorResponse;
 import com.official.memento.global.exception.*;
+import io.jsonwebtoken.io.DecodingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
@@ -27,6 +30,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> noResourceFoundException(NoResourceFoundException exception) {
         logger.error("No resource found: ", exception);
         return ErrorResponse.of(HttpStatus.NOT_FOUND, ErrorCode.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> runtimeException(RuntimeException exception) {
+        logger.error("Runtime exception occurred ", exception);
+        alarmSendUseCase.sendException(new AlarmExceptionCommand(exception));
+        return ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(Exception.class)
@@ -53,7 +63,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ErrorResponse> unauthorizedException(UnauthorizedException exception) {
         logger.error("Unauthorized access attempt", exception);
-        alarmSendUseCase.sendException(new AlarmExceptionCommand(exception));
         return ErrorResponse.of(HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED_USER);
     }
 
@@ -69,5 +78,29 @@ public class GlobalExceptionHandler {
         logger.error("Invalid request:", exception);
         alarmSendUseCase.sendException(new AlarmExceptionCommand(exception));
         return ErrorResponse.of(HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND_ENTITY);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> MethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception) {
+        logger.error("Invalid request:", exception);
+        return ErrorResponse.of(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_ARGUMENT_TYPE);
+    }
+
+    @ExceptionHandler(DecodingException.class)
+    public ResponseEntity<ErrorResponse> DecodingException(DecodingException exception) {
+        logger.error("Invalid request:", exception);
+        return ErrorResponse.of(HttpStatus.BAD_REQUEST, ErrorCode.DECODING_FAILURE);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> HttpMessageNotReadableException(HttpMessageNotReadableException exception) {
+        logger.error("Invalid request:", exception);
+        return ErrorResponse.of(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_JSON_FORMAT);
+    }
+
+    @ExceptionHandler(InvalidAiRequestException.class)
+    public ResponseEntity<ErrorResponse> invalidAiRequestException(InvalidAiRequestException exception) {
+        logger.error("Invalid AI request:", exception);
+        return ErrorResponse.of(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_AI_PRIORITIZATION_REQUEST);
     }
 }

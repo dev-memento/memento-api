@@ -1,5 +1,6 @@
 package com.official.memento.schedule.conntroller.dto.request;
 
+import com.official.memento.global.exception.InvalidRequestBodyException;
 import com.official.memento.global.exception.NullPointException;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -37,7 +38,7 @@ public record ScheduleUpdateRequest(
             final LocalDateTime endDate
     ) {
         if (description == null | startDate == null || endDate == null) {
-            throw new NullPointException(NULL_DATA_ERROR);
+            throw new InvalidRequestBodyException(NULL_DATA_ERROR);
         }
     }
 }

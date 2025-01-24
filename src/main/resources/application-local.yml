@@ -17,6 +17,10 @@ spring:
         format_sql: true
         show_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  threads:
+    virtual:
+      enabled: true
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
