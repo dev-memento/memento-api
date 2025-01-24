@@ -20,6 +20,7 @@ import com.official.memento.todo.service.command.BrainDumpCreateCommand
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.UUID
 
 @Service
 class BrainDumpService(
@@ -43,7 +44,7 @@ class BrainDumpService(
         val toDo =
             ToDo.of(
                 command.memberId,
-                null,
+                UUID.randomUUID().toString(),
                 toDoBrainDump.createdDate,
                 toDoBrainDump.task,
                 toDoBrainDump.deadline,
