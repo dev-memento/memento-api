@@ -1,7 +1,6 @@
 package com.official.memento.schedule.service.command;
 
 import com.official.memento.global.exception.InvalidRequestBodyException;
-import com.official.memento.global.exception.NullPointException;
 
 import java.time.LocalDateTime;
 

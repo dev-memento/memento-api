@@ -1,8 +1,6 @@
 package com.official.memento.todo.controller.dto;
 
-import com.official.memento.global.entity.enums.RepeatOption;
 import com.official.memento.global.exception.InvalidRequestBodyException;
-import com.official.memento.global.exception.NullPointException;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;

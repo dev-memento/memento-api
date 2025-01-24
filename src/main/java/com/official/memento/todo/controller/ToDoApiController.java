@@ -66,7 +66,6 @@ public class ToDoApiController implements ToDoApiDocs {
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId
     ) {
-        // todo: 로그인 후 추후 삭제 예정
         toDoDeleteUseCase.delete(ToDoDeleteCommand.of(
                 authorizationUser.memberId(),
                 toDoId)
