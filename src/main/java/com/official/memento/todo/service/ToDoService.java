@@ -271,6 +271,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
     }
 
     private void connectTag(final Long tagId, final ToDo toDo) {
+        tagRepository.findById(tagId);
         ToDoTag toDoTag = ToDoTag.of(tagId, toDo.getId());
         toDoTagRepository.save(toDoTag);
     }
