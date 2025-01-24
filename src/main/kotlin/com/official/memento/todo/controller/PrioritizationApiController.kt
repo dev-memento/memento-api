@@ -21,12 +21,12 @@ class PrioritizationApiController(
     private val toDoPrioritizationUseCase: ToDoPrioritizationUseCase,
 ) : PrioritizationApiDocs {
     @PostMapping("/weekly")
-    fun prioritizeWeeklyToDo(
+    override fun prioritizeWeeklyToDo(
         @Authorization authorizationUser: AuthorizationUser,
         @RequestBody request: PrioritizationRequest,
     ): ResponseEntity<SuccessResponse<PrioritizationResponse>> {
         val todosForWeek =
-            toDoPrioritizationUseCase.prioritize(
+            toDoPrioritizationUseCase.prioritizeWeekly(
                 ToDoPrioritizationCommand(
                     memberId = authorizationUser.memberId,
                     targetDate = request.targetDate,
@@ -40,7 +40,7 @@ class PrioritizationApiController(
         @Authorization authorizationUser: AuthorizationUser,
         @RequestBody request: PrioritizationRequest,
     ): ResponseEntity<SuccessResponse<PrioritizationDailyResponse>> {
-        val todosForDaily = toDoPrioritizationUseCase.prioritize(
+        val todosForDaily = toDoPrioritizationUseCase.prioritizeDaily(
                 ToDoPrioritizationCommand(
                     memberId = authorizationUser.memberId,
                     targetDate = request.targetDate,
