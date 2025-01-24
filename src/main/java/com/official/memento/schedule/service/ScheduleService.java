@@ -284,8 +284,6 @@ public class ScheduleService implements
         } else if (scheduleTag.getTagId() != tagId) {
             scheduleTag.updateTag(tagId, scheduleTag.getUpdatedAt());
             scheduleTagRepository.update(scheduleTag);
-        } else {
-            throw new IllegalArgumentException("예상치 못한 오류 발생"); //Todo 커스텀 오류 변경 예정
         }
     }
 
