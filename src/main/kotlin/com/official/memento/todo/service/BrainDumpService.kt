@@ -57,10 +57,10 @@ class BrainDumpService(
                 PriorityType.findPriorityType(toDoBrainDump.urgency.toDouble(), toDoBrainDump.importance.toDouble()),
                 ToDoType.NORMAL,
             )
-        toDoRepository.save(toDo)
+        val savedToDo = toDoRepository.save(toDo)
         val tag = tagRepository.findById(DEFAULT_BRAINDUMP_TODO_TAG_ID)
-        toDoTagRepository.save(ToDoTag.of(toDo.id, tag.id))
-        assignOrder(toDoBrainDump.createdDate, toDo)
+        toDoTagRepository.save(ToDoTag.of(savedToDo.id, tag.id))
+        assignOrder(toDoBrainDump.createdDate, savedToDo)
         return toDoBrainDump
     }
 
