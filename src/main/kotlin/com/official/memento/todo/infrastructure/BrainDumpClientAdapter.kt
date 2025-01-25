@@ -154,6 +154,7 @@ class BrainDumpClientAdapter(
                     )
                     .retrieve()
                     .bodyToMono(ClaudeResponse::class.java)
+                    .retry(3)
                     .block()
             val taskJsonResponse =
                 response?.content?.filter {
