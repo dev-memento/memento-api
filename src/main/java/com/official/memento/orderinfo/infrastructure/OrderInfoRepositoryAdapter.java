@@ -10,6 +10,8 @@ import com.official.memento.orderinfo.infrastructure.persistence.OrderInfoEntity
 import com.official.memento.orderinfo.infrastructure.persistence.OrderInfoEntityJpaRepository;
 import com.official.memento.orderinfo.infrastructure.persistence.OrderInfoMapper;
 import com.official.memento.orderinfo.infrastructure.persistence.projection.OrderInfoProjection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.Optional;
 @Adapter
 public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
 
+    private static final Logger log = LoggerFactory.getLogger(OrderInfoRepositoryAdapter.class);
     private final OrderInfoEntityJpaRepository orderInfoEntityJpaRepository;
 
     public OrderInfoRepositoryAdapter(OrderInfoEntityJpaRepository orderInfoEntityJpaRepository) {
@@ -31,7 +34,10 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
 
     @Override
     public void update(final OrderInfo orderInfo) {
-        orderInfoEntityJpaRepository.save(OrderInfoEntity.withId(orderInfo));
+        orderInfoEntityJpaRepository.findById(orderInfo.getId())
+                .ifPresent(entity -> {
+                    entity.updateOrderNum(orderInfo.getOrderNum());
+                });
     }
 
     @Override
