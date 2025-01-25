@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.web.reactive.function.client.WebClient
+import reactor.util.retry.Retry
+import java.time.Duration
 import java.time.LocalDate
 
 @Adapter
@@ -212,6 +214,7 @@ class ClaudeAiChatClientAdapter(
                 .bodyValue(requestBody)
                 .retrieve()
                 .bodyToMono(ClaudeResponse::class.java)
+                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
                 .block()
 
             val taskResponse = response?.content?.firstOrNull {

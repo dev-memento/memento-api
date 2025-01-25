@@ -10,6 +10,8 @@ import com.official.memento.todo.domain.vo.BrainDump
 import com.official.memento.todo.domain.vo.ToDoBrainDump
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.reactive.function.client.WebClient
+import reactor.util.retry.Retry
+import java.time.Duration
 import java.time.LocalDate
 
 @Adapter
@@ -154,7 +156,7 @@ class BrainDumpClientAdapter(
                     )
                     .retrieve()
                     .bodyToMono(ClaudeResponse::class.java)
-                    .retry(3)
+                    .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
                     .block()
             val taskJsonResponse =
                 response?.content?.filter {
