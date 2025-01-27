@@ -1,0 +1,38 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+    import: application-secret.yml
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: root
+    password: 1234
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  threads:
+    virtual:
+      enabled: true
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+
+claude:
+  ai:
+    api-key: ${CLAUDE.API-KEY.local}
+
+logging:
+  level:
+    root: INFO
+
+discord:
+  error-alert-url: ${DISCORD.ERROR_ALERT_URL.local}

@@ -1,0 +1,120 @@
+package com.official.memento.orderinfo.infrastructure.persistence;
+
+import com.official.memento.orderinfo.domain.PlanType;
+import com.official.memento.orderinfo.domain.OrderInfo;
+import jakarta.persistence.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "order_info")
+public class OrderInfoEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private Long scheduleId;
+    private Long toDoId;
+    private int orderNum;
+    // fixme: 오늘 날짜라는 의미를 담도록 변수명 변경
+    private LocalDate date;
+    @Enumerated(EnumType.STRING)
+    private PlanType planType;
+    private LocalDateTime createdAt;
+
+    private OrderInfoEntity(
+            final Long id,
+            final Long scheduleId,
+            final Long toDoId,
+            final int orderNum,
+            final LocalDate date,
+            final PlanType planType,
+            final LocalDateTime createdAt
+    ) {
+        this.id = id;
+        this.scheduleId = scheduleId;
+        this.toDoId = toDoId;
+        this.orderNum = orderNum;
+        this.date = date;
+        this.planType = planType;
+        this.createdAt = createdAt;
+    }
+
+    private OrderInfoEntity(
+            final Long scheduleId,
+            final Long toDoId,
+            final int orderNum,
+            final LocalDate date,
+            final PlanType planType,
+            final LocalDateTime createdAt
+    ) {
+        this.scheduleId = scheduleId;
+        this.toDoId = toDoId;
+        this.orderNum = orderNum;
+        this.date = date;
+        this.planType = planType;
+        this.createdAt = createdAt;
+    }
+
+    protected OrderInfoEntity() {
+
+    }
+
+    public static OrderInfoEntity of(final OrderInfo orderInfo) {
+        return new OrderInfoEntity(
+                orderInfo.getScheduleId(),
+                orderInfo.getToDoId(),
+                orderInfo.getOrderNum(),
+                orderInfo.getDate(),
+                orderInfo.getPlanType(),
+                orderInfo.getCreatedAt()
+        );
+    }
+
+    public static OrderInfoEntity withId(
+            final OrderInfo orderInfo
+    ) {
+        return new OrderInfoEntity(
+                orderInfo.getId(),
+                orderInfo.getScheduleId(),
+                orderInfo.getToDoId(),
+                orderInfo.getOrderNum(),
+                orderInfo.getDate(),
+                orderInfo.getPlanType(),
+                orderInfo.getCreatedAt()
+        );
+    }
+
+    public void updateOrderNum(final int orderNum) {
+        this.orderNum = orderNum;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Long getScheduleId() {
+        return scheduleId;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public Long getToDoId() {
+        return toDoId;
+    }
+
+    public int getOrderNum() {
+        return orderNum;
+    }
+
+    public PlanType getPlanType() {
+        return planType;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+}
