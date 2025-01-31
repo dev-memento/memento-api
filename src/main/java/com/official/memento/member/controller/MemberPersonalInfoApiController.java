@@ -9,20 +9,17 @@ import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.service.command.MemberPersonalInfoCommand;
 import com.official.memento.member.service.usecase.MemberPersonalInfoRetrieveUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoUpdateUseCase;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/members/personal-info")
 public class MemberPersonalInfoApiController implements MemberPersonalInfoApiDocs {
     private final MemberPersonalInfoUpdateUseCase memberPersonalInfoUpdateUseCase;
     private final MemberPersonalInfoRetrieveUseCase memberPersonalInfoRetrieveUseCase;
-
-    public MemberPersonalInfoApiController(MemberPersonalInfoUpdateUseCase memberPersonalInfoUpdateUseCase, MemberPersonalInfoRetrieveUseCase memberPersonalInfoRetrieveUseCase) {
-        this.memberPersonalInfoUpdateUseCase = memberPersonalInfoUpdateUseCase;
-        this.memberPersonalInfoRetrieveUseCase = memberPersonalInfoRetrieveUseCase;
-    }
 
     @PatchMapping
     @Override

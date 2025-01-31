@@ -7,17 +7,15 @@ import com.official.memento.todo.domain.ToDoTagRepository;
 import com.official.memento.todo.infrastructure.persistence.ToDoEntity;
 import com.official.memento.todo.infrastructure.persistence.ToDoTagEntity;
 import com.official.memento.todo.infrastructure.persistence.ToDoTagJpaRepository;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
 
 @Adapter
+@RequiredArgsConstructor
 public class ToDoTagRepositoryAdapter implements ToDoTagRepository {
 
     private final ToDoTagJpaRepository toDoTagJpaRepository;
-
-    public ToDoTagRepositoryAdapter(ToDoTagJpaRepository toDoTagJpaRepository){
-        this.toDoTagJpaRepository = toDoTagJpaRepository;
-    }
 
     @Override
     public ToDoTag save(ToDoTag toDoTag){
