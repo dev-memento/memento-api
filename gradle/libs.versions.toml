@@ -6,7 +6,7 @@ ktlint = "12.1.0"
 coroutines = "1.7.3"
 springdoc = "2.7.0"
 jjwt = "0.11.5"
-lombok = "1.18.22"
+lombok = "1.18.34"
 
 [libraries]
 spring-boot-starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web" }
