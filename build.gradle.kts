@@ -27,11 +27,7 @@ java {
     }
 }
 
-configurations {
-    compileOnly {
-        extendsFrom(configurations.annotationProcessor.get())
-    }
-}
+
 
 repositories {
     mavenCentral()
@@ -68,6 +64,10 @@ dependencies {
     implementation(libs.jjwt.api)
     runtimeOnly(libs.jjwt.impl)
     runtimeOnly(libs.jjwt.jackson)
+
+    // Lombok
+    annotationProcessor(libs.lombok)
+    compileOnly(libs.lombok)
 }
 
 kotlin {
@@ -75,6 +75,12 @@ kotlin {
 
     compilerOptions {
         freeCompilerArgs.add("-Xjsr305=strict")
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom(configurations.annotationProcessor.get())
     }
 }
 
