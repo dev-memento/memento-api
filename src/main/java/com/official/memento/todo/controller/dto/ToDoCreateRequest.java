@@ -17,9 +17,9 @@ public record ToDoCreateRequest(
         LocalDate endDate,
         @Schema(description = "태그 ID", example = "12")
         long tagId,
-        @Schema(description = "긴급도 우선순위 (0~1)", example = "0.5")
+        @Schema(description = "긴급도 우선순위 (0~1)", example = "0.5", nullable = true)
         Double priorityUrgency,
-        @Schema(description = "중요도 우선순위 (0~1)", example = "0.5")
+        @Schema(description = "중요도 우선순위 (0~1)", example = "0.5", nullable = true)
         Double priorityImportance
 ) {
     public ToDoCreateRequest(
