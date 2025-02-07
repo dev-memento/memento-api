@@ -30,9 +30,6 @@ public class ToDo extends BaseTimeEntity {
     private String tagName;
     private TagColor tagColor;
 
-    public ToDo() {
-    }
-
     private ToDo(
             final Long id,
             final long memberId,
