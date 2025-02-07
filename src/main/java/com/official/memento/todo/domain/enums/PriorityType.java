@@ -1,21 +1,18 @@
 package com.official.memento.todo.domain.enums;
 
 import java.util.Arrays;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 public enum PriorityType {
     IMMEDIATE(0.5, 0.5),
     MEDIUM(0.5, 0.0),
     HIGH(0.0, 0.5),
     LOW(0.0, 0.0),
-    NONE(null,null);
+    NONE(null, null);
 
     private final Double xCenter;
     private final Double yCenter;
-
-    PriorityType( final Double xCenter, final Double yCenter) {
-        this.xCenter = xCenter;
-        this.yCenter = yCenter;
-    }
 
     public Double getXCenter() {
         return xCenter;

@@ -7,18 +7,15 @@ import com.official.memento.todo.domain.ToDo;
 import com.official.memento.todo.domain.ToDoRepository;
 import com.official.memento.todo.infrastructure.persistence.ToDoEntity;
 import com.official.memento.todo.infrastructure.persistence.ToDoJpaRepository;
-
 import java.time.LocalDate;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Adapter
+@RequiredArgsConstructor
 public class ToDoRepositoryAdapter implements ToDoRepository {
 
     private final ToDoJpaRepository toDoJpaRepository;
-
-    public ToDoRepositoryAdapter(ToDoJpaRepository toDoJpaRepository) {
-        this.toDoJpaRepository = toDoJpaRepository;
-    }
 
     @Override
     public ToDo save(final ToDo toDo) {
@@ -44,7 +41,7 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
     }
 
     @Override
-    public ToDo update(final ToDo toDo){
+    public ToDo update(final ToDo toDo) {
         ToDoEntity toDoEntity = toDoJpaRepository.save(ToDoEntity.withId(toDo));
         return ToDo.withId(
                 toDoEntity.getId(),

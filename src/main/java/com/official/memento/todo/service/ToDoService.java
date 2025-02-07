@@ -14,6 +14,7 @@ import com.official.memento.todo.domain.ToDoTag;
 import com.official.memento.todo.domain.ToDoTagRepository;
 import com.official.memento.todo.domain.enums.PriorityType;
 import com.official.memento.todo.service.command.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,19 +27,13 @@ import java.util.UUID;
 import static com.official.memento.todo.domain.enums.ToDoType.NORMAL;
 
 @Service
+@RequiredArgsConstructor
 public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUpdateUseCase {
 
     private final ToDoRepository toDoRepository;
     private final ToDoTagRepository toDoTagRepository;
     private final TagRepository tagRepository;
     private final OrderInfoRepository orderInfoRepository;
-
-    public ToDoService(ToDoRepository toDoRepository, ToDoTagRepository toDoTagRepository, TagRepository tagRepository, OrderInfoRepository orderInfoRepository) {
-        this.toDoRepository = toDoRepository;
-        this.toDoTagRepository = toDoTagRepository;
-        this.tagRepository = tagRepository;
-        this.orderInfoRepository = orderInfoRepository;
-    }
 
     @Override
     @Transactional

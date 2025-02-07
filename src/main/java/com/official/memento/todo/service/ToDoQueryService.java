@@ -9,29 +9,23 @@ import com.official.memento.todo.domain.ToDo;
 import com.official.memento.todo.domain.ToDoRepository;
 import com.official.memento.todo.domain.ToDoTag;
 import com.official.memento.todo.domain.ToDoTagRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@RequiredArgsConstructor
 public class ToDoQueryService implements ToDoGetUseCase {
 
     private final ToDoRepository toDoRepository;
     private final OrderInfoRepository orderInfoRepository;
     private final ToDoTagRepository toDoTagRepository;
     private final TagRepository tagRepository;
-
-    public ToDoQueryService(ToDoRepository toDoRepository, OrderInfoRepository orderInfoRepository, ToDoTagRepository toDoTagRepository, TagRepository tagRepository) {
-        this.toDoRepository = toDoRepository;
-        this.orderInfoRepository = orderInfoRepository;
-        this.toDoTagRepository = toDoTagRepository;
-        this.tagRepository = tagRepository;
-    }
 
     @Transactional(readOnly = true)
     @Override

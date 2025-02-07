@@ -1,14 +1,20 @@
 package com.official.memento.todo.infrastructure.persistence;
 
-import com.official.memento.global.entity.BaseTimeEntity;
-import com.official.memento.tag.infrastructure.persistence.TagEntity;
-import com.official.memento.todo.domain.ToDoTag;
-import jakarta.persistence.*;
+import static lombok.AccessLevel.PROTECTED;
 
+import com.official.memento.global.entity.BaseTimeEntity;
+import com.official.memento.todo.domain.ToDoTag;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "todo_tag")
+@NoArgsConstructor(access = PROTECTED)
 public class ToDoTagEntity extends BaseTimeEntity {
 
     @Id
@@ -38,10 +44,6 @@ public class ToDoTagEntity extends BaseTimeEntity {
         this.tagId = tagId;
         this.toDoId = toDoId;
     }
-
-    protected ToDoTagEntity() {
-    }
-
 
     public static ToDoTagEntity of(final ToDoTag toDoTag) {
         return new ToDoTagEntity(
