@@ -1,11 +1,8 @@
 package com.official.memento.todo.controller.dto;
 
-import com.official.memento.global.exception.InvalidRequestBodyException;
+import com.official.memento.global.util.Validator;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.time.LocalDate;
-
-import static com.official.memento.global.exception.ErrorCode.NULL_DATA_ERROR;
 
 @Schema(name = "ToDo 생성 요청")
 public record ToDoCreateRequest(
@@ -39,12 +36,8 @@ public record ToDoCreateRequest(
         this.priorityImportance = priorityImportance;
     }
 
-    private static void checkNullData(
-            final LocalDate startDate,
-            final String description
-    ) {
-        if (startDate == null || description == null) {
-            throw new InvalidRequestBodyException(NULL_DATA_ERROR);
-        }
+    private static void checkNullData(final LocalDate startDate, final String description) {
+        Validator.isNull(startDate);
+        Validator.isNull(description);
     }
 }
