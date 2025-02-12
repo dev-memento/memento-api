@@ -1,5 +1,6 @@
-package com.official.memento.todo.domain;
+package com.official.memento.todo.domain.repository;
 
+import com.official.memento.todo.domain.entity.ToDo;
 import java.time.LocalDate;
 import java.util.List;
 
