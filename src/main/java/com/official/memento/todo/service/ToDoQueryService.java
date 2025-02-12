@@ -5,10 +5,8 @@ import com.official.memento.global.exception.UnauthorizedException;
 import com.official.memento.orderinfo.domain.OrderInfoRepository;
 import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.TagRepository;
-import com.official.memento.todo.domain.ToDo;
-import com.official.memento.todo.domain.ToDoRepository;
-import com.official.memento.todo.domain.ToDoTag;
-import com.official.memento.todo.domain.ToDoTagRepository;
+import com.official.memento.todo.domain.entity.ToDo;
+import com.official.memento.todo.domain.repository.ToDoRepository;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -24,7 +22,6 @@ public class ToDoQueryService implements ToDoGetUseCase {
 
     private final ToDoRepository toDoRepository;
     private final OrderInfoRepository orderInfoRepository;
-    private final ToDoTagRepository toDoTagRepository;
     private final TagRepository tagRepository;
 
     @Transactional(readOnly = true)
@@ -34,13 +31,6 @@ public class ToDoQueryService implements ToDoGetUseCase {
         List<ToDo> toDos = todos.stream()
                 .peek(todo -> {
                     Integer order = orderInfoRepository.findOrderByToDoId(todo.getId());
-                    ToDoTag toDoTag = toDoTagRepository.findByToDoId(todo.getId());
-
-                    if (toDoTag != null) {
-                        Tag tag = tagRepository.findById(toDoTag.getTagId());
-                        todo.updateTag(tag);
-                    }
-
                     todo.updateOrderNum(order);
                 })
                 .toList();
@@ -53,21 +43,7 @@ public class ToDoQueryService implements ToDoGetUseCase {
         List<ToDo> toDos = toDoRepository.findAllByMemberIdAndStartDate(memberId, date);
         toDos.forEach(todo -> {
             int orderNum = orderInfoRepository.findByToDoId(todo.getId()).getOrderNum();
-            ToDoTag toDoTag = toDoTagRepository.findByToDoId(todo.getId());
-            if (toDoTag != null) {
-                Tag tag = tagRepository.findById(toDoTag.getTagId());
-                todo.updateTag(tag);
-            }
-            todo.update(
-                    todo.getStartDate(),
-                    todo.getDescription(),
-                    todo.getEndDate(),
-                    todo.getPriorityUrgency(),
-                    todo.getPriorityImportance(),
-                    orderNum,
-                    todo.getPriorityType(),
-                    todo.getPriorityValue()
-            );
+            todo.updateOrderNum(orderNum);
         });
         return toDos;
     }
@@ -77,12 +53,9 @@ public class ToDoQueryService implements ToDoGetUseCase {
     public ToDo getDetail(long memberId, long toDoId) {
         ToDo toDo = toDoRepository.findById(toDoId);
         checkOwn(memberId, toDo);
-        ToDoTag toDoTag = toDoTagRepository.findByToDoId(toDoId);
-        if (toDoTag != null) {
-            Tag tag = tagRepository.findById(toDoTag.getTagId());
-            toDo.updateTag(tag);
-            toDo.updateTagId(toDoTag.getTagId());
-        }
+        Tag tag = tagRepository.findById(toDo.getTagId());
+        toDo.updateTag(tag);
+        toDo.updateTagId(toDo.getTagId());
         return toDo;
     }
 
