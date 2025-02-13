@@ -8,4 +8,6 @@ public interface ScheduleCreateUseCase {
     void create(final ScheduleCreateCommand command);
 
     void createAppleSchedules(final List<ScheduleCreateCommand> command);
+
+    void createGoogleSchedules(final String command );
 }
