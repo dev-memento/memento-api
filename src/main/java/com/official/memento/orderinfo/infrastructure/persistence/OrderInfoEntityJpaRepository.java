@@ -23,10 +23,10 @@ public interface OrderInfoEntityJpaRepository extends JpaRepository<OrderInfoEnt
             FROM OrderInfoEntity o
             LEFT JOIN ToDoEntity t ON o.toDoId = t.id AND o.planType = 'TODO'
             LEFT JOIN ScheduleEntity s ON o.scheduleId = s.id AND o.planType = 'SCHEDULE'
-            WHERE DATE(o.date) = :startDate
+            WHERE DATE(o.date) = :startDate AND o.memberId = :memberId
             ORDER BY o.orderNum ASC, o.createdAt ASC
             """)
-    List<OrderInfoProjection> findOrderInfoWithDetails(final LocalDate startDate);
+    List<OrderInfoProjection> findOrderInfoWithDetails(final LocalDate startDate,final long memberId);
 
     void deleteByScheduleId(final long scheduleId);
 
@@ -44,8 +44,8 @@ public interface OrderInfoEntityJpaRepository extends JpaRepository<OrderInfoEnt
 """)
     List<OrderInfoEntity> findOrdersBetween(
             @Param("date") LocalDate date,
-            @Param("startOrder") int startOrder,
-            @Param("endOrder") int endOrder
+            @Param("startOrder") double startOrder,
+            @Param("endOrder") double endOrder
     );
 
     @Query("""
