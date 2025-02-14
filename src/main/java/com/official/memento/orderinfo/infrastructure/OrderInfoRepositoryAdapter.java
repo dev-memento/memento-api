@@ -51,11 +51,12 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
     }
 
     @Override
-    public List<OrderWithScheduleOrToDo> findOrderInfoWithDetails(final LocalDate startDate) {
-        List<OrderInfoProjection> projections = orderInfoEntityJpaRepository.findOrderInfoWithDetails(startDate);
+    public List<OrderWithScheduleOrToDo> findOrderInfoWithDetails(final LocalDate startDate, final long memberId) {
+        List<OrderInfoProjection> projections = orderInfoEntityJpaRepository.findOrderInfoWithDetails(startDate,memberId);
         return projections.stream()
                 .map(projection -> OrderWithScheduleOrToDo.of(
                         projection.getOrderInfoId(),
+                        projection.getMemberId(),
                         projection.getScheduleId(),
                         projection.getToDoId(),
                         projection.getStartDate(),
@@ -69,7 +70,7 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
     }
 
     @Override
-    public Integer findOrderByToDoId(Long toDoId) {
+    public Double findOrderByToDoId(Long toDoId) {
         return orderInfoEntityJpaRepository.findOrderByToDoId(toDoId)
                 .map(OrderInfoEntity::getOrderNum) // 예: orderNum 필드 가져오기
                 .orElse(null); // 결과가 없을 경우 null 반환
@@ -82,19 +83,20 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
     }
 
     @Override
-    public OrderInfo updateOrderNum(OrderInfo orderInfo, int orderNum) {
+    public OrderInfo updateOrderNum(OrderInfo orderInfo, double orderNum) {
         OrderInfoEntity entity = orderInfoEntityJpaRepository.findById(orderInfo.getId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY));
         entity.updateOrderNum(orderNum);
         orderInfo.updateOrderNum(orderNum);
         return orderInfo;
     }
-  
-    public List<OrderInfo> findOrdersBetween(LocalDate date, int startOrder, int endOrder) {
+
+    public List<OrderInfo> findOrdersBetween(LocalDate date, double startOrder, double endOrder) {
         List<OrderInfoEntity> entities = orderInfoEntityJpaRepository.findOrdersBetween(date, startOrder, endOrder);
         return entities.stream()
                 .map(entity -> OrderInfo.withId(
                         entity.getId(),
+                        entity.getMemberId(),
                         entity.getScheduleId(),
                         entity.getToDoId(),
                         entity.getOrderNum(),
@@ -106,11 +108,6 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
     }
 
     @Override
-    public Optional<Integer> findOrderNumByToDoId(final Long toDoId) {
-        return orderInfoEntityJpaRepository.findOrderNumByToDoId(toDoId);
-    }
-
-    @Override
     public OrderInfo findByToDoId(Long toDoId) {
         OrderInfoEntity orderInfoEntity = orderInfoEntityJpaRepository.findOrderByToDoId(toDoId)
                 .orElseThrow(
@@ -118,6 +115,7 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
                 );
         return OrderInfo.withId(
                 orderInfoEntity.getId(),
+                orderInfoEntity.getMemberId(),
                 orderInfoEntity.getScheduleId(),
                 orderInfoEntity.getToDoId(),
                 orderInfoEntity.getOrderNum(),

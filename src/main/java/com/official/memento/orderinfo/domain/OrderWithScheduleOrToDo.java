@@ -1,54 +1,39 @@
 package com.official.memento.orderinfo.domain;
 
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@AllArgsConstructor
+@Getter
 public class OrderWithScheduleOrToDo {
     private long orderInfoId;
+    private long memberId;
     private Long scheduleId;
     private Long toDoId;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private Double priorityValue;
-    private int order;
+    private double order;
     private PlanType type;
     private LocalDateTime createdAt;
 
-    private OrderWithScheduleOrToDo(
-            final Long orderInfoId,
-            final Long scheduleId,
-            final Long toDoId,
-            final LocalDateTime startDate,
-            final LocalDateTime endDate,
-            final Double priorityValue,
-            final int order,
-            final PlanType type,
-            final LocalDateTime createdAt
-    ) {
-        this.orderInfoId = orderInfoId;
-        this.scheduleId = scheduleId;
-        this.toDoId = toDoId;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.priorityValue = priorityValue;
-        this.order = order;
-        this.type = type;
-        this.createdAt = createdAt;
-    }
-
     public static OrderWithScheduleOrToDo of(
             final Long orderInfoId,
+            final long memberId,
             final Long scheduleId,
             final Long toDoId,
             final LocalDateTime startDate,
             final LocalDateTime endDate,
             final Double priorityValue,
-            final int order,
+            final double order,
             final PlanType planType,
             final LocalDateTime createdAt
 
     ) {
         return new OrderWithScheduleOrToDo(
                 orderInfoId,
+                memberId,
                 scheduleId,
                 toDoId,
                 startDate,
@@ -60,44 +45,8 @@ public class OrderWithScheduleOrToDo {
         );
     }
 
-    public Long getOrderInfoId() {
-        return orderInfoId;
-    }
-
-    public Long getScheduleId() {
-        return scheduleId;
-    }
-
-    public Long getToDoId() {
-        return toDoId;
-    }
-
-    public LocalDateTime getStartDate() {
-        return startDate;
-    }
-
-    public LocalDateTime getEndDate() {
-        return endDate;
-    }
-
-    public Double getPriorityValue() {
-        return priorityValue;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public int getOrder() {
-        return order;
-    }
-
     public void shiftBack() {
         this.order++;
-    }
-
-    public PlanType getType() {
-        return type;
     }
 
     public void shiftForward() {

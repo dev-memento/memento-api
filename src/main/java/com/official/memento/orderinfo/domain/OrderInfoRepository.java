@@ -14,17 +14,15 @@ public interface OrderInfoRepository {
 
     void deleteByToDoId(final long toDoId);
 
-    List<OrderWithScheduleOrToDo> findOrderInfoWithDetails(final LocalDate startDate);
+    List<OrderWithScheduleOrToDo> findOrderInfoWithDetails(final LocalDate startDate,final long memberId);
 
-    Integer findOrderByToDoId(final Long toDoId);
+    Double findOrderByToDoId(final Long toDoId);
 
     OrderInfo findByToDoIdAndDate(final Long toDoId, final LocalDate date);
 
-    OrderInfo updateOrderNum(final OrderInfo orderInfo , final int orderNum);
+    OrderInfo updateOrderNum(final OrderInfo orderInfo , final double orderNum);
 
-    List<OrderInfo> findOrdersBetween(LocalDate date, int startOrder, int endOrder);
-
-    Optional<Integer> findOrderNumByToDoId(final Long toDoId);
+    List<OrderInfo> findOrdersBetween(LocalDate date, double startOrder, double endOrder);
 
     OrderInfo findByToDoId(Long toDoId);
 

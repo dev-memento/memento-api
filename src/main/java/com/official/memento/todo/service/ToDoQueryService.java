@@ -33,7 +33,7 @@ public class ToDoQueryService implements ToDoGetUseCase {
         List<ToDo> todos = toDoRepository.findAllByMemberId(memberId);
         List<ToDo> toDos = todos.stream()
                 .peek(todo -> {
-                    Integer order = orderInfoRepository.findOrderByToDoId(todo.getId());
+                    Double order = orderInfoRepository.findOrderByToDoId(todo.getId());
                     ToDoTag toDoTag = toDoTagRepository.findByToDoId(todo.getId());
 
                     if (toDoTag != null) {
@@ -52,7 +52,7 @@ public class ToDoQueryService implements ToDoGetUseCase {
     public List<ToDo> getTodosByDate(long memberId, LocalDate date) {
         List<ToDo> toDos = toDoRepository.findAllByMemberIdAndStartDate(memberId, date);
         toDos.forEach(todo -> {
-            int orderNum = orderInfoRepository.findByToDoId(todo.getId()).getOrderNum();
+            double orderNum = orderInfoRepository.findByToDoId(todo.getId()).getOrderNum();
             ToDoTag toDoTag = toDoTagRepository.findByToDoId(todo.getId());
             if (toDoTag != null) {
                 Tag tag = tagRepository.findById(toDoTag.getTagId());

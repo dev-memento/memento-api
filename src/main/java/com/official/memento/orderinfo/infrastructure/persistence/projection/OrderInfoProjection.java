@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 public interface OrderInfoProjection {
     long getOrderInfoId();
 
+    long getMemberId();
+
     Long getScheduleId();
 
     Long getToDoId();
@@ -17,7 +19,7 @@ public interface OrderInfoProjection {
 
     Double getPriorityValue();
 
-    int getOrderNum();
+    double getOrderNum();
 
     PlanType getPlanType();
 

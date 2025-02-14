@@ -62,7 +62,7 @@ public class ScheduleService implements
         String scheduleGroupId = UUID.randomUUID().toString();
         Schedule schedule = createSchedule(command, scheduleGroupId);
         connectTag(command.tagId(), schedule);
-        assignOrder(command.startDate().toLocalDate(), schedule);
+        assignOrder(command.startDate().toLocalDate(), schedule, command.memberId());
     }
 
     @Override
@@ -72,7 +72,7 @@ public class ScheduleService implements
             String scheduleGroupId = UUID.randomUUID().toString();
             Schedule schedule = createAppleSchedule(scheduleCreateCommand, scheduleGroupId);
             connectTag(tag.getId(), schedule);
-            assignOrder(scheduleCreateCommand.startDate().toLocalDate(), schedule);
+            assignOrder(scheduleCreateCommand.startDate().toLocalDate(), schedule,command.get(0).memberId());
         }
     }
 
@@ -91,7 +91,7 @@ public class ScheduleService implements
         updateOrDeleteTag(schedule, command.tagId());
         if (schedule.getStartDate() != command.startDate() || schedule.getEndDate() != command.endDate()) {
             orderInfoRepository.deleteByScheduleId(schedule.getId());
-            assignOrder(command.startDate().toLocalDate(), schedule);
+            assignOrder(command.startDate().toLocalDate(), schedule, command.memberId());
 
         }
     }
@@ -220,10 +220,10 @@ public class ScheduleService implements
         ));
     }
 
-    private void assignOrder(LocalDate date, Schedule schedule) {
-        List<OrderWithScheduleOrToDo> scheduleList = orderInfoRepository.findOrderInfoWithDetails(date);
-        int insertOrder = getInsertOrder(date, scheduleList, schedule);
-        createOrderInfo(date, schedule, insertOrder);
+    private void assignOrder(final LocalDate date,final Schedule schedule,final long memberId) {
+        List<OrderWithScheduleOrToDo> scheduleList = orderInfoRepository.findOrderInfoWithDetails(date,memberId);
+        double insertOrder = getInsertOrder(date, scheduleList, schedule);
+        createOrderInfo(date, schedule, insertOrder,memberId);
     }
 
     private List<Schedule> createRepeatSchedules(
@@ -324,8 +324,8 @@ public class ScheduleService implements
         }
     }
 
-    private int getInsertOrder(final LocalDate date, final List<OrderWithScheduleOrToDo> scheduleList, final Schedule schedule) {
-        int insertOrder = 1;
+    private double getInsertOrder(final LocalDate date, final List<OrderWithScheduleOrToDo> scheduleList, final Schedule schedule) {
+        double insertOrder = 1;
         boolean isInserted = false;
         for (OrderWithScheduleOrToDo existingOrder : scheduleList) {
 
@@ -346,6 +346,7 @@ public class ScheduleService implements
                 orderInfoRepository.update(
                         OrderInfo.withId(
                                 existingOrder.getOrderInfoId(),
+                                existingOrder.getMemberId(),
                                 existingOrder.getScheduleId(),
                                 existingOrder.getToDoId(),
                                 existingOrder.getOrder(),
@@ -363,8 +364,9 @@ public class ScheduleService implements
         return insertOrder;
     }
 
-    private void createOrderInfo(final LocalDate date, final Schedule schedule, final int insertOrder) {
+    private void createOrderInfo(final LocalDate date, final Schedule schedule, final double insertOrder,final long memberId) {
         orderInfoRepository.save(OrderInfo.of(
+                memberId,
                 schedule.getId(),
                 null,
                 insertOrder,

@@ -3,12 +3,12 @@ package com.official.memento.todo.service.command;
 public record ToDoPositionUpdateCommand(
         Long memberId,
         Long toDoId,
-        Integer targetOrderNum
+        Double targetOrderNum
 ) {
     public static ToDoPositionUpdateCommand of(
             final Long memberId,
             final Long toDoId,
-            final Integer targetOrderNum
+            final Double targetOrderNum
     ) {
         return new ToDoPositionUpdateCommand(
                 memberId,

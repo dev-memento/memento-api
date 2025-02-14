@@ -6,7 +6,6 @@ import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.enums.TagColor;
 import com.official.memento.todo.domain.enums.PriorityType;
 import com.official.memento.todo.domain.enums.ToDoType;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -25,7 +24,7 @@ public class ToDo extends BaseTimeEntity {
     private Double priorityValue;
     private PriorityType priorityType;
     private ToDoType type;
-    private Integer orderNum;
+    private Double orderNum;
     private Long tagId;
     private String tagName;
     private TagColor tagColor;
@@ -113,7 +112,7 @@ public class ToDo extends BaseTimeEntity {
             final ToDoType type,
             final LocalDateTime createdAt,
             final LocalDateTime updatedAt,
-            final Integer orderNum,
+            final Double orderNum,
             final Long tagId,
             final String tagName,
             final TagColor tagColor
@@ -135,7 +134,7 @@ public class ToDo extends BaseTimeEntity {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.orderNum = orderNum;
-        this.tagId=tagId;
+        this.tagId = tagId;
         this.tagName = tagName;
         this.tagColor = tagColor;
     }
@@ -309,7 +308,7 @@ public class ToDo extends BaseTimeEntity {
             final ToDoType type,
             final LocalDateTime createdAt,
             final LocalDateTime updatedAt,
-            final Integer orderNum,
+            final Double orderNum,
             final Long tagId,
             final String tagName,
             final TagColor tagColor
@@ -344,7 +343,7 @@ public class ToDo extends BaseTimeEntity {
             final LocalDate endDate,
             final Double priorityUrgency,
             final Double priorityImportance,
-            final Integer orderNum,
+            final Double orderNum,
             final PriorityType priorityType,
             final Double priorityValue
     ) {
@@ -378,7 +377,7 @@ public class ToDo extends BaseTimeEntity {
     }
 
 
-    public void updateOrderNum(Integer orderNum) {
+    public void updateOrderNum(double orderNum) {
         this.orderNum = orderNum;
     }
 
@@ -438,7 +437,7 @@ public class ToDo extends BaseTimeEntity {
         return type;
     }
 
-    public Integer getOrderNum() {
+    public double getOrderNum() {
         return orderNum;
     }
 

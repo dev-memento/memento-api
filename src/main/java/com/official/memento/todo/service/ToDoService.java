@@ -63,7 +63,8 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         checkOwn(command.memberId(), toDo);
         PriorityType newPriorityType = toDo.getPriorityType();
         Double newPriorityValue = toDo.getPriorityValue();
-        if (!Objects.equals(command.priorityUrgency(), toDo.getPriorityUrgency()) || !Objects.equals(command.priorityImportance(), toDo.getPriorityImportance())) {
+        if (!Objects.equals(command.priorityUrgency(), toDo.getPriorityUrgency()) || !Objects.equals(
+                command.priorityImportance(), toDo.getPriorityImportance())) {
             newPriorityType = determinePriorityType(command.priorityUrgency(), command.priorityImportance());
             newPriorityValue = calculatePriorityValue(command.priorityUrgency(), command.priorityImportance());
         }
@@ -81,7 +82,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         updateOrDeleteTag(toDo, command.tagId());
         if (toDo.getStartDate() != command.startDate() || toDo.getEndDate() != command.endDate()) {
             orderInfoRepository.deleteByToDoId(toDo.getId());
-            assignOrder(command.startDate(), toDo);
+            assignOrder(command.startDate(), toDo, command.memberId());
         }
     }
 
@@ -105,17 +106,19 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         checkOwn(command.memberId(), toDo);
 
         LocalDate date = orderInfoRepository.findDateByToDoId(command.toDoId());
-        int currentOrderNum = orderInfoRepository.findOrderByToDoId(command.toDoId());
-        int targetOrderNum = command.targetOrderNum();
+        double currentOrderNum = orderInfoRepository.findOrderByToDoId(command.toDoId());
+        double targetOrderNum = command.targetOrderNum();
 
         if (currentOrderNum > targetOrderNum) {
-            List<OrderInfo> ordersToUpdate = orderInfoRepository.findOrdersBetween(date, targetOrderNum, currentOrderNum - 1);
+            List<OrderInfo> ordersToUpdate = orderInfoRepository.findOrdersBetween(date, targetOrderNum,
+                    currentOrderNum - 1.0);
             for (OrderInfo order : ordersToUpdate) {
                 order.incrementOrder();
                 orderInfoRepository.update(order);
             }
         } else if (currentOrderNum < targetOrderNum) {
-            List<OrderInfo> ordersToUpdate = orderInfoRepository.findOrdersBetween(date, currentOrderNum + 1, targetOrderNum);
+            List<OrderInfo> ordersToUpdate = orderInfoRepository.findOrdersBetween(date, currentOrderNum + 1,
+                    targetOrderNum);
             for (OrderInfo order : ordersToUpdate) {
                 order.decrementOrder();
                 orderInfoRepository.update(order);
@@ -135,7 +138,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
 
         connectTag(command.tagId(), toDo);
 
-        assignOrder(command.startDate(), toDo);
+        assignOrder(command.startDate(), toDo, command.memberId());
     }
 
     private void createRepeatToDos(final ToDoCreateCommand command, final String toDoGroupId) {
@@ -159,7 +162,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
                 currentDate = currentDate.plusYears(1);
             }
 
-            assignOrder(command.startDate(), toDo);
+            assignOrder(command.startDate(), toDo, command.memberId());
         }
     }
 
@@ -220,15 +223,15 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         }
     }
 
-    private void assignOrder(LocalDate date, ToDo toDo) {
-        List<OrderWithScheduleOrToDo> toDoList = orderInfoRepository.findOrderInfoWithDetails(date);
-        int insertOrder = getInsertOrder(date, toDoList, toDo);
-        OrderInfo createdOrderInfo = createOrderInfo(date, toDo, insertOrder);
+    private void assignOrder(final LocalDate date, final ToDo toDo, final long memberId) {
+        List<OrderWithScheduleOrToDo> toDoList = orderInfoRepository.findOrderInfoWithDetails(date, memberId);
+        double insertOrder = getInsertOrder(date, toDoList, toDo);
+        OrderInfo createdOrderInfo = createOrderInfo(date, toDo, insertOrder,memberId);
         toDo.updateOrderNum(createdOrderInfo.getOrderNum());
     }
 
-    private int getInsertOrder(final LocalDate date, final List<OrderWithScheduleOrToDo> toDoList, final ToDo toDo) {
-        int insertOrder = 1;
+    private double getInsertOrder(final LocalDate date, final List<OrderWithScheduleOrToDo> toDoList, final ToDo toDo) {
+        double insertOrder = 1;
         boolean isInserted = false;
         for (OrderWithScheduleOrToDo existingOrder : toDoList) {
 
@@ -249,6 +252,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
                 orderInfoRepository.update(
                         OrderInfo.withId(
                                 existingOrder.getOrderInfoId(),
+                                existingOrder.getMemberId(),
                                 existingOrder.getScheduleId(),
                                 existingOrder.getToDoId(),
                                 existingOrder.getOrder(),
@@ -265,8 +269,9 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         return insertOrder;
     }
 
-    private OrderInfo createOrderInfo(final LocalDate date, final ToDo toDo, final int insertOrder) {
+    private OrderInfo createOrderInfo(final LocalDate date, final ToDo toDo, final double insertOrder,final long memberId) {
         return orderInfoRepository.save(OrderInfo.of(
+                memberId,
                 null,
                 toDo.getId(),
                 insertOrder,
