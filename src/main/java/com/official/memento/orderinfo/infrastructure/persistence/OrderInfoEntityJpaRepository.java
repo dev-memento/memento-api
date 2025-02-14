@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface OrderInfoEntityJpaRepository extends JpaRepository<OrderInfoEntity, Long> {
+    //Todo 조건 추가: 현재 그 날에 해당하는 모든 유저들의 투두와 스케줄을 갖고 오고 있음, 이걸 현재 유저의 것만 갖고 오도록 수정해야함
     @Query("""
             SELECT o.id AS orderInfoId,
                    o.toDoId AS toDoId,

@@ -1,10 +1,8 @@
 package com.official.memento.todo.controller.dto;
 
-import com.official.memento.todo.domain.ToDo;
-import com.official.memento.todo.domain.enums.ToDoType;
+import com.official.memento.todo.domain.entity.ToDo;
+import com.official.memento.todo.domain.entity.enums.ToDoType;
 import io.swagger.v3.oas.annotations.media.Schema;
-
-import static com.official.memento.todo.domain.enums.ToDoType.NORMAL;
 
 @Schema(description = "ToDo 목록 응답")
 public record ToDoGetResponse(

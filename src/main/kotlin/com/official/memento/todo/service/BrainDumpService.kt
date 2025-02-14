@@ -6,23 +6,24 @@ import com.official.memento.orderinfo.domain.OrderInfoRepository
 import com.official.memento.orderinfo.domain.OrderWithScheduleOrToDo
 import com.official.memento.orderinfo.domain.PlanType
 import com.official.memento.tag.domain.TagRepository
-import com.official.memento.todo.domain.*
-import com.official.memento.todo.domain.enums.PriorityType
-import com.official.memento.todo.domain.enums.ToDoType
+import com.official.memento.todo.domain.port.BrainDumpClientOutputPort
+import com.official.memento.todo.domain.entity.ToDo
+import com.official.memento.todo.domain.repository.ToDoRepository
+import com.official.memento.todo.domain.entity.enums.PriorityType
+import com.official.memento.todo.domain.entity.enums.ToDoType
 import com.official.memento.todo.domain.vo.BrainDump
 import com.official.memento.todo.domain.vo.ToDoBrainDump
 import com.official.memento.todo.service.command.BrainDumpCreateCommand
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Service
 class BrainDumpService(
         private val brainDumpClientOutputPort: BrainDumpClientOutputPort,
         private val toDoRepository: ToDoRepository,
         private val tagRepository: TagRepository,
-        private val toDoTagRepository: ToDoTagRepository,
         private val orderInfoRepository: OrderInfoRepository
 ) : BrainDumpCreateUseCase {
 
@@ -37,6 +38,7 @@ class BrainDumpService(
                                 command.content,
                         ),
                 )
+        val tag = tagRepository.findById(DEFAULT_BRAINDUMP_TODO_TAG_ID)
         val toDo =
                 ToDo.of(
                         command.memberId,
@@ -52,10 +54,9 @@ class BrainDumpService(
                         toDoBrainDump.urgency * 0.3 + toDoBrainDump.importance * 0.7,
                         PriorityType.findPriorityType(toDoBrainDump.urgency.toDouble(), toDoBrainDump.importance.toDouble()),
                         ToDoType.NORMAL,
+                        DEFAULT_BRAINDUMP_TODO_TAG_ID
                 )
         val savedToDo = toDoRepository.save(toDo)
-        val tag = tagRepository.findById(DEFAULT_BRAINDUMP_TODO_TAG_ID)
-        toDoTagRepository.save(ToDoTag.of(savedToDo.id, tag.id))
         assignOrder(toDoBrainDump.createdDate, savedToDo, command.memberId)
         return toDoBrainDump
     }
