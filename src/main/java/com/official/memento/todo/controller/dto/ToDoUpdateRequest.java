@@ -34,5 +34,6 @@ public record ToDoUpdateRequest(
     private static void checkNullData(final LocalDate startDate, final String description) {
         Validator.isNull(startDate);
         Validator.isNull(description);
+        Validator.validateLengthContainEmoji(description, 30);
     }
 }
