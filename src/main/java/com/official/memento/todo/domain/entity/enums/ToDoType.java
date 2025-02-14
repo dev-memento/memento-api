@@ -1,4 +1,4 @@
-package com.official.memento.todo.domain.enums;
+package com.official.memento.todo.domain.entity.enums;
 
 public enum ToDoType {
     NORMAL,

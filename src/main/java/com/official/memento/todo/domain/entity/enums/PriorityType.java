@@ -1,4 +1,4 @@
-package com.official.memento.todo.domain.enums;
+package com.official.memento.todo.domain.entity.enums;
 
 import java.util.Arrays;
 import lombok.AllArgsConstructor;
@@ -23,16 +23,16 @@ public enum PriorityType {
     }
 
     public static PriorityType findPriorityType(Double x, Double y) {
+        if (x == null || y == null) {
+            return NONE;
+        }
         if (x > 1.0 || y > 1.0) {
             throw new IllegalArgumentException("좌표 값이 1을 초과할 수 없습니다: x=" + x + ", y=" + y);
         }
-        if (x == null || y == null) {
-            return NONE;
-        } else {
-            return Arrays.stream(PriorityType.values())
-                    .filter(priority -> x >= priority.getXCenter() && y >= priority.getYCenter())
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 좌표입니다: x=" + x + ", y=" + y));
-        }
+        return Arrays.stream(PriorityType.values())
+                .filter(priority -> x >= priority.getXCenter() && y >= priority.getYCenter())
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 좌표입니다: x=" + x + ", y=" + y));
+
     }
 }

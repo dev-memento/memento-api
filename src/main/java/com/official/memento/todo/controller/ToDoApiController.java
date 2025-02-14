@@ -10,7 +10,7 @@ import com.official.memento.todo.controller.dto.ToDoCreateRequest;
 import com.official.memento.todo.controller.dto.ToDoDetailGetResponse;
 import com.official.memento.todo.controller.dto.ToDoDragAndDropRequest;
 import com.official.memento.todo.controller.dto.ToDoUpdateRequest;
-import com.official.memento.todo.domain.ToDo;
+import com.official.memento.todo.domain.entity.ToDo;
 import com.official.memento.todo.service.ToDoCreateUseCase;
 import com.official.memento.todo.service.ToDoDeleteUseCase;
 import com.official.memento.todo.service.ToDoGetUseCase;
