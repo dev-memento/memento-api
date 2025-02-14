@@ -5,7 +5,7 @@ import com.official.memento.global.exception.ClaudeException
 import com.official.memento.global.exception.ErrorCode
 import com.official.memento.global.exception.MementoException
 import com.official.memento.global.stereotype.Adapter
-import com.official.memento.todo.domain.BrainDumpClientOutputPort
+import com.official.memento.todo.domain.port.BrainDumpClientOutputPort
 import com.official.memento.todo.domain.vo.BrainDump
 import com.official.memento.todo.domain.vo.ToDoBrainDump
 import org.springframework.beans.factory.annotation.Value

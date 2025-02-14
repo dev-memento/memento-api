@@ -5,61 +5,58 @@ import com.official.memento.orderinfo.domain.OrderInfo
 import com.official.memento.orderinfo.domain.OrderInfoRepository
 import com.official.memento.orderinfo.domain.OrderWithScheduleOrToDo
 import com.official.memento.orderinfo.domain.PlanType
-import com.official.memento.tag.domain.Tag
 import com.official.memento.tag.domain.TagRepository
-import com.official.memento.todo.domain.BrainDumpClientOutputPort
-import com.official.memento.todo.domain.ToDo
-import com.official.memento.todo.domain.ToDoRepository
-import com.official.memento.todo.domain.ToDoTag
-import com.official.memento.todo.domain.ToDoTagRepository
-import com.official.memento.todo.domain.enums.PriorityType
-import com.official.memento.todo.domain.enums.ToDoType
+import com.official.memento.todo.domain.port.BrainDumpClientOutputPort
+import com.official.memento.todo.domain.entity.ToDo
+import com.official.memento.todo.domain.repository.ToDoRepository
+import com.official.memento.todo.domain.entity.enums.PriorityType
+import com.official.memento.todo.domain.entity.enums.ToDoType
 import com.official.memento.todo.domain.vo.BrainDump
 import com.official.memento.todo.domain.vo.ToDoBrainDump
 import com.official.memento.todo.service.command.BrainDumpCreateCommand
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 @Service
 class BrainDumpService(
-    private val brainDumpClientOutputPort: BrainDumpClientOutputPort,
-    private val toDoRepository: ToDoRepository,
-    private val tagRepository: TagRepository,
-    private val toDoTagRepository: ToDoTagRepository,
-    private val orderInfoRepository: OrderInfoRepository
+        private val brainDumpClientOutputPort: BrainDumpClientOutputPort,
+        private val toDoRepository: ToDoRepository,
+        private val tagRepository: TagRepository,
+        private val orderInfoRepository: OrderInfoRepository
 ) : BrainDumpCreateUseCase {
 
     companion object {
         private const val DEFAULT_BRAINDUMP_TODO_TAG_ID: Long = 1
     }
+
     override fun create(command: BrainDumpCreateCommand): ToDoBrainDump {
         val toDoBrainDump =
-            brainDumpClientOutputPort.createByBrainDump(
-                BrainDump(
-                    command.content,
-                ),
-            )
-        val toDo =
-            ToDo.of(
-                command.memberId,
-                UUID.randomUUID().toString(),
-                toDoBrainDump.createdDate,
-                toDoBrainDump.task,
-                toDoBrainDump.deadline,
-                false,
-                RepeatOption.NONE,
-                null,
-                toDoBrainDump.urgency.toDouble(),
-                toDoBrainDump.importance.toDouble(),
-                toDoBrainDump.urgency * 0.3 + toDoBrainDump.importance * 0.7,
-                PriorityType.findPriorityType(toDoBrainDump.urgency.toDouble(), toDoBrainDump.importance.toDouble()),
-                ToDoType.NORMAL,
-            )
-        val savedToDo = toDoRepository.save(toDo)
+                brainDumpClientOutputPort.createByBrainDump(
+                        BrainDump(
+                                command.content,
+                        ),
+                )
         val tag = tagRepository.findById(DEFAULT_BRAINDUMP_TODO_TAG_ID)
-        toDoTagRepository.save(ToDoTag.of(savedToDo.id, tag.id))
+        val toDo =
+                ToDo.of(
+                        command.memberId,
+                        UUID.randomUUID().toString(),
+                        toDoBrainDump.createdDate,
+                        toDoBrainDump.task,
+                        toDoBrainDump.deadline,
+                        false,
+                        RepeatOption.NONE,
+                        null,
+                        toDoBrainDump.urgency.toDouble(),
+                        toDoBrainDump.importance.toDouble(),
+                        toDoBrainDump.urgency * 0.3 + toDoBrainDump.importance * 0.7,
+                        PriorityType.findPriorityType(toDoBrainDump.urgency.toDouble(), toDoBrainDump.importance.toDouble()),
+                        ToDoType.NORMAL,
+                        DEFAULT_BRAINDUMP_TODO_TAG_ID
+                )
+        val savedToDo = toDoRepository.save(toDo)
         assignOrder(toDoBrainDump.createdDate, savedToDo)
         return toDoBrainDump
     }
@@ -91,15 +88,15 @@ class BrainDumpService(
             if (isInserted) {
                 existingOrder.shiftBack()
                 orderInfoRepository.update(
-                    OrderInfo.withId(
-                        existingOrder.orderInfoId,
-                        existingOrder.scheduleId,
-                        existingOrder.toDoId,
-                        existingOrder.order,
-                        date,
-                        existingOrder.type,
-                        existingOrder.createdAt
-                    )
+                        OrderInfo.withId(
+                                existingOrder.orderInfoId,
+                                existingOrder.scheduleId,
+                                existingOrder.toDoId,
+                                existingOrder.order,
+                                date,
+                                existingOrder.type,
+                                existingOrder.createdAt
+                        )
                 )
             }
         }
@@ -112,14 +109,14 @@ class BrainDumpService(
 
     private fun createOrderInfo(date: LocalDate, toDo: ToDo, insertOrder: Int): OrderInfo? {
         return orderInfoRepository.save(
-            OrderInfo.of(
-                null,
-                toDo.id,
-                insertOrder,
-                date,
-                PlanType.TODO,
-                LocalDateTime.now()
-            )
+                OrderInfo.of(
+                        null,
+                        toDo.id,
+                        insertOrder,
+                        date,
+                        PlanType.TODO,
+                        LocalDateTime.now()
+                )
         )
     }
 

@@ -1,7 +1,7 @@
 package com.official.memento.todo.controller.dto;
 
-import com.official.memento.todo.domain.ToDo;
-import com.official.memento.todo.domain.enums.ToDoType;
+import com.official.memento.todo.domain.entity.ToDo;
+import com.official.memento.todo.domain.entity.enums.ToDoType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "단일 ToDo 디테일 응답")
