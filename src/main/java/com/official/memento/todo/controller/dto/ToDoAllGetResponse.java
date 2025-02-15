@@ -1,6 +1,6 @@
 package com.official.memento.todo.controller.dto;
 
-import com.official.memento.todo.domain.ToDo;
+import com.official.memento.todo.domain.entity.ToDo;
 
 import java.util.List;
 

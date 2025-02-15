@@ -4,13 +4,14 @@ import com.official.memento.global.annotation.Authorization;
 import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
 import com.official.memento.global.entity.enums.RepeatOption;
+import com.official.memento.global.util.Validator;
 import com.official.memento.todo.controller.dto.ToDoAllGetResponse;
 import com.official.memento.todo.controller.dto.ToDoCompletionResponse;
 import com.official.memento.todo.controller.dto.ToDoCreateRequest;
 import com.official.memento.todo.controller.dto.ToDoDetailGetResponse;
 import com.official.memento.todo.controller.dto.ToDoDragAndDropRequest;
 import com.official.memento.todo.controller.dto.ToDoUpdateRequest;
-import com.official.memento.todo.domain.ToDo;
+import com.official.memento.todo.domain.entity.ToDo;
 import com.official.memento.todo.service.ToDoCreateUseCase;
 import com.official.memento.todo.service.ToDoDeleteUseCase;
 import com.official.memento.todo.service.ToDoGetUseCase;
@@ -114,7 +115,6 @@ public class ToDoApiController implements ToDoApiDocs {
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId
     ) {
-
         boolean currentCompletion = toDoUpdateUseCase.updateCompletion(ToDoCompletionUpdateCommand.of(
                 authorizationUser.memberId(),
                 toDoId
@@ -162,7 +162,8 @@ public class ToDoApiController implements ToDoApiDocs {
             @Authorization final AuthorizationUser authorizationUser,
             @RequestParam final LocalDate date
     ) {
-        List<ToDo> todos = toDoGetUseCase.getTodosByDate(authorizationUser.memberId(), date);
+        Validator.isNull(date);
+        List<ToDo> todos = toDoGetUseCase.getTodosByDate(1, date);
         return SuccessResponse.of(
                 HttpStatus.OK,
                 "당일 투두 불러오기 성공",
