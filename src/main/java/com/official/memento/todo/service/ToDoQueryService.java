@@ -2,7 +2,7 @@ package com.official.memento.todo.service;
 
 import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.exception.UnauthorizedException;
-import com.official.memento.orderinfo.domain.OrderInfoRepository;
+import com.official.memento.orderinfo.service.usecase.OrderInfoGetUseCase;
 import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.TagRepository;
 import com.official.memento.todo.domain.entity.ToDo;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ToDoQueryService implements ToDoGetUseCase {
 
     private final ToDoRepository toDoRepository;
-    private final OrderInfoRepository orderInfoRepository;
+    private final OrderInfoGetUseCase orderInfoGetUseCase;
     private final TagRepository tagRepository;
 
     @Transactional(readOnly = true)
@@ -30,7 +30,7 @@ public class ToDoQueryService implements ToDoGetUseCase {
         List<ToDo> todos = toDoRepository.findAllByMemberId(memberId);
         List<ToDo> toDos = todos.stream()
                 .peek(todo -> {
-                    double order = orderInfoRepository.findOrderByToDoId(todo.getId());
+                    double order = orderInfoGetUseCase.findByToDoId(todo.getId()).getOrderNum();
                     todo.updateOrderNum(order);
                 })
                 .toList();
@@ -42,7 +42,7 @@ public class ToDoQueryService implements ToDoGetUseCase {
     public List<ToDo> getTodosByDate(long memberId, LocalDate date) {
         List<ToDo> toDos = toDoRepository.findAllByMemberIdAndStartDate(memberId, date);
         toDos.forEach(todo -> {
-            double orderNum = orderInfoRepository.findByToDoId(todo.getId()).getOrderNum();
+            double orderNum = orderInfoGetUseCase.findByToDoId(todo.getId()).getOrderNum();
             todo.updateOrderNum(orderNum);
         });
         return toDos;
