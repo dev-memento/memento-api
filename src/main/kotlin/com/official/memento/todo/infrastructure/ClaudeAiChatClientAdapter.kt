@@ -121,7 +121,7 @@ class ClaudeAiChatClientAdapter(
 
     override fun prioritizeTodo(
             todoList: List<ToDo>,
-            orderList: List<Int>,
+            orderList: List<Double>,
             personalInfo: String
     ): List<PrioritizedToDo> {
         try {
@@ -274,7 +274,7 @@ data class Task(
     val urgency: Double,
     val importance: Double,
     val priority: Double,
-    val order: Int
+    val order: Double
 )
 
 data class Usage(

@@ -52,4 +52,44 @@ public class OrderWithScheduleOrToDo {
     public void shiftForward() {
         this.order--;
     }
+
+    public long getOrderInfoId() {
+        return orderInfoId;
+    }
+
+    public long getMemberId() {
+        return memberId;
+    }
+
+    public Long getScheduleId() {
+        return scheduleId;
+    }
+
+    public Long getToDoId() {
+        return toDoId;
+    }
+
+    public LocalDateTime getStartDate() {
+        return startDate;
+    }
+
+    public LocalDateTime getEndDate() {
+        return endDate;
+    }
+
+    public Double getPriorityValue() {
+        return priorityValue;
+    }
+
+    public double getOrder() {
+        return order;
+    }
+
+    public PlanType getType() {
+        return type;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 }

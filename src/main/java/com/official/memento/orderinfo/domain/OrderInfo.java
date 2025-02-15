@@ -78,4 +78,36 @@ public class OrderInfo {
     public void setOrderNum(double orderNum) {
         this.orderNum = orderNum;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public long getMemberId() {
+        return memberId;
+    }
+
+    public Long getScheduleId() {
+        return scheduleId;
+    }
+
+    public Long getToDoId() {
+        return toDoId;
+    }
+
+    public double getOrderNum() {
+        return orderNum;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public PlanType getPlanType() {
+        return planType;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 }

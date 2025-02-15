@@ -109,4 +109,9 @@ public class OrderInfoService implements
     public List<OrderWithScheduleOrToDo> findOrderInfoWithDetails(final LocalDate startDate, final long memberId) {
         return orderInfoRepository.findOrderInfoWithDetails(startDate, memberId);
     }
+
+    @Override
+    public OrderInfo findByToDoId(final long toDoId){
+        return orderInfoRepository.findByToDoId(toDoId);
+    }
 }

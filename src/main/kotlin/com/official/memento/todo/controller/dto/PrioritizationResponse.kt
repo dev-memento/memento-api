@@ -89,5 +89,5 @@ data class ToDoPrioritizedGetResponse(
         @Schema(description = "ToDo 유형")
     val toDoType: ToDoType,
         @Schema(description = "정렬 순서")
-    val orderNum: Int,
+    val orderNum: Double,
 )

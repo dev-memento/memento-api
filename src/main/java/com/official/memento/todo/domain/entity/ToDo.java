@@ -455,7 +455,7 @@ public class ToDo extends BaseTimeEntity {
         return type;
     }
 
-    public double getOrderNum() {
+    public Double getOrderNum() {
         return orderNum;
     }
 
