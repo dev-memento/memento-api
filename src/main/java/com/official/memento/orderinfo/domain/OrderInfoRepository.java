@@ -16,15 +16,9 @@ public interface OrderInfoRepository {
 
     List<OrderWithScheduleOrToDo> findOrderInfoWithDetails(final LocalDate startDate,final long memberId);
 
-    Double findOrderByToDoId(final Long toDoId);
-
     OrderInfo findByToDoIdAndDate(final Long toDoId, final LocalDate date);
 
     OrderInfo updateOrderNum(final OrderInfo orderInfo , final double orderNum);
 
-    List<OrderInfo> findOrdersBetween(LocalDate date, double startOrder, double endOrder);
-
     OrderInfo findByToDoId(Long toDoId);
-
-    LocalDate findDateByToDoId(Long toDoId);
 }

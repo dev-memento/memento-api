@@ -10,22 +10,15 @@ import com.official.memento.orderinfo.infrastructure.persistence.OrderInfoEntity
 import com.official.memento.orderinfo.infrastructure.persistence.OrderInfoEntityJpaRepository;
 import com.official.memento.orderinfo.infrastructure.persistence.OrderInfoMapper;
 import com.official.memento.orderinfo.infrastructure.persistence.projection.OrderInfoProjection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 
 @Adapter
+@RequiredArgsConstructor
 public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
 
-    private static final Logger log = LoggerFactory.getLogger(OrderInfoRepositoryAdapter.class);
     private final OrderInfoEntityJpaRepository orderInfoEntityJpaRepository;
-
-    public OrderInfoRepositoryAdapter(OrderInfoEntityJpaRepository orderInfoEntityJpaRepository) {
-        this.orderInfoEntityJpaRepository = orderInfoEntityJpaRepository;
-    }
 
     @Override
     public OrderInfo save(final OrderInfo orderInfo) {
@@ -41,18 +34,19 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
     }
 
     @Override
-    public void deleteByScheduleId(long scheduleId) {
+    public void deleteByScheduleId(final long scheduleId) {
         orderInfoEntityJpaRepository.deleteByScheduleId(scheduleId);
     }
 
     @Override
-    public void deleteByToDoId(long toDoId) {
+    public void deleteByToDoId(final long toDoId) {
         orderInfoEntityJpaRepository.deleteByToDoId(toDoId);
     }
 
     @Override
     public List<OrderWithScheduleOrToDo> findOrderInfoWithDetails(final LocalDate startDate, final long memberId) {
-        List<OrderInfoProjection> projections = orderInfoEntityJpaRepository.findOrderInfoWithDetails(startDate,memberId);
+        List<OrderInfoProjection> projections = orderInfoEntityJpaRepository.findOrderInfoWithDetails(startDate,
+                memberId);
         return projections.stream()
                 .map(projection -> OrderWithScheduleOrToDo.of(
                         projection.getOrderInfoId(),
@@ -70,20 +64,13 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
     }
 
     @Override
-    public Double findOrderByToDoId(Long toDoId) {
-        return orderInfoEntityJpaRepository.findOrderByToDoId(toDoId)
-                .map(OrderInfoEntity::getOrderNum) // 예: orderNum 필드 가져오기
-                .orElse(null); // 결과가 없을 경우 null 반환
-    }
-
-    @Override
-    public OrderInfo findByToDoIdAndDate(Long toDoId, LocalDate date) {
+    public OrderInfo findByToDoIdAndDate(final Long toDoId, final LocalDate date) {
         return OrderInfoMapper.toDomain(orderInfoEntityJpaRepository.findByToDoIdAndDate(toDoId, date)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY)));
     }
 
     @Override
-    public OrderInfo updateOrderNum(OrderInfo orderInfo, double orderNum) {
+    public OrderInfo updateOrderNum(final OrderInfo orderInfo, final double orderNum) {
         OrderInfoEntity entity = orderInfoEntityJpaRepository.findById(orderInfo.getId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY));
         entity.updateOrderNum(orderNum);
@@ -91,24 +78,8 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
         return orderInfo;
     }
 
-    public List<OrderInfo> findOrdersBetween(LocalDate date, double startOrder, double endOrder) {
-        List<OrderInfoEntity> entities = orderInfoEntityJpaRepository.findOrdersBetween(date, startOrder, endOrder);
-        return entities.stream()
-                .map(entity -> OrderInfo.withId(
-                        entity.getId(),
-                        entity.getMemberId(),
-                        entity.getScheduleId(),
-                        entity.getToDoId(),
-                        entity.getOrderNum(),
-                        entity.getDate(),
-                        entity.getPlanType(),
-                        entity.getCreatedAt()
-                ))
-                .toList();
-    }
-
     @Override
-    public OrderInfo findByToDoId(Long toDoId) {
+    public OrderInfo findByToDoId(final Long toDoId) {
         OrderInfoEntity orderInfoEntity = orderInfoEntityJpaRepository.findOrderByToDoId(toDoId)
                 .orElseThrow(
                         () -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY)
@@ -123,10 +94,5 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
                 orderInfoEntity.getPlanType(),
                 orderInfoEntity.getCreatedAt()
         );
-    }
-
-    @Override
-    public LocalDate findDateByToDoId(Long toDoId) {
-        return orderInfoEntityJpaRepository.findDateByToDoId(toDoId);
     }
 }
