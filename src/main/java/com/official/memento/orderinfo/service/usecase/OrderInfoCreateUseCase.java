@@ -5,5 +5,5 @@ import java.time.LocalDate;
 
 public interface OrderInfoCreateUseCase {
 
-    void assignOrder(final LocalDate date, final ToDo toDo, final long memberId);
+    void assignToDoOrder(final LocalDate date, final ToDo toDo, final long memberId);
 }
