@@ -44,6 +44,24 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
     }
 
     @Override
+    public List<OrderInfo> findAllByMemberIdAndDateOrderByOrderNum(final long memberId, final LocalDate date) {
+        List<OrderInfoEntity> entities = orderInfoEntityJpaRepository.findAllByMemberIdAndDateOrderByOrderNum(
+                memberId,
+                date);
+        return entities.stream()
+                .map(e -> OrderInfo.withId(
+                        e.getId(),
+                        e.getMemberId(),
+                        e.getScheduleId(),
+                        e.getToDoId(),
+                        e.getOrderNum(),
+                        e.getDate(),
+                        e.getPlanType(),
+                        e.getCreatedAt()
+                )).toList();
+    }
+
+    @Override
     public List<OrderWithScheduleOrToDo> findOrderInfoWithDetails(final LocalDate startDate, final long memberId) {
         List<OrderInfoProjection> projections = orderInfoEntityJpaRepository.findOrderInfoWithDetails(startDate,
                 memberId);
