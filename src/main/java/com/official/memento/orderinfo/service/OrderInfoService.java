@@ -2,7 +2,6 @@ package com.official.memento.orderinfo.service;
 
 import com.official.memento.orderinfo.domain.OrderInfo;
 import com.official.memento.orderinfo.domain.OrderInfoRepository;
-import com.official.memento.orderinfo.domain.OrderWithScheduleOrToDo;
 import com.official.memento.orderinfo.domain.PlanType;
 import com.official.memento.orderinfo.service.command.ToDoPositionUpdateCommand;
 import com.official.memento.orderinfo.service.usecase.OrderInfoCreateUseCase;
@@ -23,8 +22,7 @@ public class OrderInfoService implements
         OrderInfoUpdateUseCase,
         OrderInfoCreateUseCase,
         OrderInfoDeleteUseCase,
-        OrderInfoGetUseCase
-{
+        OrderInfoGetUseCase {
 
     private final OrderInfoRepository orderInfoRepository;
 
@@ -32,8 +30,12 @@ public class OrderInfoService implements
     @Transactional
     public void updatePosition(final ToDoPositionUpdateCommand command) {
         OrderInfo selectedTodoOrderInfo = orderInfoRepository.findByToDoId(command.toDoId());
+
+        //이전 투두의 id가 null이면 목표 위치가 첫번째
         double previousOrder = command.previousToDoId() == null ? 0
                 : orderInfoRepository.findByToDoId(command.previousToDoId()).getOrderNum();
+
+        //다음 투두의 id가 null이면 목표 위치가 마지막
         if (command.nextToDoId() == null) {
             selectedTodoOrderInfo.updateOrderNum(previousOrder + 1);
         } else {
@@ -45,51 +47,15 @@ public class OrderInfoService implements
 
     @Override
     @Transactional
-    public void assignOrder(final LocalDate date, final ToDo toDo, final long memberId) {
-        List<OrderWithScheduleOrToDo> toDoList = orderInfoRepository.findOrderInfoWithDetails(date, memberId);
-        double insertOrder = getInsertOrder(toDoList, toDo);
-        OrderInfo createdOrderInfo = createOrderInfo(date, toDo, insertOrder, memberId);
+    public void assignToDoOrder(final LocalDate date, final ToDo toDo, final long memberId) {
+        List<OrderInfo> orderInfoList = orderInfoRepository.findAllByMemberIdAndDateOrderByOrderNum(memberId, date);
+        double insertOrder = orderInfoList.get(0).getOrderNum() / 2;
+        createToDoOrderInfo(date, toDo, insertOrder, memberId);
     }
 
-    private double getInsertOrder(final List<OrderWithScheduleOrToDo> toDoList, final ToDo toDo) {
-        double insertOrder = 1;
-        boolean isInserted = false;
-
-        for (int i = 0; i < toDoList.size(); i++) {
-            OrderWithScheduleOrToDo existingOrder = toDoList.get(i);
-            if (existingOrder.getType() == PlanType.TODO) {
-                if (toDo.getPriorityValue() > existingOrder.getPriorityValue()) {
-                    if (i + 1 < toDoList.size()) {
-                        insertOrder = (existingOrder.getOrder() + toDoList.get(i + 1).getOrder()) / 2.0;
-                    } else {
-                        insertOrder = existingOrder.getOrder() + 1;
-                    }
-                    isInserted = true;
-                    break;
-                }
-                if (toDo.getPriorityValue().equals(existingOrder.getPriorityValue())) {
-                    if (toDo.getCreatedAt().isBefore(existingOrder.getCreatedAt())) {
-                        if (i + 1 < toDoList.size()) {
-                            insertOrder = (existingOrder.getOrder() + toDoList.get(i + 1).getOrder()) / 2.0;
-                        } else {
-                            insertOrder = existingOrder.getOrder() + 1;
-                        }
-                        isInserted = true;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (!isInserted) {
-            insertOrder = toDoList.isEmpty() ? 1 : toDoList.get(toDoList.size() - 1).getOrder() + 1;
-        }
-        return insertOrder;
-    }
-
-    private OrderInfo createOrderInfo(final LocalDate date, final ToDo toDo, final double insertOrder,
-                                      final long memberId) {
-        return orderInfoRepository.save(OrderInfo.of(
+    private void createToDoOrderInfo(final LocalDate date, final ToDo toDo, final double insertOrder,
+                                     final long memberId) {
+        orderInfoRepository.save(OrderInfo.of(
                 memberId,
                 null,
                 toDo.getId(),
@@ -106,12 +72,7 @@ public class OrderInfoService implements
     }
 
     @Override
-    public List<OrderWithScheduleOrToDo> findOrderInfoWithDetails(final LocalDate startDate, final long memberId) {
-        return orderInfoRepository.findOrderInfoWithDetails(startDate, memberId);
-    }
-
-    @Override
-    public OrderInfo findByToDoId(final long toDoId){
+    public OrderInfo findByToDoId(final long toDoId) {
         return orderInfoRepository.findByToDoId(toDoId);
     }
 }
