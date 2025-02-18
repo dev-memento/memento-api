@@ -45,7 +45,9 @@ public class ToDoQueryService implements ToDoGetUseCase {
             double orderNum = orderInfoGetUseCase.findByToDoId(todo.getId()).getOrderNum();
             todo.updateOrderNum(orderNum);
         });
-        return toDos;
+        return toDos.stream()
+                .sorted(Comparator.comparing(ToDo::getOrderNum))
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)

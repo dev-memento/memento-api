@@ -145,7 +145,7 @@ public class ToDoApiController implements ToDoApiDocs {
             @RequestParam final LocalDate date
     ) {
         Validator.isNull(date);
-        List<ToDo> todos = toDoGetUseCase.getTodosByDate(1, date);
+        List<ToDo> todos = toDoGetUseCase.getTodosByDate(authorizationUser.memberId(), date);
         return SuccessResponse.of(
                 HttpStatus.OK,
                 "당일 투두 불러오기 성공",
