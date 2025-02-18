@@ -68,6 +68,9 @@ dependencies {
     // Lombok
     annotationProcessor(libs.lombok)
     compileOnly(libs.lombok)
+
+    //actuator
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
 }
 
 kotlin {
