@@ -48,7 +48,7 @@ jobs:
           context: .
           file: ./Dockerfile-Dev
           push: true
-          tags: ${{ secrets.DOCKER_LOGIN_USERNAME }}/dev:latest
+          tags: ${{ secrets.DOCKERHUB_LOGIN_USERNAME }}/dev
 
   deploy-cd:
     needs: deploy-ci
