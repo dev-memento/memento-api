@@ -36,21 +36,39 @@ public class OrderInfoService implements
                 : orderInfoRepository.findByToDoId(command.previousToDoId()).getOrderNum();
 
         //다음 투두의 id가 null이면 목표 위치가 마지막
+        double insertOrder;
         if (command.nextToDoId() == null) {
-            selectedTodoOrderInfo.updateOrderNum(previousOrder + 1);
+            insertOrder = previousOrder + 1;
         } else {
-            double nextOrder = orderInfoRepository.findByToDoId(command.nextToDoId()).getOrderNum();
-            selectedTodoOrderInfo.updateOrderNum((previousOrder + nextOrder) / 2);
+            insertOrder = (previousOrder + orderInfoRepository.findByToDoId(command.nextToDoId()).getOrderNum()) / 2;
         }
+        selectedTodoOrderInfo.updateOrderNum(insertOrder);
         orderInfoRepository.update(selectedTodoOrderInfo);
+        checkReOrdering(selectedTodoOrderInfo.getDate(), command.memberId(), insertOrder);
     }
 
     @Override
     @Transactional
     public void assignToDoOrder(final LocalDate date, final ToDo toDo, final long memberId) {
         List<OrderInfo> orderInfoList = orderInfoRepository.findAllByMemberIdAndDateOrderByOrderNum(memberId, date);
-        double insertOrder = orderInfoList.get(0).getOrderNum() / 2;
-        createToDoOrderInfo(date, toDo, insertOrder, memberId);
+        double preOrder = 0;
+        double nextOrder = orderInfoList.isEmpty() ? 1 : orderInfoList.get(0).getOrderNum();
+        double insertOrder = (preOrder + nextOrder) / 2;
+        boolean checked = checkReOrdering(date, memberId, insertOrder);
+        createToDoOrderInfo(date, toDo, checked ? 1 : insertOrder, memberId);
+    }
+
+    private boolean checkReOrdering(LocalDate date, long memberId, double insertOrder) {
+        if (insertOrder < 1e-10) {
+            List<OrderInfo> afterOrderInfoList = orderInfoRepository.findAllByMemberIdAndDateOrderByOrderNum(memberId,
+                    date);
+            for (int i = 0; i < afterOrderInfoList.size(); i++) {
+                afterOrderInfoList.get(i).updateOrderNum(i + 1);
+                orderInfoRepository.update(afterOrderInfoList.get(i));
+            }
+            return true;
+        }
+        return false;
     }
 
     private void createToDoOrderInfo(final LocalDate date, final ToDo toDo, final double insertOrder,
