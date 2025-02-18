@@ -1,5 +1,7 @@
 package com.official.memento.orderinfo.service;
 
+import com.official.memento.global.exception.ErrorCode;
+import com.official.memento.global.exception.InvalidRequestBodyException;
 import com.official.memento.orderinfo.domain.OrderInfo;
 import com.official.memento.orderinfo.domain.OrderInfoRepository;
 import com.official.memento.orderinfo.domain.PlanType;
@@ -42,6 +44,7 @@ public class OrderInfoService implements
         } else {
             insertOrder = (previousOrder + orderInfoRepository.findByToDoId(command.nextToDoId()).getOrderNum()) / 2;
         }
+        checkInValidRequest(previousOrder, insertOrder);
         selectedTodoOrderInfo.updateOrderNum(insertOrder);
         orderInfoRepository.update(selectedTodoOrderInfo);
         checkReOrdering(selectedTodoOrderInfo.getDate(), command.memberId(), insertOrder);
@@ -58,7 +61,7 @@ public class OrderInfoService implements
         createToDoOrderInfo(date, toDo, checked ? 1 : insertOrder, memberId);
     }
 
-    private boolean checkReOrdering(LocalDate date, long memberId, double insertOrder) {
+    private boolean checkReOrdering(final LocalDate date, final long memberId, final double insertOrder) {
         if (insertOrder < 1e-10) {
             List<OrderInfo> afterOrderInfoList = orderInfoRepository.findAllByMemberIdAndDateOrderByOrderNum(memberId,
                     date);
@@ -93,4 +96,12 @@ public class OrderInfoService implements
     public OrderInfo findByToDoId(final long toDoId) {
         return orderInfoRepository.findByToDoId(toDoId);
     }
+
+
+    private static void checkInValidRequest(final double previousOrder, final double insertOrder) {
+        if (previousOrder > insertOrder) {
+            throw new InvalidRequestBodyException(ErrorCode.INVALID_JSON_FORMAT);
+        }
+    }
+
 }
