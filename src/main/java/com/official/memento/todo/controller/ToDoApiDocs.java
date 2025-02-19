@@ -3,6 +3,7 @@ package com.official.memento.todo.controller;
 import com.official.memento.global.annotation.Authorization;
 import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
+import com.official.memento.orderinfo.controller.dto.ToDoUpdateOrderRequest;
 import com.official.memento.todo.controller.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -89,21 +90,6 @@ public interface ToDoApiDocs {
     public ResponseEntity<SuccessResponse<ToDoAllGetResponse>> getToDos(
             @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
             @Authorization final AuthorizationUser authorizationUser
-    );
-
-    @Operation(description = "ToDo 드래그앤드롭 API")
-    @ApiResponses(
-            {
-                    @ApiResponse(responseCode = "200", description = "Success"),
-                    @ApiResponse(responseCode = "400", description = "Bad Request"),
-                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
-            }
-    )
-    ResponseEntity<SuccessResponse<?>> updateToDoPosition(
-            @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
-            @Authorization final AuthorizationUser authorizationUser,
-            @PathVariable final long toDoId,
-            @RequestBody final ToDoDragAndDropRequest request
     );
 
     @Operation(description = "당일 ToDo Get API")

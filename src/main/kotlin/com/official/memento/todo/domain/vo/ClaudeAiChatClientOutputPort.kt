@@ -5,7 +5,7 @@ import com.official.memento.todo.domain.entity.ToDo
 interface ClaudeAiChatClientOutputPort {
     fun prioritizeTodo(
             todoList: List<ToDo>,
-            orderList: List<Int>,
+            orderList: List<Double>,
             personalInfo: String
     ): List<PrioritizedToDo>
 }
