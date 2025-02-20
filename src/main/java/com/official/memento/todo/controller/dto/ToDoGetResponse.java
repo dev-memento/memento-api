@@ -40,7 +40,7 @@ public record ToDoGetResponse(
         ToDoType toDoType,
 
         @Schema(description = "정렬 순서")
-        int orderNum
+        double orderNum
 ) {
     public static ToDoGetResponse of(ToDo toDo) {
         return new ToDoGetResponse(
@@ -56,7 +56,7 @@ public record ToDoGetResponse(
                 toDo.getTagColor() == null ? "" : toDo.getTagColor().getHexCode(),
                 toDo.getType(),
                 // FIXME: NPE나는 상황 찾아서, 수정
-                toDo.getOrderNum() == null ? 0 : toDo.getOrderNum()
+                toDo.getOrderNum() == null ? 0.0 : toDo.getOrderNum()
         );
     }
 }

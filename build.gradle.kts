@@ -69,6 +69,9 @@ dependencies {
     annotationProcessor(libs.lombok)
     compileOnly(libs.lombok)
 
+    //actuator
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+
     // Google Calendar API
     implementation("com.google.api-client:google-api-client:2.2.0")
     implementation ("com.google.oauth-client:google-oauth-client-jetty:1.34.1")

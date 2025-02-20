@@ -2,7 +2,6 @@ package com.official.memento.orderinfo.domain;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 public interface OrderInfoRepository {
 
@@ -14,19 +13,13 @@ public interface OrderInfoRepository {
 
     void deleteByToDoId(final long toDoId);
 
-    List<OrderWithScheduleOrToDo> findOrderInfoWithDetails(final LocalDate startDate);
-
-    Integer findOrderByToDoId(final Long toDoId);
+    List<OrderWithScheduleOrToDo> findOrderInfoWithDetails(final LocalDate startDate, final long memberId);
 
     OrderInfo findByToDoIdAndDate(final Long toDoId, final LocalDate date);
 
-    OrderInfo updateOrderNum(final OrderInfo orderInfo , final int orderNum);
-
-    List<OrderInfo> findOrdersBetween(LocalDate date, int startOrder, int endOrder);
-
-    Optional<Integer> findOrderNumByToDoId(final Long toDoId);
+    OrderInfo updateOrderNum(final OrderInfo orderInfo, final double orderNum);
 
     OrderInfo findByToDoId(Long toDoId);
 
-    LocalDate findDateByToDoId(Long toDoId);
+    List<OrderInfo> findAllByMemberIdAndDateOrderByOrderNum(final long memberId, final LocalDate date);
 }

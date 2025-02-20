@@ -17,7 +17,7 @@ import com.official.memento.todo.service.command.BrainDumpCreateCommand
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Service
 class BrainDumpService(
@@ -57,20 +57,20 @@ class BrainDumpService(
                         DEFAULT_BRAINDUMP_TODO_TAG_ID
                 )
         val savedToDo = toDoRepository.save(toDo)
-        assignOrder(toDoBrainDump.createdDate, savedToDo)
+        assignOrder(toDoBrainDump.createdDate, savedToDo, command.memberId)
         return toDoBrainDump
     }
 
-    private fun assignOrder(date: LocalDate, toDo: ToDo) {
-        val toDoList = orderInfoRepository.findOrderInfoWithDetails(date)
-        val insertOrder: Int = getInsertOrder(date, toDoList, toDo)
-        val createdOrderInfo = createOrderInfo(date, toDo, insertOrder)
+    private fun assignOrder(date: LocalDate, toDo: ToDo, memberId: Long) {
+        val toDoList = orderInfoRepository.findOrderInfoWithDetails(date, memberId)
+        val insertOrder: Double = getInsertOrder(date, toDoList, toDo)
+        val createdOrderInfo = createOrderInfo(date, toDo, insertOrder, memberId)
         createdOrderInfo?.updateOrderNum(insertOrder)
         toDo.updateOrderNum(insertOrder)
     }
 
-    private fun getInsertOrder(date: LocalDate, toDoList: List<OrderWithScheduleOrToDo>, toDo: ToDo): Int {
-        var insertOrder = 1
+    private fun getInsertOrder(date: LocalDate, toDoList: List<OrderWithScheduleOrToDo>, toDo: ToDo): Double {
+        var insertOrder = 1.0
         var isInserted = false
         for (existingOrder in toDoList) {
             if (!isInserted && existingOrder.type == PlanType.TODO) {
@@ -90,6 +90,7 @@ class BrainDumpService(
                 orderInfoRepository.update(
                         OrderInfo.withId(
                                 existingOrder.orderInfoId,
+                                existingOrder.memberId,
                                 existingOrder.scheduleId,
                                 existingOrder.toDoId,
                                 existingOrder.order,
@@ -102,14 +103,15 @@ class BrainDumpService(
         }
 
         if (!isInserted) {
-            insertOrder = if (toDoList.isEmpty()) 1 else toDoList[toDoList.size - 1].order + 1
+            insertOrder = if (toDoList.isEmpty()) 1.0 else toDoList[toDoList.size - 1].order + 1
         }
         return insertOrder
     }
 
-    private fun createOrderInfo(date: LocalDate, toDo: ToDo, insertOrder: Int): OrderInfo? {
+    private fun createOrderInfo(date: LocalDate, toDo: ToDo, insertOrder: Double, memberId: Long): OrderInfo? {
         return orderInfoRepository.save(
                 OrderInfo.of(
+                        memberId,
                         null,
                         toDo.id,
                         insertOrder,

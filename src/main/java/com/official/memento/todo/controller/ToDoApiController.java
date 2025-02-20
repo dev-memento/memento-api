@@ -9,7 +9,6 @@ import com.official.memento.todo.controller.dto.ToDoAllGetResponse;
 import com.official.memento.todo.controller.dto.ToDoCompletionResponse;
 import com.official.memento.todo.controller.dto.ToDoCreateRequest;
 import com.official.memento.todo.controller.dto.ToDoDetailGetResponse;
-import com.official.memento.todo.controller.dto.ToDoDragAndDropRequest;
 import com.official.memento.todo.controller.dto.ToDoUpdateRequest;
 import com.official.memento.todo.domain.entity.ToDo;
 import com.official.memento.todo.service.ToDoCreateUseCase;
@@ -19,7 +18,6 @@ import com.official.memento.todo.service.ToDoUpdateUseCase;
 import com.official.memento.todo.service.command.ToDoCompletionUpdateCommand;
 import com.official.memento.todo.service.command.ToDoCreateCommand;
 import com.official.memento.todo.service.command.ToDoDeleteCommand;
-import com.official.memento.todo.service.command.ToDoPositionUpdateCommand;
 import com.official.memento.todo.service.command.ToDoUpdateCommand;
 import java.time.LocalDate;
 import java.util.List;
@@ -140,22 +138,6 @@ public class ToDoApiController implements ToDoApiDocs {
         );
     }
 
-    @PatchMapping("/{toDoId}/position")
-    @Override
-    public ResponseEntity<SuccessResponse<?>> updateToDoPosition(
-            @Authorization final AuthorizationUser authorizationUser,
-            @PathVariable final long toDoId,
-            @RequestBody final ToDoDragAndDropRequest request
-    ) {
-        toDoUpdateUseCase.updatePosition(
-                ToDoPositionUpdateCommand.of(authorizationUser.memberId(), toDoId, request.targetOrderNum()));
-
-        return SuccessResponse.of(
-                HttpStatus.OK,
-                "투두 드래그앤드랍 성공"
-        );
-    }
-
     @GetMapping("/date")
     @Override
     public ResponseEntity<SuccessResponse<ToDoAllGetResponse>> getTodoByDate(
@@ -163,7 +145,7 @@ public class ToDoApiController implements ToDoApiDocs {
             @RequestParam final LocalDate date
     ) {
         Validator.isNull(date);
-        List<ToDo> todos = toDoGetUseCase.getTodosByDate(1, date);
+        List<ToDo> todos = toDoGetUseCase.getTodosByDate(authorizationUser.memberId(), date);
         return SuccessResponse.of(
                 HttpStatus.OK,
                 "당일 투두 불러오기 성공",

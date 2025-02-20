@@ -10,5 +10,5 @@ data class PrioritizedToDo(
     val priority: Float,
     val urgency: Float,
     val importance: Float,
-    val order: Int,
+    val order: Double,
 )
