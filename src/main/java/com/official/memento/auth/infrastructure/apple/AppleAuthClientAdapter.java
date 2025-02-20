@@ -2,7 +2,9 @@ package com.official.memento.auth.infrastructure.apple;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.official.memento.auth.domain.port.AuthClientOutputPort;
+import com.official.memento.auth.util.AuthValidation;
 import com.official.memento.global.exception.ErrorCode;
+import com.official.memento.global.exception.InvalidIdTokenException;
 import com.official.memento.global.exception.MementoException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.stereotype.Component;
@@ -29,10 +31,8 @@ public class AppleAuthClientAdapter implements AuthClientOutputPort {
 
     @Override
     public Map<String, Object> verifyIdToken(final String idToken) {
+        AuthValidation.validateIdTokenFormat(idToken);
         String[] tokenParts = idToken.split("\\.");
-        if (tokenParts.length != 3) {
-            throw new MementoException(ErrorCode.INVALID_ID_TOKEN);
-        }
 
         String headerJson = decodeBase64(tokenParts[0]);
         String payloadJson = decodeBase64(tokenParts[1]);
@@ -70,7 +70,7 @@ public class AppleAuthClientAdapter implements AuthClientOutputPort {
         return keysResponse.getKeys().stream()
                 .filter(key -> key.getKid().equals(kid) && key.getAlg().equals(alg))
                 .findFirst()
-                .orElseThrow(() -> new MementoException(ErrorCode.INVALID_ID_TOKEN));
+                .orElseThrow(() -> new InvalidIdTokenException(ErrorCode.INVALID_ID_TOKEN));
     }
 
     private PublicKey generatePublicKey(AppleKey key) {
@@ -80,7 +80,7 @@ public class AppleAuthClientAdapter implements AuthClientOutputPort {
             return KeyFactory.getInstance("RSA")
                     .generatePublic(new RSAPublicKeySpec(n, e));
         } catch (Exception ex) {
-            throw new MementoException(ErrorCode.INVALID_ID_TOKEN);
+            throw new InvalidIdTokenException(ErrorCode.INVALID_ID_TOKEN);
         }
     }
 
@@ -88,7 +88,7 @@ public class AppleAuthClientAdapter implements AuthClientOutputPort {
         try {
             return objectMapper.readValue(json, valueType);
         } catch (Exception ex) {
-            throw new MementoException(ErrorCode.INVALID_ID_TOKEN);
+            throw new InvalidIdTokenException(ErrorCode.INVALID_ID_TOKEN);
         }
     }
     }
