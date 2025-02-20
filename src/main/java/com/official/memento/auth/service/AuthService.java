@@ -1,5 +1,6 @@
 package com.official.memento.auth.service;
 
+import com.official.memento.auth.service.usecase.RefreshTokenUseCase;
 import com.official.memento.member.domain.Member;
 import com.official.memento.member.domain.MemberAuth;
 import com.official.memento.member.domain.MemberPersonalInfo;
@@ -11,7 +12,7 @@ import com.official.memento.auth.domain.RefreshToken;
 import com.official.memento.auth.domain.port.AuthClientOutputPort;
 import com.official.memento.auth.domain.port.AuthRepository;
 import com.official.memento.auth.service.command.AuthCommand;
-import com.official.memento.auth.service.usecase.AuthUseCase;
+import com.official.memento.auth.service.usecase.AuthenticateUseCase;
 import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.exception.MementoException;
 import com.official.memento.tag.domain.Tag;
@@ -21,9 +22,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Service
-public class AuthService implements AuthUseCase {
+public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase {
 
     private final Map<AuthProvider, AuthClientOutputPort> authClientAdapters;
     private final AuthRepository authRepository;
@@ -60,7 +62,8 @@ public class AuthService implements AuthUseCase {
         MemberAuth auth = authRepository.findByPlatformIdAndProvider(platformId, provider)
                 .orElseGet(() -> createNewMember(platformId, provider));
 
-        boolean isNewUser = memberRepository.findPersonalInfoByMemberId(auth.getId()).isEmpty();
+        Optional<MemberPersonalInfo> personalInfo = memberRepository.findPersonalInfoByMemberId(auth.getMemberId());
+        boolean isNewUser = personalInfo.isEmpty() || personalInfo.get().getWakeUpTime() == null;
 
         AccessToken accessToken = jwtUtil.generateAccessToken(auth.getMemberId());
         RefreshToken refreshToken = jwtUtil.generateRefreshToken(auth.getMemberId());
@@ -98,6 +101,7 @@ public class AuthService implements AuthUseCase {
         }
     }
 
+    @Override
     @Transactional
     public AuthResult refreshTokens(String refreshToken) {
         if (!jwtUtil.validateToken(refreshToken)) {

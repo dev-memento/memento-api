@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class JwtUtil {
@@ -38,6 +39,7 @@ public class JwtUtil {
     public RefreshToken generateRefreshToken(final Long userId) {
         return new RefreshToken(Jwts.builder()
                 .setSubject(userId.toString())
+                .setId(UUID.randomUUID().toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
