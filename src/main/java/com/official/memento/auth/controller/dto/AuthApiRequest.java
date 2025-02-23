@@ -4,6 +4,7 @@ import com.official.memento.auth.domain.AuthProvider;
 import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.exception.InvalidRequestBodyException;
 import io.swagger.v3.oas.annotations.media.Schema;
+import com.official.memento.global.util.Validator;
 
 @Schema(name = "소셜로그인 요청")
 public record AuthApiRequest(
@@ -13,14 +14,9 @@ public record AuthApiRequest(
         String idToken
 ) {
     public AuthApiRequest(AuthProvider provider, String idToken) {
-        validateIdToken(idToken);
+        Validator.isNull(provider);
+        Validator.isNull(idToken);
         this.provider = provider;
         this.idToken = idToken;
-    }
-
-    private void validateIdToken(String idToken) {
-        if (idToken == null) {
-            throw new InvalidRequestBodyException(ErrorCode.INVALID_REQUEST_BODY);
-        }
     }
 }
