@@ -65,7 +65,7 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase, Ex
                 .orElseGet(() -> createNewMember(platformId, provider));
 
         Optional<MemberPersonalInfo> personalInfo = memberRepository.findPersonalInfoByMemberId(auth.getMemberId());
-        boolean isNewUser = personalInfo.isEmpty() || personalInfo.get().getWakeUpTime() == null;
+        boolean isNewUser = isFirstLogin(personalInfo) || isOnboardingIncomplete(personalInfo);
 
         AccessToken accessToken = jwtUtil.generateAccessToken(auth.getMemberId());
         RefreshToken refreshToken = jwtUtil.generateRefreshToken(auth.getMemberId());
@@ -97,6 +97,14 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase, Ex
         return clientAdapter.verifyIdToken(idToken);
     }
 
+    public boolean isFirstLogin(Optional<MemberPersonalInfo> personalInfo) {
+        return personalInfo.isEmpty();
+    }
+
+    public boolean isOnboardingIncomplete(Optional<MemberPersonalInfo> personalInfo) {
+        return personalInfo.isPresent() && personalInfo.get().getWakeUpTime() == null;
+    }
+
     @Override
     @Transactional
     public AuthResult refreshTokens(String refreshToken) {
@@ -122,6 +130,8 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase, Ex
     public String extractRefreshToken(String authorizationHeader) {
         return authorizationHeader.substring(7);
     }
+
+
 }
 
 
