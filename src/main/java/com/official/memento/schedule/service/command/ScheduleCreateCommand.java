@@ -22,7 +22,6 @@ public record ScheduleCreateCommand(
             final boolean isAllDay,
             final long tagId
     ) {
-        checkNullData(description, startDate, endDate);
         return new ScheduleCreateCommand(
                 memberId,
                 description,
@@ -31,15 +30,5 @@ public record ScheduleCreateCommand(
                 isAllDay,
                 tagId
         );
-    }
-
-    private static void checkNullData(
-            final String description,
-            final LocalDateTime startDate,
-            final LocalDateTime endDate
-    ) {
-        if (description == null | startDate == null || endDate == null) {
-            throw new InvalidRequestBodyException(NULL_DATA_ERROR);
-        }
     }
 }

@@ -11,7 +11,6 @@ public record ScheduleUpdateGroupCommand(
         String description,
         LocalDateTime startDate,
         LocalDateTime endDate,
-
         RepeatOption repeatOption,
         LocalDate repeatExpiredDate,
         boolean isAllDay,

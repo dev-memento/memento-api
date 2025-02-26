@@ -26,11 +26,11 @@ public interface ScheduleEntityJpaRepository extends JpaRepository<ScheduleEntit
            s.scheduleGroupId AS scheduleGroupId,
            o.orderNum AS orderNum,
            t.name AS tagName,
-           t.color AS tagColor
+           t.color AS tagColor,
+           t.id AS tagId
     FROM ScheduleEntity s
     LEFT JOIN OrderInfoEntity o ON s.id = o.scheduleId
-    LEFT JOIN ScheduleTagEntity st ON s.id = st.scheduleId
-    LEFT JOIN TagEntity t ON st.tagId = t.id
+    LEFT JOIN TagEntity t ON s.tagId = t.id
     WHERE s.isAllDay = false
       AND s.memberId = :memberId
     ORDER BY s.startDate ASC, o.orderNum ASC
@@ -51,10 +51,10 @@ public interface ScheduleEntityJpaRepository extends JpaRepository<ScheduleEntit
            s.createdAt AS createdAt,
            s.updatedAt As updatedAt,
            t.name AS tagName,
-           t.color AS tagColor
+           t.color AS tagColor,
+           t.id AS tagId
     FROM ScheduleEntity s
-    LEFT JOIN ScheduleTagEntity st ON s.id = st.scheduleId
-    LEFT JOIN TagEntity t ON st.tagId = t.id
+    LEFT JOIN TagEntity t ON s.tagId = t.id
     WHERE s.isAllDay = true
       AND s.memberId = :memberId
     ORDER BY s.startDate ASC, s.createdAt ASC
@@ -74,11 +74,11 @@ public interface ScheduleEntityJpaRepository extends JpaRepository<ScheduleEntit
            s.scheduleGroupId AS scheduleGroupId,
            o.orderNum AS orderNum,
            t.name AS tagName,
-           t.color AS tagColor
+           t.color AS tagColor,
+           t.id AS tagId
     FROM ScheduleEntity s
     LEFT JOIN OrderInfoEntity o ON s.id = o.scheduleId
-    LEFT JOIN ScheduleTagEntity st ON s.id = st.scheduleId
-    LEFT JOIN TagEntity t ON st.tagId = t.id
+    LEFT JOIN TagEntity t ON s.tagId = t.id
     WHERE s.memberId = :memberId
       AND DATE(s.startDate) = :date
     ORDER BY o.orderNum ASC

@@ -10,6 +10,7 @@ import com.official.memento.schedule.conntroller.dto.response.ScheduleDetailResp
 import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.schedule.service.command.*;
 import com.official.memento.schedule.service.usecase.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/schedules")
+@RequiredArgsConstructor
 public class ScheduleApiController implements ScheduleApiDocs {
 
     private final ScheduleCreateUseCase scheduleCreateUseCase;
@@ -28,25 +30,6 @@ public class ScheduleApiController implements ScheduleApiDocs {
     private final ScheduleUpdateUseCase scheduleUpdateUseCase;
     private final ScheduleUpdateGroupUseCase scheduleUpdateGroupUseCase;
     private final ScheduleGetUseCase scheduleGetUseCase;
-
-    public ScheduleApiController(
-            final ScheduleCreateUseCase scheduleCreateUseCase,
-            final RepeatScheduleCreateUseCase repeatScheduleCreateUseCase,
-            final ScheduleDeleteUseCase scheduleDeleteUseCase,
-            final ScheduleDeleteGroupUseCase scheduleDeleteGroupUseCase,
-            final ScheduleUpdateUseCase scheduleUpdateUseCase,
-            final ScheduleUpdateGroupUseCase scheduleUpdateGroupUseCase,
-            final ScheduleGetUseCase scheduleGetUseCase
-    ) {
-
-        this.scheduleCreateUseCase = scheduleCreateUseCase;
-        this.repeatScheduleCreateUseCase = repeatScheduleCreateUseCase;
-        this.scheduleDeleteUseCase = scheduleDeleteUseCase;
-        this.scheduleDeleteGroupUseCase = scheduleDeleteGroupUseCase;
-        this.scheduleUpdateUseCase = scheduleUpdateUseCase;
-        this.scheduleUpdateGroupUseCase = scheduleUpdateGroupUseCase;
-        this.scheduleGetUseCase = scheduleGetUseCase;
-    }
 
     @PostMapping
     @Override
