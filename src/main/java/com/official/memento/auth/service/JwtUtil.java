@@ -2,8 +2,7 @@ package com.official.memento.auth.service;
 
 import com.official.memento.auth.domain.AccessToken;
 import com.official.memento.auth.domain.RefreshToken;
-import com.official.memento.global.exception.ErrorCode;
-import com.official.memento.global.exception.MementoException;
+import com.official.memento.global.exception.*;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -19,11 +18,17 @@ import java.util.Date;
 public class JwtUtil {
 
     private final Key secretKey;
-    private static final long accessTokenExpiration = 604800000L;
-    private static final long refreshTokenExpiration = 604800000L;
+    private final long accessTokenExpiration;
+    private final long refreshTokenExpiration;
 
-    public JwtUtil(@Value("${JWT.SECRET}") String secretKey) {
+    public JwtUtil(
+            @Value("${JWT.SECRET}") String secretKey,
+            @Value("${JWT.ACCESS_TOKEN_EXPIRATION}") long accessTokenExpiration,
+            @Value("${JWT.REFRESH_TOKEN_EXPIRATION}") long refreshTokenExpiration
+    ) {
         this.secretKey = Keys.hmacShaKeyFor(secretKey.getBytes());
+        this.accessTokenExpiration = accessTokenExpiration;
+        this.refreshTokenExpiration = refreshTokenExpiration;
     }
 
     public AccessToken generateAccessToken(final Long userId) {
@@ -49,12 +54,11 @@ public class JwtUtil {
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
             return true;
         } catch (ExpiredJwtException exception) {
-            throw new MementoException(ErrorCode.EXPIRED_TOKEN);
+            throw new ExpiredTokenException(ErrorCode.EXPIRED_TOKEN);
         } catch (JwtException exception) {
-            exception.printStackTrace();
-            throw new MementoException(ErrorCode.EXPECTED_TOKEN_ERROR);
+            throw new InvalidJwtTokenException(ErrorCode.EXPECTED_TOKEN_ERROR);
         } catch (Exception exception) {
-            throw new MementoException(ErrorCode.UNEXPECTED_TOKEN_ERROR);
+            throw new UnexpectedTokenException(ErrorCode.UNEXPECTED_TOKEN_ERROR);
         }
     }
 
@@ -67,7 +71,7 @@ public class JwtUtil {
                     .getBody()
                     .getSubject();
         } catch (Exception e) {
-            throw new MementoException(ErrorCode.INVALID_ID_TOKEN);
+            throw new InvalidIdTokenException(ErrorCode.INVALID_ID_TOKEN);
         }
     }
 }
