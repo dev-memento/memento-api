@@ -1,12 +1,12 @@
 package com.official.memento.global.resolver;
 
-import com.official.memento.global.annotation.AuthorizationUser;
-import com.official.memento.global.annotation.Authorization;
 import com.official.memento.auth.service.JwtUtil;
+import com.official.memento.global.annotation.Authorization;
+import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.exception.ErrorCode;
-import com.official.memento.global.exception.MementoException;
 import com.official.memento.global.exception.UnauthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -20,8 +20,9 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
 
     private static final String AUTHORIZATION_HEADER_PREFIX = "Bearer ";
     private static final String EMPTY = "";
-
     private final JwtUtil jwtUtil;
+    @Value("${ADMIN.TOKEN_PREFIX}")
+    private String AUTHORIZATION_HEADER_ADMIN_PREFIX;
 
     public AuthArgumentResolver(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
@@ -45,7 +46,10 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
     }
 
     private Long validateToken(String token) {
-
+        if (token.startsWith(AUTHORIZATION_HEADER_ADMIN_PREFIX)) {
+            String adminId = token.substring(AUTHORIZATION_HEADER_ADMIN_PREFIX.length());
+            return Long.parseLong(adminId);
+        }
         if (jwtUtil.validateToken(token)) {
             return Long.parseLong(jwtUtil.getUserIdFromToken(token));
         } else {
