@@ -12,6 +12,7 @@ public interface OrderInfoEntityJpaRepository extends JpaRepository<OrderInfoEnt
 
     @Query("""
             SELECT o.id AS orderInfoId,
+                   o.id AS memberId,
                    o.toDoId AS toDoId,
                    o.scheduleId AS scheduleId,
                    s.startDate AS startDate,
