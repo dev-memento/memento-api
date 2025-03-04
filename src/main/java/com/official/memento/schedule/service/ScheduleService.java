@@ -52,13 +52,18 @@ public class ScheduleService implements
     }
 
     @Override
-    public void createAppleSchedules(final String syncToken, final List<ScheduleCreateCommand> command) {
+    public void createAppleSchedules(final List<ScheduleCreateCommand> command) {
         Tag tag = tagRepository.findByMemberIdAndTagColor(command.get(0).memberId(), TagColor.GRAY05);
         for (ScheduleCreateCommand scheduleCreateCommand : command) {
             String scheduleGroupId = UUID.randomUUID().toString();
             Schedule schedule = createAppleSchedule(scheduleCreateCommand, scheduleGroupId);
-            orderInfoCreateUseCase.assignScheduleOrder(scheduleCreateCommand.startDate(), schedule,command.get(0).memberId());
+            orderInfoCreateUseCase.assignScheduleOrder(scheduleCreateCommand.startDate(), schedule, command.get(0).memberId());
         }
+    }
+
+    @Override
+    public void createGoogleSchedules(String command) {
+
     }
 
     @Override

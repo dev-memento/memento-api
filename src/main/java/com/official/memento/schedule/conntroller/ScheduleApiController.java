@@ -83,7 +83,7 @@ public class ScheduleApiController implements ScheduleApiDocs {
             @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final AppleSchedulesCreateRequest request
     ) {
-        scheduleCreateUseCase.createAppleSchedules(request.syncToken(), request.scheduleCreateRequest().stream().map(scheduleCreateRequest ->
+        scheduleCreateUseCase.createAppleSchedules( request.scheduleCreateRequest().stream().map(scheduleCreateRequest ->
                 ScheduleCreateCommand.of(
                         authorizationUser.memberId(),
                         scheduleCreateRequest.description(),
