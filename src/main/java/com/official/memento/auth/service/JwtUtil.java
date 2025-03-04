@@ -9,6 +9,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -18,13 +19,11 @@ import java.util.Date;
 public class JwtUtil {
 
     private final Key secretKey;
-    private final long accessTokenExpiration;
-    private final long refreshTokenExpiration;
+    private static final long accessTokenExpiration = 604800000L;
+    private static final long refreshTokenExpiration = 604800000L;
 
-    public JwtUtil(final String secret, final long accessTokenExpiration, final long refreshTokenExpiration) {
-        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
-        this.accessTokenExpiration = accessTokenExpiration;
-        this.refreshTokenExpiration = refreshTokenExpiration;
+    public JwtUtil(@Value("${JWT.SECRET}") String secretKey) {
+        this.secretKey = Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
     public AccessToken generateAccessToken(final Long userId) {
@@ -52,6 +51,7 @@ public class JwtUtil {
         } catch (ExpiredJwtException exception) {
             throw new MementoException(ErrorCode.EXPIRED_TOKEN);
         } catch (JwtException exception) {
+            exception.printStackTrace();
             throw new MementoException(ErrorCode.EXPECTED_TOKEN_ERROR);
         } catch (Exception exception) {
             throw new MementoException(ErrorCode.UNEXPECTED_TOKEN_ERROR);

@@ -5,11 +5,8 @@ import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.stereotype.Adapter;
 import com.official.memento.todo.domain.ToDo;
 import com.official.memento.todo.domain.ToDoRepository;
-import com.official.memento.todo.domain.ToDoTag;
 import com.official.memento.todo.infrastructure.persistence.ToDoEntity;
 import com.official.memento.todo.infrastructure.persistence.ToDoJpaRepository;
-import com.official.memento.todo.infrastructure.persistence.ToDoTagJpaRepository;
-import com.official.memento.todo.infrastructure.persistence.projection.ToDoWithOrderProjection;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,11 +15,9 @@ import java.util.List;
 public class ToDoRepositoryAdapter implements ToDoRepository {
 
     private final ToDoJpaRepository toDoJpaRepository;
-    private final ToDoTagJpaRepository toDoTagJpaRepository;
 
-    public ToDoRepositoryAdapter(ToDoJpaRepository toDoJpaRepository, ToDoTagJpaRepository toDoTagJpaRepository) {
+    public ToDoRepositoryAdapter(ToDoJpaRepository toDoJpaRepository) {
         this.toDoJpaRepository = toDoJpaRepository;
-        this.toDoTagJpaRepository = toDoTagJpaRepository;
     }
 
     @Override

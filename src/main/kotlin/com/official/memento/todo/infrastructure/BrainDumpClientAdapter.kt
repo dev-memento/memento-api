@@ -1,6 +1,7 @@
 package com.official.memento.todo.infrastructure
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.official.memento.global.exception.ClaudeException
 import com.official.memento.global.exception.ErrorCode
 import com.official.memento.global.exception.MementoException
 import com.official.memento.global.stereotype.Adapter
@@ -9,8 +10,8 @@ import com.official.memento.todo.domain.vo.BrainDump
 import com.official.memento.todo.domain.vo.ToDoBrainDump
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.reactive.function.client.WebClient
-import java.nio.file.Files
-import java.nio.file.Paths
+import reactor.util.retry.Retry
+import java.time.Duration
 import java.time.LocalDate
 
 @Adapter
@@ -26,7 +27,6 @@ class BrainDumpClientAdapter(
         private val CLAUDE_ANTHROPIC_VERSION = "2023-06-01"
         private val MAX_TOKENS = 4096
         private val MODEL_NAME = "claude-3-5-haiku-20241022"
-        private val BRAINDUMP_PROMPT_FILE_PATH = "src/main/resources/braindump-prompt.txt"
     }
 
     private var brainDumpPrompt: String = """
@@ -78,103 +78,103 @@ class BrainDumpClientAdapter(
     private var userInput: String? = null
 
     override fun createByBrainDump(brainDump: BrainDump): ToDoBrainDump {
-        userInput = brainDump.content
-        val replacedPrompt = brainDumpPrompt.replace("{{USER_INPUT}}", userInput!!)
+        try {
+            userInput = brainDump.content
+            val replacedPrompt = brainDumpPrompt.replace("{{USER_INPUT}}", userInput!!)
 
-        val response =
-            webClient.post()
-                .uri(CLAUDE_API_URL)
-                .header(CLAUDE_API_KEY_HEADER, claudeApiKey)
-                .header(ANTHROPIC_VERSION_HEADER, CLAUDE_ANTHROPIC_VERSION)
-                .header("content-type", "application/json")
-                .bodyValue(
-                    mapOf(
-                        "model" to MODEL_NAME,
-                        "max_tokens" to MAX_TOKENS,
-                        "tools" to
-                            listOf(
-                                mapOf(
-                                    "name" to "get_task",
-                                    "description" to "Get the task info given in the information",
-                                    "input_schema" to
+            val response =
+                webClient.post()
+                    .uri(CLAUDE_API_URL)
+                    .header(CLAUDE_API_KEY_HEADER, claudeApiKey)
+                    .header(ANTHROPIC_VERSION_HEADER, CLAUDE_ANTHROPIC_VERSION)
+                    .header("content-type", "application/json")
+                    .bodyValue(
+                        mapOf(
+                            "model" to MODEL_NAME,
+                            "max_tokens" to MAX_TOKENS,
+                            "tools" to
+                                    listOf(
                                         mapOf(
-                                            "type" to "object",
-                                            "properties" to
-                                                mapOf(
-                                                    "task" to
-                                                        mapOf(
-                                                            "type" to "string",
-                                                            "description" to "task description",
-                                                        ),
-                                                    "deadline" to
-                                                        mapOf(
-                                                            "type" to "string",
-                                                            "description" to "task deadline date in YYYY-MM-DD format",
-                                                        ),
-                                                    "created_date" to
-                                                        mapOf(
-                                                            "type" to "string",
-                                                            "description" to "task created date in YYYY-MM-DD format",
-                                                        ),
-                                                    "urgency" to
-                                                        mapOf(
-                                                            "type" to "number",
-                                                            "description" to "Urgency score from 0 to 1, two decimal places",
-                                                        ),
-                                                    "importance" to
-                                                        mapOf(
-                                                            "type" to "number",
-                                                            "description" to "Importance score from 0 to 1, two decimal places",
-                                                        ),
-                                                    "priority" to
-                                                        mapOf(
-                                                            "type" to "number",
-                                                            "description" to "Calculated priority score from 0 to 1, two decimal places",
-                                                        ),
-                                                ),
-                                            "required" to
-                                                listOf(
-                                                    "task",
-                                                    "deadline",
-                                                    "created_date",
-                                                    "urgency",
-                                                    "importance",
-                                                    "priority",
-                                                ),
+                                            "name" to "get_task",
+                                            "description" to "Get the task info given in the information",
+                                            "input_schema" to
+                                                    mapOf(
+                                                        "type" to "object",
+                                                        "properties" to
+                                                                mapOf(
+                                                                    "task" to
+                                                                            mapOf(
+                                                                                "type" to "string",
+                                                                                "description" to "task description",
+                                                                            ),
+                                                                    "deadline" to
+                                                                            mapOf(
+                                                                                "type" to "string",
+                                                                                "description" to "task deadline date in YYYY-MM-DD format",
+                                                                            ),
+                                                                    "created_date" to
+                                                                            mapOf(
+                                                                                "type" to "string",
+                                                                                "description" to "task created date in YYYY-MM-DD format",
+                                                                            ),
+                                                                    "urgency" to
+                                                                            mapOf(
+                                                                                "type" to "number",
+                                                                                "description" to "Urgency score from 0 to 1, two decimal places",
+                                                                            ),
+                                                                    "importance" to
+                                                                            mapOf(
+                                                                                "type" to "number",
+                                                                                "description" to "Importance score from 0 to 1, two decimal places",
+                                                                            ),
+                                                                    "priority" to
+                                                                            mapOf(
+                                                                                "type" to "number",
+                                                                                "description" to "Calculated priority score from 0 to 1, two decimal places",
+                                                                            ),
+                                                                ),
+                                                        "required" to
+                                                                listOf(
+                                                                    "task",
+                                                                    "deadline",
+                                                                    "created_date",
+                                                                    "urgency",
+                                                                    "importance",
+                                                                    "priority",
+                                                                ),
+                                                    ),
                                         ),
-                                ),
-                            ),
-                        "messages" to
-                            listOf(
-                                mapOf(
-                                    "role" to "user",
-                                    "content" to replacedPrompt,
-                                ),
-                            ),
-                    ),
-                )
-                .retrieve()
-                .bodyToMono(ClaudeResponse::class.java)
-                .block()
-        val taskJsonResponse =
-            response?.content?.filter {
-                it.type == "tool_use"
-            }?.firstOrNull()?.input ?: throw MementoException(ErrorCode.INTERNAL_SERVER_ERROR)
+                                    ),
+                            "messages" to
+                                    listOf(
+                                        mapOf(
+                                            "role" to "user",
+                                            "content" to replacedPrompt,
+                                        ),
+                                    ),
+                        ),
+                    )
+                    .retrieve()
+                    .bodyToMono(ClaudeResponse::class.java)
+                    .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
+                    .block()
+            val taskJsonResponse =
+                response?.content?.filter {
+                    it.type == "tool_use"
+                }?.firstOrNull()?.input ?: throw MementoException(ErrorCode.INTERNAL_SERVER_ERROR)
 
-        return ToDoBrainDump(
-            task = taskJsonResponse.task,
-            deadline = LocalDate.parse(taskJsonResponse.deadline),
-            createdDate = LocalDate.parse(taskJsonResponse.createdDate),
-            urgency = taskJsonResponse.urgency,
-            importance = taskJsonResponse.importance,
-            priority = taskJsonResponse.priority,
-        )
+            return ToDoBrainDump(
+                task = taskJsonResponse.task,
+                deadline = LocalDate.parse(taskJsonResponse.deadline),
+                createdDate = LocalDate.parse(taskJsonResponse.createdDate),
+                urgency = taskJsonResponse.urgency,
+                importance = taskJsonResponse.importance,
+                priority = taskJsonResponse.priority,
+            )
+        } catch (e: Exception) {
+            throw ClaudeException(ErrorCode.INTERNAL_SERVER_ERROR)
+        }
     }
-//
-//    private fun readPromptFromFile(): String {
-//        val path = Paths.get(BRAINDUMP_PROMPT_FILE_PATH)
-//        return Files.readString(path)
-//    }
 
     data class ClaudeMessage(
         val role: String,

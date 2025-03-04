@@ -32,34 +32,6 @@ public class GlobalExceptionHandler {
         return ErrorResponse.of(HttpStatus.NOT_FOUND, ErrorCode.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorResponse> runtimeException(RuntimeException exception) {
-        logger.error("Runtime exception occurred ", exception);
-        alarmSendUseCase.sendException(new AlarmExceptionCommand(exception));
-        return ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> exception(Exception exception) {
-        logger.error("Unhandled exception occurred ", exception);
-        alarmSendUseCase.sendException(new AlarmExceptionCommand(exception));
-        return ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(MementoException.class)
-    public ResponseEntity<ErrorResponse> mementoException(MementoException exception) {
-        logger.error("MementoException", exception);
-        alarmSendUseCase.sendException(new AlarmExceptionCommand(exception));
-        return ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(InvalidRequestBodyException.class)
-    public ResponseEntity<ErrorResponse> invalidRequestBodyException(InvalidRequestBodyException exception) {
-        logger.warn("Invalid request body: {}", exception.getMessage());
-        alarmSendUseCase.sendException(new AlarmExceptionCommand(exception));
-        return ErrorResponse.of(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_REQUEST_BODY);
-    }
-
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ErrorResponse> unauthorizedException(UnauthorizedException exception) {
         logger.error("Unauthorized access attempt", exception);
@@ -73,11 +45,11 @@ public class GlobalExceptionHandler {
         return ErrorResponse.of(HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND_ENTITY);
     }
 
-    @ExceptionHandler(NullPointException.class)
-    public ResponseEntity<ErrorResponse> nullPointException(NullPointException exception) {
-        logger.error("Invalid request:", exception);
+    @ExceptionHandler(ClaudeException.class)
+    public ResponseEntity<ErrorResponse> claudeException(ClaudeException exception) {
+        logger.error("Claude exception occurred", exception);
         alarmSendUseCase.sendException(new AlarmExceptionCommand(exception));
-        return ErrorResponse.of(HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND_ENTITY);
+        return ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.CLAUDE_ERROR);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -103,4 +75,34 @@ public class GlobalExceptionHandler {
         logger.error("Invalid AI request:", exception);
         return ErrorResponse.of(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_AI_PRIORITIZATION_REQUEST);
     }
+
+    @ExceptionHandler(MementoException.class)
+    public ResponseEntity<ErrorResponse> mementoException(MementoException exception) {
+        logger.error("MementoException", exception);
+        alarmSendUseCase.sendException(new AlarmExceptionCommand(exception));
+        return ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> runtimeException(RuntimeException exception) {
+        logger.error("Runtime exception occurred ", exception);
+        alarmSendUseCase.sendException(new AlarmExceptionCommand(exception));
+        return ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> exception(Exception exception) {
+        logger.error("Unhandled exception occurred ", exception);
+        alarmSendUseCase.sendException(new AlarmExceptionCommand(exception));
+        return ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR);
+    }
+
+
+    @ExceptionHandler(InvalidRequestBodyException.class)
+    public ResponseEntity<ErrorResponse> invalidRequestBodyException(InvalidRequestBodyException exception) {
+        logger.warn("Invalid request body: {}", exception.getMessage());
+        alarmSendUseCase.sendException(new AlarmExceptionCommand(exception));
+        return ErrorResponse.of(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_REQUEST_BODY);
+    }
+
 }

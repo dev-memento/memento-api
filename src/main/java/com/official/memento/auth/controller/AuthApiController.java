@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 
 @RestController
-public class AuthApiController {
+public class AuthApiController implements AuthApiDocs {
 
     private final AuthService authService;
 
@@ -27,6 +27,7 @@ public class AuthApiController {
         this.authService = authService;
     }
 
+    @Override
     @PostMapping("/api/v1/auth/login")
     public ResponseEntity<SuccessResponse<AuthApiResponse>> login(@Valid @RequestBody final AuthApiRequest request) {
         final AuthCommand command = AuthCommand.of(request.provider(), request.idToken());
@@ -40,6 +41,7 @@ public class AuthApiController {
         return SuccessResponse.of(HttpStatus.OK, "소셜 로그인 성공", response);
     }
 
+    @Override
     @PostMapping("/api/v1/auth/token/refresh")
     public ResponseEntity<SuccessResponse<AuthApiResponse>> refreshTokens(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {

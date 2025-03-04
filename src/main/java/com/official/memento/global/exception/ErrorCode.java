@@ -27,6 +27,9 @@ public enum ErrorCode {
     EXPECTED_TOKEN_ERROR("토큰 에러입니다"),
     UNEXPECTED_TOKEN_ERROR("예상치 못한 토큰 에러입니다"),
 
+    // AI 관련 에러
+    CLAUDE_ERROR("Cladue 요청시에 에러가 발생했습니다."),
+
     INVALID_AI_PRIORITIZATION_REQUEST("AI 우선순위 요청이 유효하지 않습니다.");
     ;
 

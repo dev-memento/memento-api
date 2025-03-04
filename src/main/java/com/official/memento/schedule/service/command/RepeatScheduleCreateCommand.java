@@ -2,7 +2,6 @@ package com.official.memento.schedule.service.command;
 
 import com.official.memento.global.entity.enums.RepeatOption;
 import com.official.memento.global.exception.InvalidRequestBodyException;
-import com.official.memento.global.exception.NullPointException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

@@ -2,8 +2,6 @@ package com.official.memento.member.domain.port;
 
 import com.official.memento.member.domain.Member;
 import com.official.memento.member.domain.MemberPersonalInfo;
-import com.official.memento.member.infrastructure.persistence.MemberEntity;
-import com.official.memento.member.infrastructure.persistence.MemberPersonalInfoEntity;
 
 import java.util.Optional;
 
