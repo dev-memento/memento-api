@@ -1,4 +1,4 @@
-package com.official.memento.member.infrastructure.persistence;
+package com.official.memento.member.infrastructure.persistence.entity;
 
 import com.official.memento.auth.domain.AuthProvider;
 import jakarta.persistence.*;
