@@ -39,5 +39,4 @@ public record RepeatScheduleCreateCommand(
                 tagId
         );
     }
-    // checkNullData(description, startDate, endDate, repeatOption); 제외 한 위치
 }
