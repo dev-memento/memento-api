@@ -31,7 +31,7 @@ public record ScheduleDetailResponse(
               schedule.getEndDate(),
               schedule.isAllDay(),
               schedule.getType(),
-              schedule.getTagId() == null ? 0L : schedule.getTagId()
+              schedule.getTagId()
       );
    }
 }

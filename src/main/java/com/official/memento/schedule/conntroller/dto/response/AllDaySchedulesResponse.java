@@ -33,8 +33,8 @@ public record AllDaySchedulesResponse(
                 schedule.getEndDate(),
                 schedule.isAllDay(),
                 schedule.getType(),
-                schedule.getTagName() == null ? "" : schedule.getTagName(),
-                schedule.getTagColor() == null ? "" : schedule.getTagColor().getHexCode()
+                schedule.getTagName(),
+                schedule.getTagColor().getHexCode()
         );
     }
 }

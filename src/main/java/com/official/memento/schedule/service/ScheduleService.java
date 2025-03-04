@@ -179,7 +179,7 @@ public class ScheduleService implements
         return scheduleRepository.findAllByStartDateAndMemberId(date, memberId);
     }
 
-    private static void checkOwnTag(long memberId, Tag tag) {
+    private static void checkOwnTag(final long memberId, final Tag tag) {
         if (tag.getMemberId() != memberId) {
             throw new InvalidRequestBodyException(ErrorCode.INVALID_REQUEST_BODY);
         }
