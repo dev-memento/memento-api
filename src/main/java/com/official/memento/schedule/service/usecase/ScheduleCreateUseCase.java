@@ -7,5 +7,5 @@ import java.util.List;
 public interface ScheduleCreateUseCase {
     void create(final ScheduleCreateCommand command);
 
-    void createAppleSchedules(final List<ScheduleCreateCommand> command);
+    void createAppleSchedules(final String syncToken, final List<ScheduleCreateCommand> command);
 }

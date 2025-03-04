@@ -66,7 +66,8 @@ public class ScheduleService implements
     }
 
     @Override
-    public void createAppleSchedules(final List<ScheduleCreateCommand> command) {
+    public void createAppleSchedules(final String syncToken, final List<ScheduleCreateCommand> command) {
+
         Tag tag = tagRepository.findByMemberIdAndTagColor(command.get(0).memberId(), TagColor.GRAY05);
         for (ScheduleCreateCommand scheduleCreateCommand : command) {
             String scheduleGroupId = UUID.randomUUID().toString();
@@ -278,7 +279,7 @@ public class ScheduleService implements
 
     private void updateOrDeleteTag(final Schedule schedule, final long tagId) {
         ScheduleTag scheduleTag = scheduleTagRepository.findByScheduleId(schedule.getId());
-       if (scheduleTag == null) {
+        if (scheduleTag == null) {
             scheduleTag = ScheduleTag.of(tagId, schedule.getId());
             scheduleTagRepository.save(scheduleTag);
         } else if (scheduleTag.getTagId() != tagId) {
