@@ -38,5 +38,9 @@ public interface OrderInfoEntityJpaRepository extends JpaRepository<OrderInfoEnt
     @Query("SELECT o FROM OrderInfoEntity o WHERE o.toDoId = :toDoId")
     Optional<OrderInfoEntity> findOrderByToDoId(@Param("toDoId") Long toDoId);
 
+    @Query("SELECT o FROM OrderInfoEntity o WHERE o.scheduleId = :scheduleId")
+    Optional<OrderInfoEntity> findOrderByScheduleId(@Param("scheduleId") Long scheduleId);
+
     Optional<OrderInfoEntity> findByToDoIdAndDate(Long toDoId, LocalDate date);
+
 }

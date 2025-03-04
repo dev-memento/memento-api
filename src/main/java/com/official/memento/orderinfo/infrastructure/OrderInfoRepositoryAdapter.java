@@ -113,4 +113,22 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
                 orderInfoEntity.getCreatedAt()
         );
     }
+
+    @Override
+    public OrderInfo findByScheduleId(final Long scheduleId) {
+        OrderInfoEntity orderInfoEntity = orderInfoEntityJpaRepository.findOrderByScheduleId(scheduleId)
+                .orElseThrow(
+                        () -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY)
+                );
+        return OrderInfo.withId(
+                orderInfoEntity.getId(),
+                orderInfoEntity.getMemberId(),
+                orderInfoEntity.getScheduleId(),
+                orderInfoEntity.getToDoId(),
+                orderInfoEntity.getOrderNum(),
+                orderInfoEntity.getDate(),
+                orderInfoEntity.getPlanType(),
+                orderInfoEntity.getCreatedAt()
+        );
+    }
 }
