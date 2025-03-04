@@ -1,8 +1,8 @@
 package com.official.memento.auth.service;
 
 import com.official.memento.auth.domain.AccessToken;
-import com.official.memento.auth.domain.AuthProvider;
 import com.official.memento.auth.domain.Auth;
+import com.official.memento.auth.domain.AuthProvider;
 import com.official.memento.auth.domain.RefreshToken;
 import com.official.memento.auth.domain.port.AuthClientOutputPort;
 import com.official.memento.auth.domain.port.AuthRepository;
@@ -16,11 +16,9 @@ import com.official.memento.global.exception.UnauthorizedException;
 import com.official.memento.member.domain.Member;
 import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.service.command.MemberPersonalInfoCreateCommand;
-import com.official.memento.member.service.command.MemberSyncInfoCreateCommand;
 import com.official.memento.member.service.usecase.MemberCreateUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoCreateUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoGetUseCase;
-import com.official.memento.member.service.usecase.MemberSyncInfoCreateUseCase;
 import com.official.memento.tag.domain.enums.TagColor;
 import com.official.memento.tag.service.TagCreateUseCase;
 import com.official.memento.tag.service.command.TagCreateCommand;
@@ -37,7 +35,6 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase, Ex
 
     private final AuthRepository authRepository;
     private final MemberCreateUseCase memberCreateUseCase;
-    private final MemberSyncInfoCreateUseCase memberSyncInfoCreateUseCase;
     private final MemberPersonalInfoCreateUseCase memberPersonalInfoCreateUseCase;
     private final MemberPersonalInfoGetUseCase memberPersonalInfoGetUseCase;
     private final TagCreateUseCase tagCreateUseCase;
@@ -50,7 +47,6 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase, Ex
     public AuthResult authenticate(final AuthCommand command) {
         final AuthProvider provider = command.providerName();
         final Map<String, Object> tokenInfo = verifyIdToken(provider, command.idToken());
-
         final String platformId = (String) tokenInfo.get("sub");
         final String email = (String) tokenInfo.get("email");
 
@@ -83,7 +79,6 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase, Ex
         }
         AccessToken newAccessToken = jwtUtil.generateAccessToken(Long.parseLong(memberId));
         RefreshToken newRefreshToken = jwtUtil.generateRefreshToken(Long.parseLong(memberId));
-
         auth.withUpdatedToken(newRefreshToken.getToken());
         authRepository.save(auth);
 
@@ -99,7 +94,6 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase, Ex
         Member newMember = memberCreateUseCase.create();
         Long memberId = newMember.getId();
         memberPersonalInfoCreateUseCase.create(MemberPersonalInfoCreateCommand.from(memberId));
-        memberSyncInfoCreateUseCase.create(MemberSyncInfoCreateCommand.from(memberId));
         createOwnTags(memberId);
         Auth newAuth = Auth.of(memberId, provider, platformId, "");
         return authRepository.save(newAuth);
