@@ -2,9 +2,10 @@ package com.official.memento.auth.service;
 
 import com.official.memento.auth.domain.AccessToken;
 import com.official.memento.auth.domain.AuthProvider;
+import com.official.memento.auth.domain.Auth;
 import com.official.memento.auth.domain.RefreshToken;
 import com.official.memento.auth.domain.port.AuthClientOutputPort;
-import com.official.memento.auth.domain.port.MemberAuthRepository;
+import com.official.memento.auth.domain.port.AuthRepository;
 import com.official.memento.auth.service.command.AuthCommand;
 import com.official.memento.auth.service.usecase.AuthenticateUseCase;
 import com.official.memento.auth.service.usecase.ExtractRefreshTokenUseCase;
@@ -13,7 +14,6 @@ import com.official.memento.auth.util.AuthValidation;
 import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.exception.UnauthorizedException;
 import com.official.memento.member.domain.Member;
-import com.official.memento.member.domain.MemberAuth;
 import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.service.command.MemberPersonalInfoCreateCommand;
 import com.official.memento.member.service.command.MemberSyncInfoCreateCommand;
@@ -35,7 +35,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase, ExtractRefreshTokenUseCase {
 
-    private final MemberAuthRepository memberAuthRepository;
+    private final AuthRepository authRepository;
     private final MemberCreateUseCase memberCreateUseCase;
     private final MemberSyncInfoCreateUseCase memberSyncInfoCreateUseCase;
     private final MemberPersonalInfoCreateUseCase memberPersonalInfoCreateUseCase;
@@ -54,7 +54,7 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase, Ex
         final String platformId = (String) tokenInfo.get("sub");
         final String email = (String) tokenInfo.get("email");
 
-        MemberAuth auth = memberAuthRepository.findByPlatformIdAndProvider(platformId, provider)
+        Auth auth = authRepository.findByPlatformIdAndProvider(platformId, provider)
                 .orElseGet(() -> createNewMember(platformId, provider));
 
         Optional<MemberPersonalInfo> personalInfo = memberPersonalInfoGetUseCase.findNullableByMemberId(auth.getMemberId());
@@ -64,7 +64,7 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase, Ex
         RefreshToken refreshToken = jwtUtil.generateRefreshToken(auth.getMemberId());
 
         auth.withUpdatedToken(refreshToken.getToken());
-        memberAuthRepository.save(auth);
+        authRepository.save(auth);
 
         return AuthResult.of(accessToken, refreshToken, isNewUser);
     }
@@ -76,16 +76,16 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase, Ex
             throw new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
         String memberId = jwtUtil.getUserIdFromToken(refreshToken);
-        MemberAuth memberAuth = memberAuthRepository.findByMemberId(Long.parseLong(memberId))
+        Auth auth = authRepository.findByMemberId(Long.parseLong(memberId))
                 .orElseThrow(() -> new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN));
-        if (!memberAuth.getRefreshToken().equals(refreshToken)) {
+        if (!auth.getRefreshToken().equals(refreshToken)) {
             throw new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
         AccessToken newAccessToken = jwtUtil.generateAccessToken(Long.parseLong(memberId));
         RefreshToken newRefreshToken = jwtUtil.generateRefreshToken(Long.parseLong(memberId));
 
-        memberAuth.withUpdatedToken(newRefreshToken.getToken());
-        memberAuthRepository.save(memberAuth);
+        auth.withUpdatedToken(newRefreshToken.getToken());
+        authRepository.save(auth);
 
         return AuthResult.of(newAccessToken, newRefreshToken, false);
     }
@@ -95,14 +95,14 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase, Ex
         return authorizationHeader.substring(7);
     }
 
-    private MemberAuth createNewMember(String platformId, AuthProvider provider) {
+    private Auth createNewMember(String platformId, AuthProvider provider) {
         Member newMember = memberCreateUseCase.create();
         Long memberId = newMember.getId();
         memberPersonalInfoCreateUseCase.create(MemberPersonalInfoCreateCommand.from(memberId));
         memberSyncInfoCreateUseCase.create(MemberSyncInfoCreateCommand.from(memberId));
         createOwnTags(memberId);
-        MemberAuth newAuth = MemberAuth.of(memberId, provider, platformId, "");
-        return memberAuthRepository.save(newAuth);
+        Auth newAuth = Auth.of(memberId, provider, platformId, "");
+        return authRepository.save(newAuth);
     }
 
     private void createOwnTags(Long memberId) {

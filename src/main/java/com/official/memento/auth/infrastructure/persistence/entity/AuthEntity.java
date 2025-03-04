@@ -1,12 +1,18 @@
-package com.official.memento.member.infrastructure.persistence.entity;
+package com.official.memento.auth.infrastructure.persistence.entity;
 
+import com.official.memento.auth.domain.Auth;
 import com.official.memento.auth.domain.AuthProvider;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "member_auth", uniqueConstraints = {
+@Table(name = "auth", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"platformId", "provider"})})
-public class MemberAuthEntity {
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class AuthEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,20 +30,8 @@ public class MemberAuthEntity {
     @Column(nullable = false)
     private String refreshToken;
 
-    protected MemberAuthEntity() {
-    }
-
-    public MemberAuthEntity(
-            final Long id,
-            final AuthProvider provider,
-            final String platformId,
-            final String refreshToken,
-            final long memberId) {
-        this.id = id;
-        this.provider = provider;
-        this.platformId = platformId;
-        this.refreshToken = refreshToken;
-        this.memberId = memberId;
+    public static AuthEntity of(final Auth auth) {
+        return new AuthEntity(auth.getId(), auth.getMemberId(), auth.getProvider(), auth.getPlatformId(), auth.getRefreshToken());
     }
 
     public Long getId() {
@@ -59,6 +53,7 @@ public class MemberAuthEntity {
     public long getMemberId() {
         return memberId;
     }
+
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
