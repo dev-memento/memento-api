@@ -98,7 +98,7 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
 
     @Override
     public OrderInfo findByToDoId(final Long toDoId) {
-        OrderInfoEntity orderInfoEntity = orderInfoEntityJpaRepository.findOrderByToDoId(toDoId)
+        OrderInfoEntity orderInfoEntity = orderInfoEntityJpaRepository.findByToDoId(toDoId)
                 .orElseThrow(
                         () -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY)
                 );
@@ -116,7 +116,7 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
 
     @Override
     public OrderInfo findByScheduleId(final Long scheduleId) {
-        OrderInfoEntity orderInfoEntity = orderInfoEntityJpaRepository.findOrderByScheduleId(scheduleId)
+        OrderInfoEntity orderInfoEntity = orderInfoEntityJpaRepository.findByScheduleId(scheduleId)
                 .orElseThrow(
                         () -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY)
                 );
