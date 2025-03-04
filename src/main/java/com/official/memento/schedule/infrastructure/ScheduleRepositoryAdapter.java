@@ -9,19 +9,17 @@ import com.official.memento.schedule.domain.ScheduleRepository;
 import com.official.memento.schedule.infrastructure.persistence.ScheduleEntity;
 import com.official.memento.schedule.infrastructure.persistence.ScheduleEntityJpaRepository;
 import com.official.memento.schedule.infrastructure.persistence.projection.ScheduleOrderInfoProjection;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Adapter
+@RequiredArgsConstructor
 public class ScheduleRepositoryAdapter implements ScheduleRepository {
 
     private final ScheduleEntityJpaRepository scheduleEntityJpaRepository;
-
-    public ScheduleRepositoryAdapter(final ScheduleEntityJpaRepository scheduleEntityJpaRepository) {
-        this.scheduleEntityJpaRepository = scheduleEntityJpaRepository;
-    }
 
     @Override
     public Schedule save(final Schedule schedule) {
@@ -38,13 +36,14 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
                 scheduleEntity.getType(),
                 scheduleEntity.getScheduleGroupId(),
                 scheduleEntity.getCreatedAt(),
-                scheduleEntity.getUpdatedAt()
+                scheduleEntity.getUpdatedAt(),
+                scheduleEntity.getTagId()
         );
     }
 
     @Override
     public Schedule update(final Schedule schedule) {
-        ScheduleEntity scheduleEntity = scheduleEntityJpaRepository.save(ScheduleEntity.withId(schedule));
+        ScheduleEntity scheduleEntity = scheduleEntityJpaRepository.save(ScheduleEntity.from(schedule));
         return Schedule.withId(
                 scheduleEntity.getId(),
                 scheduleEntity.getMemberId(),
@@ -57,7 +56,8 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
                 scheduleEntity.getType(),
                 scheduleEntity.getScheduleGroupId(),
                 scheduleEntity.getCreatedAt(),
-                scheduleEntity.getUpdatedAt()
+                scheduleEntity.getUpdatedAt(),
+                scheduleEntity.getTagId()
         );
     }
 
@@ -79,7 +79,8 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
                 scheduleEntity.getType(),
                 scheduleEntity.getScheduleGroupId(),
                 scheduleEntity.getCreatedAt(),
-                scheduleEntity.getUpdatedAt()
+                scheduleEntity.getUpdatedAt(),
+                scheduleEntity.getTagId()
         );
     }
 
@@ -103,7 +104,8 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
                 scheduleEntity.getUpdatedAt(),
                 scheduleEntity.getOrderNum(),
                 scheduleEntity.getTagName(),
-                scheduleEntity.getTagColor()
+                scheduleEntity.getTagColor(),
+                scheduleEntity.getTagId()
         )).toList();
     }
 
@@ -124,7 +126,8 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
                 scheduleEntity.getEndDate(),
                 scheduleEntity.getUpdatedAt(),
                 scheduleEntity.getTagName(),
-                scheduleEntity.getTagColor()
+                scheduleEntity.getTagColor(),
+                scheduleEntity.getTagId()
         )).toList();
     }
 
@@ -146,7 +149,8 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
                 scheduleEntity.getUpdatedAt(),
                 scheduleEntity.getOrderNum(),
                 scheduleEntity.getTagName(),
-                scheduleEntity.getTagColor()
+                scheduleEntity.getTagColor(),
+                scheduleEntity.getTagId()
         )).toList();
     }
 
@@ -165,7 +169,8 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
                 scheduleEntity.getType(),
                 scheduleEntity.getScheduleGroupId(),
                 scheduleEntity.getCreatedAt(),
-                scheduleEntity.getUpdatedAt()
+                scheduleEntity.getUpdatedAt(),
+                scheduleEntity.getTagId()
         )).toList();
     }
 
@@ -184,7 +189,8 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
                 scheduleEntity.getType(),
                 scheduleEntity.getScheduleGroupId(),
                 scheduleEntity.getCreatedAt(),
-                scheduleEntity.getUpdatedAt()
+                scheduleEntity.getUpdatedAt(),
+                scheduleEntity.getTagId()
         )).toList();
     }
 
@@ -195,7 +201,7 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
 
     @Override
     public void deleteAll(final List<Schedule> schedules) {
-        List<ScheduleEntity> scheduleEntities = schedules.stream().map(ScheduleEntity::withId).toList();
+        List<ScheduleEntity> scheduleEntities = schedules.stream().map(ScheduleEntity::from).toList();
         scheduleEntityJpaRepository.deleteAll(scheduleEntities);
     }
 

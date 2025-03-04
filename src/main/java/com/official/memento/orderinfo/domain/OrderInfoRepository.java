@@ -21,5 +21,7 @@ public interface OrderInfoRepository {
 
     OrderInfo findByToDoId(Long toDoId);
 
+    OrderInfo findByScheduleId(Long scheduleId);
+
     List<OrderInfo> findAllByMemberIdAndDateOrderByOrderNum(final long memberId, final LocalDate date);
 }

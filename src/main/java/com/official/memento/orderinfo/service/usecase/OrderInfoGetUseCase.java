@@ -4,4 +4,6 @@ import com.official.memento.orderinfo.domain.OrderInfo;
 
 public interface OrderInfoGetUseCase {
     OrderInfo findByToDoId(final long toDoId);
+
+    OrderInfo findByScheduleId(final long scheduleId);
 }

@@ -18,11 +18,10 @@ public interface ScheduleOrderInfoProjection {
     Integer getOrderNum();
     String getTagName();
     TagColor getTagColor();
+    Long getTagId();
     RepeatOption getRepeatOption();
     LocalDate getRepeatExpiredDate();
     String getScheduleGroupId();
-
     LocalDateTime getCreatedAt();
     LocalDateTime getUpdatedAt();
-
 }
