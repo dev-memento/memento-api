@@ -4,12 +4,15 @@ import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.exception.InvalidRequestBodyException;
 import com.official.memento.orderinfo.domain.OrderInfo;
 import com.official.memento.orderinfo.domain.OrderInfoRepository;
+import com.official.memento.orderinfo.domain.OrderWithScheduleOrToDo;
 import com.official.memento.orderinfo.domain.PlanType;
+import com.official.memento.orderinfo.infrastructure.persistence.OrderInfoEntity;
 import com.official.memento.orderinfo.service.command.ToDoPositionUpdateCommand;
 import com.official.memento.orderinfo.service.usecase.OrderInfoCreateUseCase;
 import com.official.memento.orderinfo.service.usecase.OrderInfoDeleteUseCase;
 import com.official.memento.orderinfo.service.usecase.OrderInfoGetUseCase;
 import com.official.memento.orderinfo.service.usecase.OrderInfoUpdateUseCase;
+import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.todo.domain.entity.ToDo;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -61,6 +64,52 @@ public class OrderInfoService implements
         createToDoOrderInfo(date, toDo, checked ? 1 : insertOrder, memberId);
     }
 
+    @Override
+    @Transactional
+    public void assignScheduleOrder(final LocalDateTime dateTime, final Schedule schedule, final long memberId){
+        LocalDate date = dateTime.toLocalDate();
+        List<OrderWithScheduleOrToDo> orderInfoList = orderInfoRepository.findOrderInfoWithDetails(date,memberId);
+        double insertOrder = 1;
+        boolean isInserted = false;
+
+        for (OrderWithScheduleOrToDo existingOrder : orderInfoList) {
+            if (!isInserted && existingOrder.getType() == PlanType.SCHEDULE) {
+                if (schedule.getStartDate().equals(existingOrder.getStartDate())
+                        && schedule.getEndDate().isBefore(existingOrder.getEndDate())) {
+                    insertOrder = existingOrder.getOrder();
+                    isInserted = true;
+                }
+                else if (schedule.getStartDate().isBefore(existingOrder.getStartDate())) {
+                    insertOrder = existingOrder.getOrder();
+                    isInserted = true;
+                }
+            }
+
+            if (isInserted) {
+                existingOrder.shiftBack(); // 내부적으로 order 값을 1 증가시키는 메서드라고 가정
+                orderInfoRepository.update(
+                        OrderInfo.withId(
+                                existingOrder.getOrderInfoId(),
+                                existingOrder.getMemberId(),
+                                existingOrder.getScheduleId(),
+                                existingOrder.getToDoId(),
+                                existingOrder.getOrder(), // 이미 증가된 값
+                                date,
+                                existingOrder.getType(),
+                                existingOrder.getCreatedAt()
+                        )
+                );
+            }
+        }
+
+        if (!isInserted) {
+            insertOrder = orderInfoList.isEmpty() ? 1 : orderInfoList.get(orderInfoList.size() - 1).getOrder() + 1;
+        }
+
+        boolean checked = checkReOrdering(date, memberId, insertOrder);
+        createScheduleOrderInfo(date, schedule, checked ? 1 : insertOrder, memberId);
+    }
+
     private boolean checkReOrdering(final LocalDate date, final long memberId, final double insertOrder) {
         if (insertOrder < 1e-10) {
             List<OrderInfo> afterOrderInfoList = orderInfoRepository.findAllByMemberIdAndDateOrderByOrderNum(memberId,
@@ -87,9 +136,27 @@ public class OrderInfoService implements
         ));
     }
 
+    private void createScheduleOrderInfo(final LocalDate date, final Schedule schedule, final double insertOrder,
+                                     final long memberId) {
+        orderInfoRepository.save(OrderInfo.of(
+                memberId,
+                schedule.getId(),
+                null,
+                insertOrder,
+                date,
+                PlanType.SCHEDULE,
+                LocalDateTime.now()
+        ));
+    }
+
     @Override
     public void deleteByToDoId(final long toDoId) {
         orderInfoRepository.deleteByToDoId(toDoId);
+    }
+
+    @Override
+    public void deleteByScheduleId(final long scheduleId) {
+        orderInfoRepository.deleteByScheduleId(scheduleId);
     }
 
     @Override
@@ -97,6 +164,8 @@ public class OrderInfoService implements
         return orderInfoRepository.findByToDoId(toDoId);
     }
 
+    @Override
+    public OrderInfo findByScheduleId(final long scheduleId) {return  orderInfoRepository.findByScheduleId(scheduleId);}
 
     private static void checkInValidRequest(final double previousOrder, final double insertOrder) {
         if (previousOrder > insertOrder) {

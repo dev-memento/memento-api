@@ -35,8 +35,9 @@ public interface OrderInfoEntityJpaRepository extends JpaRepository<OrderInfoEnt
 
     void deleteByToDoId(final long toDoId);
 
-    @Query("SELECT o FROM OrderInfoEntity o WHERE o.toDoId = :toDoId")
-    Optional<OrderInfoEntity> findOrderByToDoId(@Param("toDoId") Long toDoId);
+    Optional<OrderInfoEntity> findByToDoId(Long toDoId);
+
+    Optional<OrderInfoEntity> findByScheduleId(Long scheduleId);
 
     Optional<OrderInfoEntity> findByToDoIdAndDate(Long toDoId, LocalDate date);
 }
