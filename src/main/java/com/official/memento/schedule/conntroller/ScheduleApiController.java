@@ -3,6 +3,7 @@ package com.official.memento.schedule.conntroller;
 import com.official.memento.global.annotation.Authorization;
 import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
+import com.official.memento.global.util.Validator;
 import com.official.memento.schedule.conntroller.dto.request.*;
 import com.official.memento.schedule.conntroller.dto.response.ScheduleAllAllDaysGetResponse;
 import com.official.memento.schedule.conntroller.dto.response.ScheduleAllGetResponse;
@@ -10,6 +11,7 @@ import com.official.memento.schedule.conntroller.dto.response.ScheduleDetailResp
 import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.schedule.service.command.*;
 import com.official.memento.schedule.service.usecase.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/schedules")
+@RequiredArgsConstructor
 public class ScheduleApiController implements ScheduleApiDocs {
 
     private final ScheduleCreateUseCase scheduleCreateUseCase;
@@ -28,25 +31,6 @@ public class ScheduleApiController implements ScheduleApiDocs {
     private final ScheduleUpdateUseCase scheduleUpdateUseCase;
     private final ScheduleUpdateGroupUseCase scheduleUpdateGroupUseCase;
     private final ScheduleGetUseCase scheduleGetUseCase;
-
-    public ScheduleApiController(
-            final ScheduleCreateUseCase scheduleCreateUseCase,
-            final RepeatScheduleCreateUseCase repeatScheduleCreateUseCase,
-            final ScheduleDeleteUseCase scheduleDeleteUseCase,
-            final ScheduleDeleteGroupUseCase scheduleDeleteGroupUseCase,
-            final ScheduleUpdateUseCase scheduleUpdateUseCase,
-            final ScheduleUpdateGroupUseCase scheduleUpdateGroupUseCase,
-            final ScheduleGetUseCase scheduleGetUseCase
-    ) {
-
-        this.scheduleCreateUseCase = scheduleCreateUseCase;
-        this.repeatScheduleCreateUseCase = repeatScheduleCreateUseCase;
-        this.scheduleDeleteUseCase = scheduleDeleteUseCase;
-        this.scheduleDeleteGroupUseCase = scheduleDeleteGroupUseCase;
-        this.scheduleUpdateUseCase = scheduleUpdateUseCase;
-        this.scheduleUpdateGroupUseCase = scheduleUpdateGroupUseCase;
-        this.scheduleGetUseCase = scheduleGetUseCase;
-    }
 
     @PostMapping
     @Override
@@ -192,7 +176,10 @@ public class ScheduleApiController implements ScheduleApiDocs {
             @Authorization final AuthorizationUser authorizationUser,
             @RequestParam LocalDate date
     ) {
-        List<Schedule> schedules = scheduleGetUseCase.getSchedules(authorizationUser.memberId(), date);
+        Validator.isNull(date);
+        //List<Schedule> schedules = scheduleGetUseCase.getSchedules(authorizationUser.memberId(), date);
+        List<Schedule> schedules = scheduleGetUseCase.getSchedules(1, date);
+
         return SuccessResponse.of(
                 HttpStatus.CREATED,
                 "스케줄 반환 성공",

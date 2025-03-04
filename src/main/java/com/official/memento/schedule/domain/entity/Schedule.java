@@ -37,7 +37,8 @@ public class Schedule extends BaseTimeEntity {
             final ScheduleType type,
             final String scheduleGroupId,
             final LocalDateTime createdAt,
-            final LocalDateTime updatedAt
+            final LocalDateTime updatedAt,
+            final long tagId
     ) {
         this.id = id;
         this.memberId = memberId;
@@ -51,6 +52,7 @@ public class Schedule extends BaseTimeEntity {
         this.scheduleGroupId = scheduleGroupId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.tagId = tagId;
     }
 
     private Schedule(
@@ -68,7 +70,9 @@ public class Schedule extends BaseTimeEntity {
             final LocalDateTime updatedAt,
             final int orderNum,
             final String tagName,
-            final TagColor tagColor
+            final TagColor tagColor,
+            final long tagId
+
             ) {
         this.id = id;
         this.memberId = memberId;
@@ -85,6 +89,7 @@ public class Schedule extends BaseTimeEntity {
         this.orderNum = orderNum;
         this.tagName = tagName;
         this.tagColor = tagColor;
+        this.tagId = tagId;
     }
 
     private Schedule(
@@ -101,7 +106,8 @@ public class Schedule extends BaseTimeEntity {
             final LocalDateTime createdAt,
             final LocalDateTime updatedAt,
             final String tagName,
-            final TagColor tagColor
+            final TagColor tagColor,
+            final long tagId
     ) {
         this.id = id;
         this.memberId = memberId;
@@ -117,6 +123,7 @@ public class Schedule extends BaseTimeEntity {
         this.updatedAt = updatedAt;
         this.tagName = tagName;
         this.tagColor = tagColor;
+        this.tagId = tagId;
     }
 
     private Schedule(
@@ -128,7 +135,8 @@ public class Schedule extends BaseTimeEntity {
             final RepeatOption repeatOption,
             final LocalDate repeatExpiredDate,
             final ScheduleType type,
-            final String scheduleGroupId
+            final String scheduleGroupId,
+            final long tagId
     ) {
         this.memberId = memberId;
         this.description = description;
@@ -139,6 +147,7 @@ public class Schedule extends BaseTimeEntity {
         this.repeatExpiredDate = repeatExpiredDate;
         this.type = type;
         this.scheduleGroupId = scheduleGroupId;
+        this.tagId = tagId;
     }
 
     public static Schedule withId(
@@ -153,7 +162,8 @@ public class Schedule extends BaseTimeEntity {
             final ScheduleType type,
             final String scheduleGroupId,
             final LocalDateTime createdAt,
-            final LocalDateTime updatedAt
+            final LocalDateTime updatedAt,
+            final long tagId
     ) {
         return new Schedule(
                 id,
@@ -167,7 +177,8 @@ public class Schedule extends BaseTimeEntity {
                 type,
                 scheduleGroupId,
                 createdAt,
-                updatedAt
+                updatedAt,
+                tagId
         );
     }
 
@@ -185,7 +196,8 @@ public class Schedule extends BaseTimeEntity {
             final LocalDateTime createdAt,
             final LocalDateTime updatedAt,
             final String tagName,
-            final TagColor tagColor
+            final TagColor tagColor,
+            final long tagId
     ) {
         return new Schedule(
                 id,
@@ -201,7 +213,8 @@ public class Schedule extends BaseTimeEntity {
                 createdAt,
                 updatedAt,
                 tagName,
-                tagColor
+                tagColor,
+                tagId
         );
     }
 
@@ -220,7 +233,8 @@ public class Schedule extends BaseTimeEntity {
             final LocalDateTime updatedAt,
             final int orderNum,
             final String tagName,
-            final TagColor tagColor
+            final TagColor tagColor,
+            final long tagId
     ) {
         return new Schedule(
                 id,
@@ -237,7 +251,8 @@ public class Schedule extends BaseTimeEntity {
                 updatedAt,
                 orderNum,
                 tagName,
-                tagColor
+                tagColor,
+                tagId
         );
     }
 
@@ -250,7 +265,8 @@ public class Schedule extends BaseTimeEntity {
             final RepeatOption repeatOption,
             final LocalDate repeatExpiredDate,
             final ScheduleType type,
-            final String scheduleGroupId
+            final String scheduleGroupId,
+            final long tagId
     ) {
         return new Schedule(
                 memberId,
@@ -261,20 +277,33 @@ public class Schedule extends BaseTimeEntity {
                 repeatOption,
                 repeatExpiredDate,
                 type,
-                scheduleGroupId
+                scheduleGroupId,
+                tagId
         );
     }
 
-    public void update(
+    public Schedule update(
             final String description,
             final LocalDateTime startDate,
             final LocalDateTime endDate,
-            final boolean isAllDay
+            final boolean isAllDay,
+            final long tagId
     ) {
-        this.description = description;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.isAllDay = isAllDay;
+        return Schedule.withId(
+                id,
+                memberId,
+                description,
+                startDate,
+                endDate,
+                isAllDay,
+                repeatOption,
+                repeatExpiredDate,
+                type,
+                scheduleGroupId,
+                createdAt,
+                LocalDateTime.now(),
+                tagId
+        );
     }
 
     public Long getId() {
@@ -332,9 +361,5 @@ public class Schedule extends BaseTimeEntity {
 
     public Long getTagId() {
         return tagId;
-    }
-
-    public void setTagId(Long tagId) {
-        this.tagId = tagId;
     }
 }

@@ -28,7 +28,6 @@ public record RepeatScheduleCreateCommand(
             final LocalDate repeatExpiredDate,
             final Long tagId
     ) {
-        checkNullData(description, startDate, endDate, repeatOption);
         return new RepeatScheduleCreateCommand(
                 memberId,
                 description,
@@ -41,14 +40,4 @@ public record RepeatScheduleCreateCommand(
         );
     }
 
-    private static void checkNullData(
-            final String description,
-            final LocalDateTime startDate,
-            final LocalDateTime endDate,
-            final RepeatOption repeatOption
-    ) {
-        if (description == null | startDate == null || endDate == null || repeatOption == null) {
-            throw new InvalidRequestBodyException(NULL_DATA_ERROR);
-        }
-    }
 }

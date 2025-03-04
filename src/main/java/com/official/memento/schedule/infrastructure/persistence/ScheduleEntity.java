@@ -5,12 +5,18 @@ import com.official.memento.global.entity.enums.RepeatOption;
 import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.schedule.domain.enums.ScheduleType;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static lombok.AccessLevel.PROTECTED;
+
 @Entity
 @Table(name = "schedule")
+@Getter
+@NoArgsConstructor(access = PROTECTED)
 public class ScheduleEntity extends BaseTimeEntity {
 
     @Id
@@ -27,12 +33,10 @@ public class ScheduleEntity extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private ScheduleType type;
     private String scheduleGroupId;
-
-    protected ScheduleEntity() {
-    }
+    private long tagId;
 
     private ScheduleEntity(
-            final long id,
+            final Long id,
             final long memberId,
             final String description,
             final LocalDateTime startDate,
@@ -43,7 +47,8 @@ public class ScheduleEntity extends BaseTimeEntity {
             final ScheduleType type,
             final String scheduleGroupId,
             final LocalDateTime createdAt,
-            final LocalDateTime updatedAt
+            final LocalDateTime updatedAt,
+            final long tagId
     ) {
         this.id = id;
         this.memberId = memberId;
@@ -57,6 +62,7 @@ public class ScheduleEntity extends BaseTimeEntity {
         this.scheduleGroupId = scheduleGroupId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.tagId = tagId;
     }
 
     private ScheduleEntity(
@@ -68,7 +74,8 @@ public class ScheduleEntity extends BaseTimeEntity {
             final RepeatOption repeatOption,
             final LocalDate repeatExpiredDate,
             final ScheduleType type,
-            final String scheduleGroupId
+            final String scheduleGroupId,
+            final long tagId
     ) {
         this.memberId = memberId;
         this.description = description;
@@ -79,6 +86,7 @@ public class ScheduleEntity extends BaseTimeEntity {
         this.repeatExpiredDate = repeatExpiredDate;
         this.type = type;
         this.scheduleGroupId = scheduleGroupId;
+        this.tagId = tagId;
     }
 
     public static ScheduleEntity of(final Schedule schedule) {
@@ -91,11 +99,12 @@ public class ScheduleEntity extends BaseTimeEntity {
                 schedule.getRepeatOption(),
                 schedule.getRepeatExpiredDate(),
                 schedule.getType(),
-                schedule.getScheduleGroupId()
+                schedule.getScheduleGroupId(),
+                schedule.getTagId()
         );
     }
 
-    public static ScheduleEntity withId(final Schedule schedule) {
+    public static ScheduleEntity from(final Schedule schedule) {
         return new ScheduleEntity(
                 schedule.getId(),
                 schedule.getMemberId(),
@@ -108,47 +117,8 @@ public class ScheduleEntity extends BaseTimeEntity {
                 schedule.getType(),
                 schedule.getScheduleGroupId(),
                 schedule.getCreatedAt(),
-                schedule.getUpdatedAt()
+                schedule.getUpdatedAt(),
+                schedule.getTagId()
         );
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public long getMemberId() {
-        return memberId;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public LocalDateTime getStartDate() {
-        return startDate;
-    }
-
-    public LocalDateTime getEndDate() {
-        return endDate;
-    }
-
-    public boolean isAllDay() {
-        return isAllDay;
-    }
-
-    public RepeatOption getRepeatOption() {
-        return repeatOption;
-    }
-
-    public LocalDate getRepeatExpiredDate() {
-        return repeatExpiredDate;
-    }
-
-    public ScheduleType getType() {
-        return type;
-    }
-
-    public String getScheduleGroupId() {
-        return scheduleGroupId;
     }
 }
