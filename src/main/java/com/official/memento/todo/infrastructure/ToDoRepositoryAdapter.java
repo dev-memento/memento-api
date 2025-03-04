@@ -3,22 +3,19 @@ package com.official.memento.todo.infrastructure;
 import com.official.memento.global.exception.EntityNotFoundException;
 import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.stereotype.Adapter;
-import com.official.memento.todo.domain.ToDo;
-import com.official.memento.todo.domain.ToDoRepository;
+import com.official.memento.todo.domain.entity.ToDo;
+import com.official.memento.todo.domain.repository.ToDoRepository;
 import com.official.memento.todo.infrastructure.persistence.ToDoEntity;
 import com.official.memento.todo.infrastructure.persistence.ToDoJpaRepository;
-
 import java.time.LocalDate;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Adapter
+@RequiredArgsConstructor
 public class ToDoRepositoryAdapter implements ToDoRepository {
 
     private final ToDoJpaRepository toDoJpaRepository;
-
-    public ToDoRepositoryAdapter(ToDoJpaRepository toDoJpaRepository) {
-        this.toDoJpaRepository = toDoJpaRepository;
-    }
 
     @Override
     public ToDo save(final ToDo toDo) {
@@ -30,7 +27,7 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
                 toDoEntity.getStartDate(),
                 toDoEntity.getDescription(),
                 toDoEntity.getEndDate(),
-                toDoEntity.getIsCompleted(),
+                toDoEntity.isCompleted(),
                 toDoEntity.getRepeatOption(),
                 toDoEntity.getRepeatExpiredDate(),
                 toDoEntity.getPriorityUrgency(),
@@ -39,13 +36,14 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
                 toDoEntity.getPriorityType(),
                 toDoEntity.getType(),
                 toDoEntity.getCreatedAt(),
-                toDoEntity.getUpdatedAt()
+                toDoEntity.getUpdatedAt(),
+                toDoEntity.getTagId()
         );
     }
 
     @Override
-    public ToDo update(final ToDo toDo){
-        ToDoEntity toDoEntity = toDoJpaRepository.save(ToDoEntity.withId(toDo));
+    public ToDo update(final ToDo toDo) {
+        ToDoEntity toDoEntity = toDoJpaRepository.save(ToDoEntity.from(toDo));
         return ToDo.withId(
                 toDoEntity.getId(),
                 toDoEntity.getMemberId(),
@@ -53,7 +51,7 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
                 toDoEntity.getStartDate(),
                 toDoEntity.getDescription(),
                 toDoEntity.getEndDate(),
-                toDoEntity.getIsCompleted(),
+                toDoEntity.isCompleted(),
                 toDoEntity.getRepeatOption(),
                 toDoEntity.getRepeatExpiredDate(),
                 toDoEntity.getPriorityUrgency(),
@@ -62,7 +60,8 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
                 toDoEntity.getPriorityType(),
                 toDoEntity.getType(),
                 toDoEntity.getCreatedAt(),
-                toDoEntity.getUpdatedAt()
+                toDoEntity.getUpdatedAt(),
+                toDoEntity.getTagId()
         );
     }
 
@@ -79,7 +78,7 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
                 toDoEntity.getStartDate(),
                 toDoEntity.getDescription(),
                 toDoEntity.getEndDate(),
-                toDoEntity.getIsCompleted(),
+                toDoEntity.isCompleted(),
                 toDoEntity.getRepeatOption(),
                 toDoEntity.getRepeatExpiredDate(),
                 toDoEntity.getPriorityUrgency(),
@@ -88,7 +87,8 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
                 toDoEntity.getPriorityType(),
                 toDoEntity.getType(),
                 toDoEntity.getCreatedAt(),
-                toDoEntity.getUpdatedAt()
+                toDoEntity.getUpdatedAt(),
+                toDoEntity.getTagId()
         );
     }
 
@@ -110,7 +110,7 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
                                 t.getStartDate(),
                                 t.getDescription(),
                                 t.getEndDate(),
-                                t.getIsCompleted(),
+                                t.isCompleted(),
                                 t.getRepeatOption(),
                                 t.getRepeatExpiredDate(),
                                 t.getPriorityUrgency(),
@@ -119,7 +119,8 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
                                 t.getPriorityType(),
                                 t.getType(),
                                 t.getCreatedAt(),
-                                t.getUpdatedAt()
+                                t.getUpdatedAt(),
+                                t.getTagId()
                         )
                 ).toList();
     }
@@ -136,7 +137,7 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
                                 t.getStartDate(),
                                 t.getDescription(),
                                 t.getEndDate(),
-                                t.getIsCompleted(),
+                                t.isCompleted(),
                                 t.getRepeatOption(),
                                 t.getRepeatExpiredDate(),
                                 t.getPriorityUrgency(),
@@ -145,7 +146,8 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
                                 t.getPriorityType(),
                                 t.getType(),
                                 t.getCreatedAt(),
-                                t.getUpdatedAt()
+                                t.getUpdatedAt(),
+                                t.getTagId()
                         )
                 ).toList();
     }

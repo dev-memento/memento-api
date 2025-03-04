@@ -2,43 +2,31 @@ package com.official.memento.orderinfo.domain;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
+@AllArgsConstructor
 public class OrderInfo {
     private Long id;
+    private long memberId;
     private Long scheduleId;
     private Long toDoId;
-    private int orderNum;
+    private double orderNum;
     private LocalDate date;
     private PlanType planType;
     private LocalDateTime createdAt;
 
-
     private OrderInfo(
-            final Long id,
+            final Long memberId,
             final Long scheduleId,
             final Long toDoId,
-            final int orderNum,
+            final double orderNum,
             final LocalDate date,
             final PlanType planType,
             final LocalDateTime createdAt
     ) {
-        this.id = id;
-        this.scheduleId = scheduleId;
-        this.toDoId = toDoId;
-        this.orderNum = orderNum;
-        this.date = date;
-        this.planType = planType;
-        this.createdAt = createdAt;
-    }
-
-    private OrderInfo(
-            final Long scheduleId,
-            final Long toDoId,
-            final int orderNum,
-            final LocalDate date,
-            final PlanType planType,
-            final LocalDateTime createdAt
-    ) {
+        this.memberId = memberId;
         this.scheduleId = scheduleId;
         this.toDoId = toDoId;
         this.orderNum = orderNum;
@@ -48,29 +36,31 @@ public class OrderInfo {
     }
 
     public static OrderInfo of(
+            final long memberId,
             final Long scheduleId,
             final Long toDoId,
-            final int order,
+            final double order,
             final LocalDate date,
             final PlanType planType,
             final LocalDateTime createdAt
     ) {
-        return new OrderInfo(scheduleId, toDoId, order, date, planType, createdAt);
+        return new OrderInfo(memberId,scheduleId, toDoId, order, date, planType, createdAt);
     }
 
     public static OrderInfo withId(
             final Long id,
+            final long memberId,
             final Long scheduleId,
             final Long toDoId,
-            final int order,
+            final double order,
             final LocalDate date,
             final PlanType planType,
             final LocalDateTime createdAt
     ) {
-        return new OrderInfo(id, scheduleId, toDoId, order, date, planType, createdAt);
+        return new OrderInfo(id,memberId, scheduleId, toDoId, order, date, planType, createdAt);
     }
 
-    public void updateOrderNum(final int orderNum) {
+    public void updateOrderNum(final double orderNum) {
         this.orderNum = orderNum;
     }
 
@@ -85,12 +75,16 @@ public class OrderInfo {
 
     }
 
+    public void setOrderNum(double orderNum) {
+        this.orderNum = orderNum;
+    }
+
     public Long getId() {
         return id;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public long getMemberId() {
+        return memberId;
     }
 
     public Long getScheduleId() {
@@ -101,6 +95,10 @@ public class OrderInfo {
         return toDoId;
     }
 
+    public double getOrderNum() {
+        return orderNum;
+    }
+
     public LocalDate getDate() {
         return date;
     }
@@ -109,11 +107,7 @@ public class OrderInfo {
         return planType;
     }
 
-    public int getOrderNum() {
-        return orderNum;
-    }
-
-    public void setOrderNum(int orderNum) {
-        this.orderNum = orderNum;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 }

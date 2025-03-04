@@ -1,6 +1,6 @@
 package com.official.memento.todo.service;
 
-import com.official.memento.todo.domain.ToDo;
+import com.official.memento.todo.domain.entity.ToDo;
 
 import java.time.LocalDate;
 import java.util.List;

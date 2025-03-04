@@ -7,6 +7,7 @@ public class OrderInfoMapper {
     public static OrderInfo toDomain(final OrderInfoEntity entity) {
         return OrderInfo.withId(
             entity.getId(),
+            entity.getMemberId(),
             entity.getScheduleId(),
             entity.getToDoId(),
             entity.getOrderNum(),

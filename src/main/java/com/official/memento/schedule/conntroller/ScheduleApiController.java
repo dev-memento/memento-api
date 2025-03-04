@@ -3,6 +3,7 @@ package com.official.memento.schedule.conntroller;
 import com.official.memento.global.annotation.Authorization;
 import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
+import com.official.memento.global.util.Validator;
 import com.official.memento.schedule.conntroller.dto.request.*;
 import com.official.memento.schedule.conntroller.dto.response.ScheduleAllAllDaysGetResponse;
 import com.official.memento.schedule.conntroller.dto.response.ScheduleAllGetResponse;
@@ -192,7 +193,10 @@ public class ScheduleApiController implements ScheduleApiDocs {
             @Authorization final AuthorizationUser authorizationUser,
             @RequestParam LocalDate date
     ) {
-        List<Schedule> schedules = scheduleGetUseCase.getSchedules(authorizationUser.memberId(), date);
+        Validator.isNull(date);
+        //List<Schedule> schedules = scheduleGetUseCase.getSchedules(authorizationUser.memberId(), date);
+        List<Schedule> schedules = scheduleGetUseCase.getSchedules(1, date);
+
         return SuccessResponse.of(
                 HttpStatus.CREATED,
                 "스케줄 반환 성공",

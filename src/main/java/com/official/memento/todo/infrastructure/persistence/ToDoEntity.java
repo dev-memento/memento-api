@@ -1,17 +1,28 @@
 package com.official.memento.todo.infrastructure.persistence;
 
+import static lombok.AccessLevel.PROTECTED;
+
 import com.official.memento.global.entity.BaseTimeEntity;
 import com.official.memento.global.entity.enums.RepeatOption;
-import com.official.memento.todo.domain.ToDo;
-import com.official.memento.todo.domain.enums.PriorityType;
-import com.official.memento.todo.domain.enums.ToDoType;
-import jakarta.persistence.*;
-
+import com.official.memento.todo.domain.entity.ToDo;
+import com.official.memento.todo.domain.entity.enums.PriorityType;
+import com.official.memento.todo.domain.entity.enums.ToDoType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "todo")
+@Getter
+@NoArgsConstructor(access = PROTECTED)
 public class ToDoEntity extends BaseTimeEntity {
 
     @Id
@@ -33,12 +44,10 @@ public class ToDoEntity extends BaseTimeEntity {
     private PriorityType priorityType;
     @Enumerated(EnumType.STRING)
     private ToDoType type;
-
-    protected ToDoEntity(){
-    }
+    private long tagId;
 
     private ToDoEntity(
-            final long id,
+            final Long id,
             final long memberId,
             final String groupId,
             final LocalDate startDate,
@@ -53,9 +62,10 @@ public class ToDoEntity extends BaseTimeEntity {
             final PriorityType priorityType,
             final ToDoType type,
             final LocalDateTime createdAt,
-            final LocalDateTime updatedAt
+            final LocalDateTime updatedAt,
+            final long tagId
     ) {
-        this.id=id;
+        this.id = id;
         this.memberId = memberId;
         this.groupId = groupId;
         this.startDate = startDate;
@@ -69,8 +79,9 @@ public class ToDoEntity extends BaseTimeEntity {
         this.priorityValue = priorityValue;
         this.priorityType = priorityType;
         this.type = type;
-        this.createdAt=createdAt;
-        this.updatedAt=updatedAt;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.tagId = tagId;
     }
 
     private ToDoEntity(
@@ -88,8 +99,9 @@ public class ToDoEntity extends BaseTimeEntity {
             final PriorityType priorityType,
             final ToDoType type,
             final LocalDateTime createdAt,
-            final LocalDateTime updatedAt
-    ){
+            final LocalDateTime updatedAt,
+            final long tagId
+    ) {
         this.memberId = memberId;
         this.groupId = groupId;
         this.startDate = startDate;
@@ -103,8 +115,9 @@ public class ToDoEntity extends BaseTimeEntity {
         this.priorityValue = priorityValue;
         this.priorityType = priorityType;
         this.type = type;
-        this.createdAt=createdAt;
-        this.updatedAt=updatedAt;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.tagId = tagId;
     }
 
     public static ToDoEntity of(final ToDo toDo) {
@@ -123,11 +136,12 @@ public class ToDoEntity extends BaseTimeEntity {
                 toDo.getPriorityType(),
                 toDo.getType(),
                 toDo.getCreatedAt(),
-                toDo.getUpdatedAt()
+                toDo.getUpdatedAt(),
+                toDo.getTagId()
         );
     }
 
-    public static ToDoEntity withId(final ToDo toDo) {
+    public static ToDoEntity from(final ToDo toDo) {
         return new ToDoEntity(
                 toDo.getId(),
                 toDo.getMemberId(),
@@ -144,7 +158,8 @@ public class ToDoEntity extends BaseTimeEntity {
                 toDo.getPriorityType(),
                 toDo.getType(),
                 toDo.getCreatedAt(),
-                toDo.getUpdatedAt()
+                toDo.getUpdatedAt(),
+                toDo.getTagId()
         );
     }
 
@@ -153,69 +168,14 @@ public class ToDoEntity extends BaseTimeEntity {
             final String description,
             final LocalDate endDate,
             final Double priorityUrgency,
-            final Double priorityImportance
-    ){
-        this.startDate=startDate;
-        this.description=description;
-        this.endDate =endDate;
+            final Double priorityImportance,
+            final long tagId
+    ) {
+        this.startDate = startDate;
+        this.description = description;
+        this.endDate = endDate;
         this.priorityUrgency = priorityUrgency;
-        this.priorityImportance=priorityImportance;
-
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public long getMemberId() {
-        return memberId;
-    }
-
-    public String getGroupId() {
-        return groupId;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public boolean getIsCompleted() {
-        return isCompleted;
-    }
-
-    public RepeatOption getRepeatOption() {
-        return repeatOption;
-    }
-
-    public LocalDate getRepeatExpiredDate() {
-        return repeatExpiredDate;
-    }
-
-    public Double getPriorityUrgency() {
-        return priorityUrgency;
-    }
-
-    public Double getPriorityImportance() {
-        return priorityImportance;
-    }
-
-    public Double getPriorityValue() {
-        return priorityValue;
-    }
-
-    public PriorityType getPriorityType() {
-        return priorityType;
-    }
-
-    public ToDoType getType() {
-        return type;
+        this.priorityImportance = priorityImportance;
+        this.tagId = tagId;
     }
 }

@@ -1,11 +1,8 @@
 package com.official.memento.schedule.conntroller.dto.request;
 
-import com.official.memento.global.exception.InvalidRequestBodyException;
+import com.official.memento.global.util.Validator;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.time.LocalDateTime;
-
-import static com.official.memento.global.exception.ErrorCode.NULL_DATA_ERROR;
 
 @Schema(name = "일정 수정 요청")
 public record ScheduleUpdateRequest(
@@ -31,13 +28,10 @@ public record ScheduleUpdateRequest(
         return new ScheduleUpdateRequest(description, startDate, endDate, isAllDay, tagId);
     }
 
-    private static void checkNullData(
-            final String description,
-            final LocalDateTime startDate,
-            final LocalDateTime endDate
-    ) {
-        if (description == null | startDate == null || endDate == null) {
-            throw new InvalidRequestBodyException(NULL_DATA_ERROR);
-        }
+    private static void checkNullData(final String description, final LocalDateTime startDate, final LocalDateTime endDate){
+        Validator.isNull(description);
+        Validator.isNull(startDate);
+        Validator.isNull(endDate);
+        Validator.validateLengthContainEmoji(description, 30);
     }
 }

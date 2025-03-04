@@ -1,11 +1,11 @@
-package com.official.memento.todo.domain;
+package com.official.memento.todo.domain.entity;
 
 import com.official.memento.global.entity.BaseTimeEntity;
 import com.official.memento.global.entity.enums.RepeatOption;
 import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.enums.TagColor;
-import com.official.memento.todo.domain.enums.PriorityType;
-import com.official.memento.todo.domain.enums.ToDoType;
+import com.official.memento.todo.domain.entity.enums.PriorityType;
+import com.official.memento.todo.domain.entity.enums.ToDoType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,13 +25,10 @@ public class ToDo extends BaseTimeEntity {
     private Double priorityValue;
     private PriorityType priorityType;
     private ToDoType type;
-    private Integer orderNum;
+    private Double orderNum;
     private Long tagId;
     private String tagName;
     private TagColor tagColor;
-
-    public ToDo() {
-    }
 
     private ToDo(
             final Long id,
@@ -49,7 +46,8 @@ public class ToDo extends BaseTimeEntity {
             final PriorityType priorityType,
             final ToDoType type,
             final LocalDateTime createdAt,
-            final LocalDateTime updatedAt
+            final LocalDateTime updatedAt,
+            final long tagId
     ) {
         this.id = id;
         this.memberId = memberId;
@@ -67,6 +65,7 @@ public class ToDo extends BaseTimeEntity {
         this.type = type;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.tagId = tagId;
     }
 
     private ToDo(
@@ -82,7 +81,8 @@ public class ToDo extends BaseTimeEntity {
             final Double priorityImportance,
             final Double priorityValue,
             final PriorityType priorityType,
-            final ToDoType type
+            final ToDoType type,
+            final long tagId
     ) {
         this.memberId = memberId;
         this.groupId = groupId;
@@ -97,6 +97,7 @@ public class ToDo extends BaseTimeEntity {
         this.priorityValue = priorityValue;
         this.priorityType = priorityType;
         this.type = type;
+        this.tagId = tagId;
     }
 
     private ToDo(
@@ -116,7 +117,7 @@ public class ToDo extends BaseTimeEntity {
             final ToDoType type,
             final LocalDateTime createdAt,
             final LocalDateTime updatedAt,
-            final Integer orderNum,
+            final Double orderNum,
             final Long tagId,
             final String tagName,
             final TagColor tagColor
@@ -138,7 +139,7 @@ public class ToDo extends BaseTimeEntity {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.orderNum = orderNum;
-        this.tagId=tagId;
+        this.tagId = tagId;
         this.tagName = tagName;
         this.tagColor = tagColor;
     }
@@ -199,7 +200,8 @@ public class ToDo extends BaseTimeEntity {
             final PriorityType priorityType,
             final ToDoType type,
             final LocalDateTime createdAt,
-            final LocalDateTime updatedAt
+            final LocalDateTime updatedAt,
+            final long tagId
     ) {
         return new ToDo(
                 id,
@@ -217,7 +219,8 @@ public class ToDo extends BaseTimeEntity {
                 priorityType,
                 type,
                 createdAt,
-                updatedAt
+                updatedAt,
+                tagId
         );
     }
 
@@ -234,7 +237,8 @@ public class ToDo extends BaseTimeEntity {
             final Double priorityImportance,
             final Double priorityValue,
             final PriorityType priorityType,
-            final ToDoType type
+            final ToDoType type,
+            final long tagId
     ) {
         return new ToDo(
                 memberId,
@@ -249,7 +253,8 @@ public class ToDo extends BaseTimeEntity {
                 priorityImportance,
                 priorityValue,
                 priorityType,
-                type
+                type,
+                tagId
         );
     }
 
@@ -312,7 +317,7 @@ public class ToDo extends BaseTimeEntity {
             final ToDoType type,
             final LocalDateTime createdAt,
             final LocalDateTime updatedAt,
-            final Integer orderNum,
+            final Double orderNum,
             final Long tagId,
             final String tagName,
             final TagColor tagColor
@@ -341,24 +346,36 @@ public class ToDo extends BaseTimeEntity {
         );
     }
 
-    public void update(
+    public ToDo update(
             final LocalDate startDate,
             final String description,
             final LocalDate endDate,
             final Double priorityUrgency,
             final Double priorityImportance,
-            final Integer orderNum,
+            final Double orderNum,
             final PriorityType priorityType,
-            final Double priorityValue
+            final Double priorityValue,
+            final long tagId
     ) {
-        this.startDate = startDate;
-        this.description = description;
-        this.endDate = endDate;
-        this.priorityUrgency = priorityUrgency;
-        this.priorityImportance = priorityImportance;
-        this.orderNum = orderNum;
-        this.priorityType = priorityType;
-        this.priorityValue = priorityValue;
+        return ToDo.withId(
+                id,
+                memberId,
+                groupId,
+                startDate,
+                description,
+                endDate,
+                isCompleted,
+                repeatOption,
+                repeatExpiredDate,
+                priorityUrgency,
+                priorityImportance,
+                priorityValue,
+                priorityType,
+                type,
+                createdAt,
+                LocalDateTime.now(),
+                tagId
+        );
     }
 
     public void updateCompletion(
@@ -371,17 +388,14 @@ public class ToDo extends BaseTimeEntity {
         this.tagId = tagId;
     }
 
-    public void updateTagColor(TagColor tagColor) {
-        this.tagColor = tagColor;
-    }
-
     public void updateTag(Tag tag) {
+        this.tagId = tag.getId();
         this.tagName = tag.getName();
         this.tagColor = tag.getColor();
     }
 
 
-    public void updateOrderNum(Integer orderNum) {
+    public void updateOrderNum(double orderNum) {
         this.orderNum = orderNum;
     }
 
@@ -441,7 +455,7 @@ public class ToDo extends BaseTimeEntity {
         return type;
     }
 
-    public Integer getOrderNum() {
+    public Double getOrderNum() {
         return orderNum;
     }
 
@@ -455,62 +469,6 @@ public class ToDo extends BaseTimeEntity {
 
     public TagColor getTagColor() {
         return tagColor;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setMemberId(long memberId) {
-        this.memberId = memberId;
-    }
-
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public void setCompleted(boolean completed) {
-        isCompleted = completed;
-    }
-
-    public void setRepeatOption(RepeatOption repeatOption) {
-        this.repeatOption = repeatOption;
-    }
-
-    public void setRepeatExpiredDate(LocalDate repeatExpiredDate) {
-        this.repeatExpiredDate = repeatExpiredDate;
-    }
-
-    public void setPriorityUrgency(Double priorityUrgency) {
-        this.priorityUrgency = priorityUrgency;
-    }
-
-    public void setPriorityImportance(Double priorityImportance) {
-        this.priorityImportance = priorityImportance;
-    }
-
-    public void setPriorityValue(Double priorityValue) {
-        this.priorityValue = priorityValue;
-    }
-
-    public void setPriorityType(PriorityType priorityType) {
-        this.priorityType = priorityType;
-    }
-
-    public void setType(ToDoType type) {
-        this.type = type;
     }
 
     public String toTaskDescription() {

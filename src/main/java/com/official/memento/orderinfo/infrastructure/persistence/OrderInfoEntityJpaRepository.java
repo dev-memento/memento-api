@@ -1,17 +1,18 @@
 package com.official.memento.orderinfo.infrastructure.persistence;
 
 import com.official.memento.orderinfo.infrastructure.persistence.projection.OrderInfoProjection;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-
 public interface OrderInfoEntityJpaRepository extends JpaRepository<OrderInfoEntity, Long> {
+
     @Query("""
             SELECT o.id AS orderInfoId,
+                   o.id AS memberId,
                    o.toDoId AS toDoId,
                    o.scheduleId AS scheduleId,
                    s.startDate AS startDate,
@@ -23,12 +24,14 @@ public interface OrderInfoEntityJpaRepository extends JpaRepository<OrderInfoEnt
             FROM OrderInfoEntity o
             LEFT JOIN ToDoEntity t ON o.toDoId = t.id AND o.planType = 'TODO'
             LEFT JOIN ScheduleEntity s ON o.scheduleId = s.id AND o.planType = 'SCHEDULE'
-            WHERE DATE(o.date) = :startDate
+            WHERE DATE(o.date) = :startDate AND o.memberId = :memberId
             ORDER BY o.orderNum ASC, o.createdAt ASC
             """)
-    List<OrderInfoProjection> findOrderInfoWithDetails(final LocalDate startDate);
+    List<OrderInfoProjection> findOrderInfoWithDetails(final LocalDate startDate, final long memberId);
 
     void deleteByScheduleId(final long scheduleId);
+
+    List<OrderInfoEntity> findAllByMemberIdAndDateOrderByOrderNum(final long memberId, final LocalDate date);
 
     void deleteByToDoId(final long toDoId);
 
@@ -36,30 +39,4 @@ public interface OrderInfoEntityJpaRepository extends JpaRepository<OrderInfoEnt
     Optional<OrderInfoEntity> findOrderByToDoId(@Param("toDoId") Long toDoId);
 
     Optional<OrderInfoEntity> findByToDoIdAndDate(Long toDoId, LocalDate date);
-
-    @Query("""
-    SELECT o FROM OrderInfoEntity o
-    WHERE o.date = :date AND o.orderNum BETWEEN :startOrder AND :endOrder
-    ORDER BY o.orderNum ASC
-""")
-    List<OrderInfoEntity> findOrdersBetween(
-            @Param("date") LocalDate date,
-            @Param("startOrder") int startOrder,
-            @Param("endOrder") int endOrder
-    );
-
-    @Query("""
-    SELECT o.orderNum
-    FROM OrderInfoEntity o
-    WHERE o.toDoId = :toDoId
-""")
-    Optional<Integer> findOrderNumByToDoId(@Param("toDoId") Long toDoId);
-
-    @Query("""
-    SELECT o.date 
-    FROM OrderInfoEntity o 
-    WHERE o.toDoId = :toDoId
-""")
-    LocalDate findDateByToDoId(@Param("toDoId") Long toDoId);
-
 }

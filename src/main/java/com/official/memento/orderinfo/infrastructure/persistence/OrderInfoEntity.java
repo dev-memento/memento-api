@@ -3,21 +3,25 @@ package com.official.memento.orderinfo.infrastructure.persistence;
 import com.official.memento.orderinfo.domain.PlanType;
 import com.official.memento.orderinfo.domain.OrderInfo;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 @Table(name = "order_info")
+@NoArgsConstructor
 public class OrderInfoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private long memberId;
     private Long scheduleId;
     private Long toDoId;
-    private int orderNum;
-    // fixme: 오늘 날짜라는 의미를 담도록 변수명 변경
+    private double orderNum;
     private LocalDate date;
     @Enumerated(EnumType.STRING)
     private PlanType planType;
@@ -25,14 +29,16 @@ public class OrderInfoEntity {
 
     private OrderInfoEntity(
             final Long id,
+            final long memberId,
             final Long scheduleId,
             final Long toDoId,
-            final int orderNum,
+            final double orderNum,
             final LocalDate date,
             final PlanType planType,
             final LocalDateTime createdAt
     ) {
         this.id = id;
+        this.memberId = memberId;
         this.scheduleId = scheduleId;
         this.toDoId = toDoId;
         this.orderNum = orderNum;
@@ -42,13 +48,15 @@ public class OrderInfoEntity {
     }
 
     private OrderInfoEntity(
+            final long memberId,
             final Long scheduleId,
             final Long toDoId,
-            final int orderNum,
+            final double orderNum,
             final LocalDate date,
             final PlanType planType,
             final LocalDateTime createdAt
     ) {
+        this.memberId = memberId;
         this.scheduleId = scheduleId;
         this.toDoId = toDoId;
         this.orderNum = orderNum;
@@ -57,12 +65,9 @@ public class OrderInfoEntity {
         this.createdAt = createdAt;
     }
 
-    protected OrderInfoEntity() {
-
-    }
-
     public static OrderInfoEntity of(final OrderInfo orderInfo) {
         return new OrderInfoEntity(
+                orderInfo.getMemberId(),
                 orderInfo.getScheduleId(),
                 orderInfo.getToDoId(),
                 orderInfo.getOrderNum(),
@@ -77,6 +82,7 @@ public class OrderInfoEntity {
     ) {
         return new OrderInfoEntity(
                 orderInfo.getId(),
+                orderInfo.getMemberId(),
                 orderInfo.getScheduleId(),
                 orderInfo.getToDoId(),
                 orderInfo.getOrderNum(),
@@ -86,35 +92,7 @@ public class OrderInfoEntity {
         );
     }
 
-    public void updateOrderNum(final int orderNum) {
+    public void updateOrderNum(final double orderNum) {
         this.orderNum = orderNum;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getScheduleId() {
-        return scheduleId;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public Long getToDoId() {
-        return toDoId;
-    }
-
-    public int getOrderNum() {
-        return orderNum;
-    }
-
-    public PlanType getPlanType() {
-        return planType;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
     }
 }

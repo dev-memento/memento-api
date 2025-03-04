@@ -1,5 +1,9 @@
 package com.official.memento.auth.service;
 
+import com.official.memento.auth.service.usecase.ExtractRefreshTokenUseCase;
+import com.official.memento.auth.service.usecase.RefreshTokenUseCase;
+import com.official.memento.auth.util.AuthValidation;
+import com.official.memento.global.exception.UnauthorizedException;
 import com.official.memento.member.domain.Member;
 import com.official.memento.member.domain.MemberAuth;
 import com.official.memento.member.domain.MemberPersonalInfo;
@@ -11,9 +15,8 @@ import com.official.memento.auth.domain.RefreshToken;
 import com.official.memento.auth.domain.port.AuthClientOutputPort;
 import com.official.memento.auth.domain.port.AuthRepository;
 import com.official.memento.auth.service.command.AuthCommand;
-import com.official.memento.auth.service.usecase.AuthUseCase;
+import com.official.memento.auth.service.usecase.AuthenticateUseCase;
 import com.official.memento.global.exception.ErrorCode;
-import com.official.memento.global.exception.MementoException;
 import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.TagRepository;
 import com.official.memento.tag.domain.enums.TagColor;
@@ -21,9 +24,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Service
-public class AuthService implements AuthUseCase {
+public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase, ExtractRefreshTokenUseCase {
 
     private final Map<AuthProvider, AuthClientOutputPort> authClientAdapters;
     private final AuthRepository authRepository;
@@ -60,7 +64,8 @@ public class AuthService implements AuthUseCase {
         MemberAuth auth = authRepository.findByPlatformIdAndProvider(platformId, provider)
                 .orElseGet(() -> createNewMember(platformId, provider));
 
-        boolean isNewUser = memberRepository.findPersonalInfoByMemberId(auth.getId()).isEmpty();
+        Optional<MemberPersonalInfo> personalInfo = memberRepository.findPersonalInfoByMemberId(auth.getMemberId());
+        boolean isNewUser = isFirstLogin(personalInfo) || isOnboardingIncomplete(personalInfo);
 
         AccessToken accessToken = jwtUtil.generateAccessToken(auth.getMemberId());
         RefreshToken refreshToken = jwtUtil.generateRefreshToken(auth.getMemberId());
@@ -71,7 +76,7 @@ public class AuthService implements AuthUseCase {
         return AuthResult.of(accessToken, refreshToken, isNewUser);
     }
 
-    private MemberAuth createNewMember(String platformId, AuthProvider provider) {
+    public MemberAuth createNewMember(String platformId, AuthProvider provider) {
         Member newMember = memberRepository.save(Member.createNew());
         Long memberId = newMember.getId();
         MemberAuth newAuth = MemberAuth.of(memberId, provider, platformId, "");
@@ -86,28 +91,31 @@ public class AuthService implements AuthUseCase {
         return authRepository.save(newAuth);
     }
 
-    private Map<String, Object> verifyIdToken(final AuthProvider provider, final String idToken) {
+    public Map<String, Object> verifyIdToken(final AuthProvider provider, final String idToken) {
+        AuthValidation.validateAuthProvider(provider, authClientAdapters);
         final AuthClientOutputPort clientAdapter = authClientAdapters.get(provider);
-        if (clientAdapter == null) {
-            throw new MementoException(ErrorCode.UNSUPPORTED_PROVIDER);
-        }
-        try {
-            return clientAdapter.verifyIdToken(idToken);
-        } catch (Exception e) {
-            throw new MementoException(ErrorCode.INVALID_ID_TOKEN);
-        }
+        return clientAdapter.verifyIdToken(idToken);
     }
 
+    public boolean isFirstLogin(Optional<MemberPersonalInfo> personalInfo) {
+        return personalInfo.isEmpty();
+    }
+
+    public boolean isOnboardingIncomplete(Optional<MemberPersonalInfo> personalInfo) {
+        return personalInfo.isPresent() && personalInfo.get().getWakeUpTime() == null;
+    }
+
+    @Override
     @Transactional
     public AuthResult refreshTokens(String refreshToken) {
         if (!jwtUtil.validateToken(refreshToken)) {
-            throw new MementoException(ErrorCode.INVALID_REFRESH_TOKEN);
+            throw new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
         String memberId = jwtUtil.getUserIdFromToken(refreshToken);
         MemberAuth memberAuth = authRepository.findByMemberId(Long.parseLong(memberId))
-                .orElseThrow(() -> new MementoException(ErrorCode.INVALID_REFRESH_TOKEN));
+                .orElseThrow(() -> new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN));
         if (!memberAuth.getRefreshToken().equals(refreshToken)) {
-            throw new MementoException(ErrorCode.INVALID_REFRESH_TOKEN);
+            throw new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
         AccessToken newAccessToken = jwtUtil.generateAccessToken(Long.parseLong(memberId));
         RefreshToken newRefreshToken = jwtUtil.generateRefreshToken(Long.parseLong(memberId));
@@ -116,8 +124,14 @@ public class AuthService implements AuthUseCase {
         authRepository.save(memberAuth);
 
         return AuthResult.of(newAccessToken, newRefreshToken, false);
-
     }
+
+    @Override
+    public String extractRefreshToken(String authorizationHeader) {
+        return authorizationHeader.substring(7);
+    }
+
+
 }
 
 

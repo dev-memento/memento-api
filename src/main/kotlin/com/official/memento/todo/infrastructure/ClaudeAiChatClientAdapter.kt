@@ -5,7 +5,7 @@ import com.official.memento.global.exception.ClaudeException
 import com.official.memento.global.exception.ErrorCode
 import com.official.memento.global.exception.MementoException
 import com.official.memento.global.stereotype.Adapter
-import com.official.memento.todo.domain.ToDo
+import com.official.memento.todo.domain.entity.ToDo
 import com.official.memento.todo.domain.vo.ClaudeAiChatClientOutputPort
 import com.official.memento.todo.domain.vo.PrioritizedToDo
 import org.springframework.beans.factory.annotation.Value
@@ -120,9 +120,9 @@ class ClaudeAiChatClientAdapter(
     """.trimIndent()
 
     override fun prioritizeTodo(
-        todoList: List<ToDo>,
-        orderList: List<Int>,
-        personalInfo: String
+            todoList: List<ToDo>,
+            orderList: List<Double>,
+            personalInfo: String
     ): List<PrioritizedToDo> {
         try {
             var taskPrompt = ""
@@ -274,7 +274,7 @@ data class Task(
     val urgency: Double,
     val importance: Double,
     val priority: Double,
-    val order: Int
+    val order: Double
 )
 
 data class Usage(
