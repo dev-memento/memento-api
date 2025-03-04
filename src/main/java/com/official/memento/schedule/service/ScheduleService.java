@@ -1,20 +1,20 @@
 package com.official.memento.schedule.service;
 
 import com.official.memento.global.entity.enums.RepeatOption;
-import com.official.memento.member.domain.port.MemberPersonalInfoRepository;
+import com.official.memento.global.exception.ErrorCode;
+import com.official.memento.global.exception.InvalidRequestBodyException;
 import com.official.memento.orderinfo.domain.OrderInfo;
 import com.official.memento.orderinfo.domain.OrderInfoRepository;
 import com.official.memento.orderinfo.domain.OrderWithScheduleOrToDo;
 import com.official.memento.orderinfo.domain.PlanType;
 import com.official.memento.schedule.domain.ScheduleRepository;
-import com.official.memento.schedule.domain.ScheduleTagRepository;
 import com.official.memento.schedule.domain.entity.Schedule;
-import com.official.memento.schedule.domain.entity.ScheduleTag;
 import com.official.memento.schedule.service.command.*;
 import com.official.memento.schedule.service.usecase.*;
 import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.TagRepository;
 import com.official.memento.tag.domain.enums.TagColor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +28,7 @@ import static com.official.memento.schedule.domain.enums.ScheduleType.APPLE;
 import static com.official.memento.schedule.domain.enums.ScheduleType.NORMAL;
 
 @Service
+@RequiredArgsConstructor
 public class ScheduleService implements
         ScheduleCreateUseCase,
         RepeatScheduleCreateUseCase,
@@ -37,31 +38,17 @@ public class ScheduleService implements
         ScheduleUpdateGroupUseCase,
         ScheduleGetUseCase {
 
-    private final ScheduleTagRepository scheduleTagRepository;
     private final ScheduleRepository scheduleRepository;
     private final TagRepository tagRepository;
     private final OrderInfoRepository orderInfoRepository;
-    private final MemberPersonalInfoRepository memberPersonalInfoRepository;
-
-    public ScheduleService(
-            final ScheduleRepository scheduleRepository,
-            final ScheduleTagRepository scheduleTagRepository,
-            final TagRepository tagRepository,
-            final OrderInfoRepository orderInfoRepository,
-            MemberPersonalInfoRepository memberPersonalInfoRepository) {
-        this.scheduleRepository = scheduleRepository;
-        this.scheduleTagRepository = scheduleTagRepository;
-        this.tagRepository = tagRepository;
-        this.orderInfoRepository = orderInfoRepository;
-        this.memberPersonalInfoRepository = memberPersonalInfoRepository;
-    }
 
     @Override
     @Transactional
     public void create(final ScheduleCreateCommand command) {
         String scheduleGroupId = UUID.randomUUID().toString();
+        Tag tag = tagRepository.findById(command.tagId());
+        checkOwnTag(command.memberId(), tag);
         Schedule schedule = createSchedule(command, scheduleGroupId);
-        connectTag(command.tagId(), schedule);
         assignOrder(command.startDate().toLocalDate(), schedule, command.memberId());
     }
 
@@ -71,7 +58,6 @@ public class ScheduleService implements
         for (ScheduleCreateCommand scheduleCreateCommand : command) {
             String scheduleGroupId = UUID.randomUUID().toString();
             Schedule schedule = createAppleSchedule(scheduleCreateCommand, scheduleGroupId);
-            connectTag(tag.getId(), schedule);
             assignOrder(scheduleCreateCommand.startDate().toLocalDate(), schedule,command.get(0).memberId());
         }
     }
@@ -85,10 +71,10 @@ public class ScheduleService implements
                 command.description(),
                 command.startDate(),
                 command.endDate(),
-                command.isAllDay()
+                command.isAllDay(),
+                command.tagId()
         );
         scheduleRepository.update(schedule);
-        updateOrDeleteTag(schedule, command.tagId());
         if (schedule.getStartDate() != command.startDate() || schedule.getEndDate() != command.endDate()) {
             orderInfoRepository.deleteByScheduleId(schedule.getId());
             assignOrder(command.startDate().toLocalDate(), schedule, command.memberId());
@@ -102,7 +88,6 @@ public class ScheduleService implements
         Schedule schedule = scheduleRepository.findById(command.scheduleId());
         checkOwn(command.memberId(), schedule);
         scheduleRepository.deleteById(schedule.getId());
-        scheduleTagRepository.deleteByScheduleId(schedule.getId());
         orderInfoRepository.deleteByScheduleId(schedule.getId());
     }
 
@@ -118,12 +103,10 @@ public class ScheduleService implements
                 command.repeatOption(),
                 command.repeatExpiredDate(),
                 command.isAllDay(),
-                scheduleGroupId
+                scheduleGroupId,
+                command.tagId()
         );
-        if (command.tagId() != null) {
-            connectTags(command.tagId(), schedules);
-        }
-        //Todo 순서관련 로직 추가
+        //Todo 기능 미구현
     }
 
     @Override
@@ -133,9 +116,8 @@ public class ScheduleService implements
         checkOwn(command.memberId(), schedule);
         belongsToGroup(command.scheduleGroupId(), schedule);
         List<Schedule> targetSchedules = scheduleRepository.findAllByScheduleGroupIdAndStartDateGreaterThanEqual(command.scheduleGroupId(), schedule.getStartDate());
-        targetSchedules.forEach(targetSchedule -> removeTagConnection(targetSchedule.getId()));
         scheduleRepository.deleteAll(targetSchedules);
-        //Todo 순서 관련 삭제
+        //Todo 기능 미구현
     }
 
     @Override
@@ -148,7 +130,6 @@ public class ScheduleService implements
                 command.scheduleGroupId(),
                 schedule.getStartDate()
         );
-        oldSchedules.forEach(oldSchedule -> removeTagConnection(oldSchedule.getId()));
         List<Schedule> newSchedules = createRepeatSchedules(
                 command.memberId(),
                 command.description(),
@@ -157,11 +138,10 @@ public class ScheduleService implements
                 command.repeatOption(),
                 command.repeatExpiredDate(),
                 command.isAllDay(),
-                schedule.getScheduleGroupId()
+                schedule.getScheduleGroupId(),
+                command.tagId()
         );
-        if (command.tagId() != null) {
-            connectTags(command.tagId(), newSchedules);
-        }
+        //Todo 기능 미구현
     }
 
     @Override
@@ -181,8 +161,6 @@ public class ScheduleService implements
     public Schedule getDetail(final long memberId, final long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId);
         checkOwn(memberId, schedule);
-        ScheduleTag scheduleTag = scheduleTagRepository.findByScheduleId(scheduleId);
-        schedule.setTagId(scheduleTag.getTagId());
         return schedule;
     }
 
@@ -190,6 +168,12 @@ public class ScheduleService implements
     @Transactional(readOnly = true)
     public List<Schedule> getSchedules(final long memberId, final LocalDate date) {
         return scheduleRepository.findAllByStartDateAndMemberId(date, memberId);
+    }
+
+    private static void checkOwnTag(long memberId, Tag tag) {
+        if (tag.getMemberId() != memberId) {
+            throw new InvalidRequestBodyException(ErrorCode.INVALID_REQUEST_BODY);
+        }
     }
 
     private Schedule createSchedule(final ScheduleCreateCommand command, final String scheduleGroupId) {
@@ -202,7 +186,8 @@ public class ScheduleService implements
                 RepeatOption.NONE,
                 null,
                 NORMAL,
-                scheduleGroupId
+                scheduleGroupId,
+                command.tagId()
         ));
     }
 
@@ -216,7 +201,8 @@ public class ScheduleService implements
                 RepeatOption.NONE,
                 null,
                 APPLE,
-                scheduleGroupId
+                scheduleGroupId,
+                command.tagId()
         ));
     }
 
@@ -234,7 +220,8 @@ public class ScheduleService implements
             final RepeatOption repeatOption,
             final LocalDate repeatExpiredDate,
             final boolean isAllDay,
-            final String scheduleGroupId
+            final String scheduleGroupId,
+            final long tagId
     ) {
         List<Schedule> schedules = new ArrayList<>();
         LocalDateTime currentStartDate = startDate;
@@ -249,7 +236,8 @@ public class ScheduleService implements
                     repeatOption,
                     repeatExpiredDate,
                     NORMAL,
-                    scheduleGroupId
+                    scheduleGroupId,
+                    tagId
             ));
             schedules.add(schedule);
             switch (repeatOption) {
@@ -274,42 +262,7 @@ public class ScheduleService implements
             }
         }
         return schedules;
-    }
-
-    private void updateOrDeleteTag(final Schedule schedule, final long tagId) {
-        ScheduleTag scheduleTag = scheduleTagRepository.findByScheduleId(schedule.getId());
-       if (scheduleTag == null) {
-            scheduleTag = ScheduleTag.of(tagId, schedule.getId());
-            scheduleTagRepository.save(scheduleTag);
-        } else if (scheduleTag.getTagId() != tagId) {
-            scheduleTag.updateTag(tagId, scheduleTag.getUpdatedAt());
-            scheduleTagRepository.update(scheduleTag);
-        }
-    }
-
-    private void saveOrUpdateTag(ScheduleTag scheduleTag, final long scheduleId, final long tagId) {
-        if (scheduleTag == null) {
-            scheduleTag = ScheduleTag.of(tagId, scheduleId);
-            scheduleTagRepository.save(scheduleTag);
-        } else {
-            scheduleTag.updateTag(tagId, scheduleTag.getUpdatedAt());
-            scheduleTagRepository.save(scheduleTag);
-        }
-
-    }
-
-    private void connectTags(final Long tagId, final List<Schedule> schedules) {
-        schedules.forEach(schedule -> connectTag(tagId, schedule));
-    }
-
-    private void connectTag(final Long tagId, final Schedule schedule) {
-        tagRepository.findById(tagId);
-        ScheduleTag scheduleTag = ScheduleTag.of(tagId, schedule.getId());
-        scheduleTagRepository.save(scheduleTag);
-    }
-
-    private void removeTagConnection(final long scheduleId) {
-        scheduleTagRepository.deleteByScheduleId(scheduleId);
+        //Todo 기능 미구현
     }
 
     private static void checkOwn(final long memberId, final Schedule schedule) { //Todo Schedule안으로 리팩토링
