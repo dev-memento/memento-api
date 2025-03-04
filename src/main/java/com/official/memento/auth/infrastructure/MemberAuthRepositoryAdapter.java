@@ -1,22 +1,20 @@
 package com.official.memento.auth.infrastructure;
 
 import com.official.memento.auth.domain.AuthProvider;
-import com.official.memento.auth.domain.port.AuthRepository;
+import com.official.memento.auth.domain.port.MemberAuthRepository;
 import com.official.memento.member.domain.MemberAuth;
-import com.official.memento.member.infrastructure.persistence.MemberAuthEntity;
-import com.official.memento.member.infrastructure.persistence.MemberAuthJpaRepository;
+import com.official.memento.member.infrastructure.persistence.entity.MemberAuthEntity;
+import com.official.memento.member.infrastructure.persistence.repository.MemberAuthEntityJpaRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
 @Component
-public class AuthRepositoryAdapter implements AuthRepository {
+@RequiredArgsConstructor
+public class MemberAuthRepositoryAdapter implements MemberAuthRepository {
 
-    private final MemberAuthJpaRepository memberAuthJpaRepository;
-
-    public AuthRepositoryAdapter(final MemberAuthJpaRepository memberAuthJpaRepository) {
-        this.memberAuthJpaRepository = memberAuthJpaRepository;
-    }
+    private final MemberAuthEntityJpaRepository memberAuthEntityJpaRepository;
 
     @Override
     public MemberAuth save(final MemberAuth auth) {
@@ -27,7 +25,7 @@ public class AuthRepositoryAdapter implements AuthRepository {
                 auth.getRefreshToken(),
                 auth.getMemberId()
         );
-        MemberAuthEntity savedEntity = memberAuthJpaRepository.save(entityToSave);
+        MemberAuthEntity savedEntity = memberAuthEntityJpaRepository.save(entityToSave);
         return MemberAuth.withId(
                 savedEntity.getId(),
                 savedEntity.getMemberId(),
@@ -39,7 +37,7 @@ public class AuthRepositoryAdapter implements AuthRepository {
 
     @Override
     public Optional<MemberAuth> findByPlatformIdAndProvider(final String platformId, final AuthProvider provider) {
-        return memberAuthJpaRepository.findByPlatformIdAndProvider(platformId, provider)
+        return memberAuthEntityJpaRepository.findByPlatformIdAndProvider(platformId, provider)
                 .map(entity -> MemberAuth.withId(
                         entity.getId(),
                         entity.getMemberId(),
@@ -51,7 +49,7 @@ public class AuthRepositoryAdapter implements AuthRepository {
 
     @Override
     public Optional<MemberAuth> findByMemberId(final Long memberId) {
-        return memberAuthJpaRepository.findByMemberId(memberId)
+        return memberAuthEntityJpaRepository.findByMemberId(memberId)
                 .map(entity -> MemberAuth.withId(
                         entity.getId(),
                         entity.getMemberId(),

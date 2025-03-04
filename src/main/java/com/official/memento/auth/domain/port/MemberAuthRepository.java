@@ -4,7 +4,7 @@ import com.official.memento.auth.domain.AuthProvider;
 import com.official.memento.member.domain.MemberAuth;
 import java.util.Optional;
 
-public interface AuthRepository {
+public interface MemberAuthRepository {
     MemberAuth save(MemberAuth auth);
     Optional<MemberAuth> findByPlatformIdAndProvider(String platformId, AuthProvider provider);
     Optional<MemberAuth> findByMemberId(Long memberId);
