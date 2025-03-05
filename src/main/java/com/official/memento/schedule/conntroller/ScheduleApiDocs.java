@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Tag(name = "[Schedule] 일정 관련 API")
 public interface ScheduleApiDocs {
@@ -62,7 +61,7 @@ public interface ScheduleApiDocs {
     ResponseEntity<SuccessResponse<?>> createAppleSchedules(
             @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
             @Authorization final AuthorizationUser authorizationUser,
-            @RequestBody final AppleSchedulesCreateRequest request
+            @RequestBody final AppleSchedulesRequest request
     );
 
     @Operation(summary = "일정 삭제")
