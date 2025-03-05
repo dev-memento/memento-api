@@ -24,13 +24,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ScheduleApiController implements ScheduleApiDocs {
 
-    private final ScheduleCreateUseCase scheduleCreateUseCase;
-    private final RepeatScheduleCreateUseCase repeatScheduleCreateUseCase;
-    private final ScheduleDeleteUseCase scheduleDeleteUseCase;
-    private final ScheduleDeleteGroupUseCase scheduleDeleteGroupUseCase;
-    private final ScheduleUpdateUseCase scheduleUpdateUseCase;
-    private final ScheduleUpdateGroupUseCase scheduleUpdateGroupUseCase;
     private final ScheduleGetUseCase scheduleGetUseCase;
+    private final ScheduleCreateUseCase scheduleCreateUseCase;
+    private final ScheduleDeleteUseCase scheduleDeleteUseCase;
+    private final ScheduleUpdateUseCase scheduleUpdateUseCase;
+    private final ScheduleGroupDeleteUseCase scheduleGroupDeleteUseCase;
+    private final ScheduleGroupUpdateUseCase scheduleGroupUpdateUseCase;
+    private final ScheduleGroupCreateUseCase scheduleGroupCreateUseCase;
 
     @PostMapping
     @Override
@@ -60,7 +60,7 @@ public class ScheduleApiController implements ScheduleApiDocs {
             @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final RepeatScheduleCreateRequest repeatScheduleCreateRequest
     ) {
-        repeatScheduleCreateUseCase.createRepeat(
+        scheduleGroupCreateUseCase.createRepeat(
                 RepeatScheduleCreateCommand.of(
                         authorizationUser.memberId(),
                         repeatScheduleCreateRequest.description(),
@@ -81,21 +81,48 @@ public class ScheduleApiController implements ScheduleApiDocs {
     @PostMapping("/apple")
     public ResponseEntity<SuccessResponse<?>> createAppleSchedules(
             @Authorization final AuthorizationUser authorizationUser,
-            @RequestBody final AppleSchedulesCreateRequest request
+            @RequestBody final AppleSchedulesRequest request
     ) {
-        scheduleCreateUseCase.createAppleSchedules( request.scheduleCreateRequest().stream().map(scheduleCreateRequest ->
-                ScheduleCreateCommand.of(
-                        authorizationUser.memberId(),
-                        scheduleCreateRequest.description(),
-                        scheduleCreateRequest.startDate(),
-                        scheduleCreateRequest.endDate(),
-                        scheduleCreateRequest.isAllDay(),
-                        scheduleCreateRequest.tagId()
-                )
-        ).toList());
+        scheduleCreateUseCase.createAppleSchedules(
+                AppleSchedulesCommand.of(
+                        request.memberId(),
+                        request.syncToken(),
+                        request.scheduleCreateRequest().stream().map(scheduleCreateRequest ->
+                                AppleScheduleCreateCommand.of(
+                                        scheduleCreateRequest.id(),
+                                        scheduleCreateRequest.description(),
+                                        scheduleCreateRequest.startDate(),
+                                        scheduleCreateRequest.endDate(),
+                                        scheduleCreateRequest.isAllDay()
+                                )
+                        ).toList()));
         return SuccessResponse.of(
                 HttpStatus.CREATED,
-                "반복 스케줄 생성 성공"
+                "애플 스케줄 생성 성공"
+        );
+    }
+
+    @PutMapping("/apple")
+    public ResponseEntity<SuccessResponse<?>> updateAppleSchedules(
+            @Authorization final AuthorizationUser authorizationUser,
+            @RequestBody final AppleSchedulesRequest request
+    ) {
+        scheduleCreateUseCase.updateAppleSchedules(
+                AppleSchedulesCommand.of(
+                        request.memberId(),
+                        request.syncToken(),
+                        request.scheduleCreateRequest().stream().map(scheduleCreateRequest ->
+                                AppleScheduleCreateCommand.of(
+                                        scheduleCreateRequest.id(),
+                                        scheduleCreateRequest.description(),
+                                        scheduleCreateRequest.startDate(),
+                                        scheduleCreateRequest.endDate(),
+                                        scheduleCreateRequest.isAllDay()
+                                )
+                        ).toList()));
+        return SuccessResponse.of(
+                HttpStatus.CREATED,
+                "애플 스케줄 업데이트 성공"
         );
     }
 
@@ -129,7 +156,8 @@ public class ScheduleApiController implements ScheduleApiDocs {
             @PathVariable final long scheduleId,
             @RequestParam final String scheduleGroupId
     ) {
-        scheduleDeleteGroupUseCase.deleteGroup(ScheduleDeleteGroupCommand.of(authorizationUser.memberId(), scheduleId, scheduleGroupId));
+        scheduleGroupDeleteUseCase.deleteGroup(
+                ScheduleDeleteGroupCommand.of(authorizationUser.memberId(), scheduleId, scheduleGroupId));
         return SuccessResponse.of(
                 HttpStatus.OK,
                 "반복 스케줄 삭제 성공"
@@ -164,7 +192,7 @@ public class ScheduleApiController implements ScheduleApiDocs {
             @PathVariable final long scheduleId,
             @RequestBody final ScheduleUpdateGroupRequest scheduleUpdateGroupRequest
     ) {
-        scheduleUpdateGroupUseCase.updateGroup(ScheduleUpdateGroupCommand.of(
+        scheduleGroupUpdateUseCase.updateGroup(ScheduleUpdateGroupCommand.of(
                 authorizationUser.memberId(),
                 scheduleId,
                 scheduleUpdateGroupRequest.description(),
