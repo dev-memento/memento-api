@@ -3,6 +3,9 @@ package com.official.memento.schedule.service;
 import com.official.memento.global.entity.enums.RepeatOption;
 import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.exception.InvalidRequestBodyException;
+import com.official.memento.member.domain.MemberSyncInfo;
+import com.official.memento.member.service.command.MemberSyncInfoGetUseCase;
+import com.official.memento.member.service.usecase.MemberSyncInfoUpdateUseCase;
 import com.official.memento.orderinfo.service.usecase.OrderInfoCreateUseCase;
 import com.official.memento.orderinfo.service.usecase.OrderInfoDeleteUseCase;
 import com.official.memento.schedule.domain.ScheduleRepository;
@@ -29,35 +32,45 @@ import static com.official.memento.schedule.domain.enums.ScheduleType.NORMAL;
 @RequiredArgsConstructor
 public class ScheduleService implements
         ScheduleCreateUseCase,
-        RepeatScheduleCreateUseCase,
         ScheduleDeleteUseCase,
-        ScheduleDeleteGroupUseCase,
         ScheduleUpdateUseCase,
-        ScheduleUpdateGroupUseCase,
-        ScheduleGetUseCase {
-
+        ScheduleGetUseCase,
+        ScheduleGroupCreateUseCase,
+        ScheduleGroupDeleteUseCase,
+        ScheduleGroupUpdateUseCase
+{
     private final ScheduleRepository scheduleRepository;
     private final TagRepository tagRepository;
     private final OrderInfoDeleteUseCase orderInfoDeleteUseCase;
     private final OrderInfoCreateUseCase orderInfoCreateUseCase;
+    private final MemberSyncInfoUpdateUseCase memberSyncInfoUpdateUseCase;
+    private final MemberSyncInfoGetUseCase memberSyncInfoGetUseCase;
 
     @Override
     @Transactional
     public void create(final ScheduleCreateCommand command) {
-        String scheduleGroupId = UUID.randomUUID().toString();
         Tag tag = tagRepository.findById(command.tagId());
         checkOwnTag(command.memberId(), tag);
-        Schedule schedule = createSchedule(command, scheduleGroupId);
+        Schedule schedule = createSchedule(command);
         orderInfoCreateUseCase.assignScheduleOrder(command.startDate(), schedule, command.memberId());
     }
 
     @Override
-    public void createAppleSchedules(final List<ScheduleCreateCommand> command) {
-        Tag tag = tagRepository.findByMemberIdAndTagColor(command.get(0).memberId(), TagColor.GRAY05);
-        for (ScheduleCreateCommand scheduleCreateCommand : command) {
-            String scheduleGroupId = UUID.randomUUID().toString();
-            Schedule schedule = createAppleSchedule(scheduleCreateCommand, scheduleGroupId);
-            orderInfoCreateUseCase.assignScheduleOrder(scheduleCreateCommand.startDate(), schedule, command.get(0).memberId());
+    public void createAppleSchedules(final AppleSchedulesCommand command) {
+        memberSyncInfoUpdateUseCase.updateAppleToken(command.memberId(), command.syncToken());
+        Tag tag = tagRepository.findByMemberIdAndTagColor(command.memberId(), TagColor.GRAY05);
+        for (AppleScheduleCreateCommand scheduleCreateCommand : command.commands()) {
+            Schedule schedule = createAppleSchedule(scheduleCreateCommand, command.memberId(), tag.getId());
+            orderInfoCreateUseCase.assignScheduleOrder(scheduleCreateCommand.startDate(), schedule, command.memberId());
+        }
+    }
+
+    @Override
+    public void updateAppleSchedules(final AppleSchedulesCommand command) {
+        MemberSyncInfo memberSyncInfo = memberSyncInfoGetUseCase.findByMemberId(command.memberId());
+        if(!memberSyncInfo.getAppleSyncToken().equals(command.syncToken())){
+            memberSyncInfoUpdateUseCase.updateAppleToken(command.memberId(), command.syncToken());
+
         }
     }
 
@@ -125,7 +138,8 @@ public class ScheduleService implements
         Schedule schedule = scheduleRepository.findById(command.scheduleId());
         checkOwn(command.memberId(), schedule);
         belongsToGroup(command.scheduleGroupId(), schedule);
-        List<Schedule> targetSchedules = scheduleRepository.findAllByScheduleGroupIdAndStartDateGreaterThanEqual(command.scheduleGroupId(), schedule.getStartDate());
+        List<Schedule> targetSchedules = scheduleRepository.findAllByScheduleGroupIdAndStartDateGreaterThanEqual(
+                command.scheduleGroupId(), schedule.getStartDate());
         scheduleRepository.deleteAll(targetSchedules);
         //Todo 기능 미구현
     }
@@ -186,7 +200,8 @@ public class ScheduleService implements
         }
     }
 
-    private Schedule createSchedule(final ScheduleCreateCommand command, final String scheduleGroupId) {
+    private Schedule createSchedule(final ScheduleCreateCommand command) {
+        String scheduleGroupId = UUID.randomUUID().toString();
         return scheduleRepository.save(Schedule.of(
                 command.memberId(),
                 command.description(),
@@ -201,9 +216,11 @@ public class ScheduleService implements
         ));
     }
 
-    private Schedule createAppleSchedule(final ScheduleCreateCommand command, final String scheduleGroupId) {
+    private Schedule createAppleSchedule(final AppleScheduleCreateCommand command, final long memberId,
+                                         final long tagId) {
+        String scheduleGroupId = UUID.randomUUID().toString();
         return scheduleRepository.save(Schedule.of(
-                command.memberId(),
+                memberId,
                 command.description(),
                 command.startDate(),
                 command.endDate(),
@@ -212,7 +229,7 @@ public class ScheduleService implements
                 null,
                 APPLE,
                 scheduleGroupId,
-                command.tagId()
+                tagId
         ));
     }
 
@@ -261,8 +278,8 @@ public class ScheduleService implements
                     currentStartDate = currentStartDate.plusYears(1);
                     currentEndDate = currentEndDate.plusYears(1);
                 }
-                default ->
-                        throw new IllegalArgumentException("Unsupported repeat option: " + repeatOption);//Todo 커스텀 익셉션으로 교체 예정
+                default -> throw new IllegalArgumentException(
+                        "Unsupported repeat option: " + repeatOption);//Todo 커스텀 익셉션으로 교체 예정
             }
         }
         return schedules;
