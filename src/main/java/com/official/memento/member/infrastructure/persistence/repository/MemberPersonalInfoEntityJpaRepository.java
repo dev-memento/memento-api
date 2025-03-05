@@ -1,5 +1,6 @@
-package com.official.memento.member.infrastructure.persistence;
+package com.official.memento.member.infrastructure.persistence.repository;
 
+import com.official.memento.member.infrastructure.persistence.entity.MemberPersonalInfoEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

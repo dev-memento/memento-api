@@ -1,22 +1,31 @@
 package com.official.memento.member.service;
 
-import com.official.memento.global.exception.EntityNotFoundException;
-import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.domain.port.MemberPersonalInfoRepository;
 import com.official.memento.member.service.command.MemberPersonalInfoCommand;
+import com.official.memento.member.service.command.MemberPersonalInfoCreateCommand;
+import com.official.memento.member.service.usecase.MemberPersonalInfoCreateUseCase;
+import com.official.memento.member.service.usecase.MemberPersonalInfoGetUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoRetrieveUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoUpdateUseCase;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
-public class MemberPersonalInfoService implements MemberPersonalInfoUpdateUseCase, MemberPersonalInfoRetrieveUseCase {
+@RequiredArgsConstructor
+public class MemberPersonalInfoService implements MemberPersonalInfoCreateUseCase, MemberPersonalInfoUpdateUseCase, MemberPersonalInfoRetrieveUseCase, MemberPersonalInfoGetUseCase {
 
     private final MemberPersonalInfoRepository memberPersonalInfoRepository;
 
-    public MemberPersonalInfoService(final MemberPersonalInfoRepository memberPersonalInfoRepository) {
-        this.memberPersonalInfoRepository = memberPersonalInfoRepository;
+    @Override
+    @Transactional
+    public MemberPersonalInfo create(final MemberPersonalInfoCreateCommand command) {
+        MemberPersonalInfo memberPersonalInfo = MemberPersonalInfo.of(command.memberId());
+        memberPersonalInfoRepository.create(memberPersonalInfo);
+        return memberPersonalInfo;
     }
 
     @Override
@@ -24,15 +33,15 @@ public class MemberPersonalInfoService implements MemberPersonalInfoUpdateUseCas
     public void update(final MemberPersonalInfoCommand command) {
         MemberPersonalInfo memberPersonalInfo = memberPersonalInfoRepository.findByMemberId(command.memberId());
         memberPersonalInfo.update(
-                        command.wakeUpTime(),
-                        command.windDownTime(),
-                        command.job(),
-                        command.jobOtherDetail(),
-                        command.isStressedUnorganizedSchedule(),
-                        command.isForgetImportantThings(),
-                        command.isPreferReminder(),
-                        command.isImportantBreaks()
-                );
+                command.wakeUpTime(),
+                command.windDownTime(),
+                command.job(),
+                command.jobOtherDetail(),
+                command.isStressedUnorganizedSchedule(),
+                command.isForgetImportantThings(),
+                command.isPreferReminder(),
+                command.isImportantBreaks()
+        );
         memberPersonalInfoRepository.update(memberPersonalInfo);
     }
 
@@ -40,5 +49,11 @@ public class MemberPersonalInfoService implements MemberPersonalInfoUpdateUseCas
     @Transactional(readOnly = true)
     public MemberPersonalInfo retrieveUptime(final Long memberId) {
         return memberPersonalInfoRepository.findByMemberId(memberId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<MemberPersonalInfo> findNullableByMemberId(long memberId) {
+        return memberPersonalInfoRepository.findNullableByMemberId(memberId);
     }
 }

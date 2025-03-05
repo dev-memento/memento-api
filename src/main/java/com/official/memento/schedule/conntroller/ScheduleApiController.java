@@ -83,7 +83,7 @@ public class ScheduleApiController implements ScheduleApiDocs {
             @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final AppleSchedulesCreateRequest request
     ) {
-        scheduleCreateUseCase.createAppleSchedules(request.scheduleCreateRequest().stream().map(scheduleCreateRequest ->
+        scheduleCreateUseCase.createAppleSchedules( request.scheduleCreateRequest().stream().map(scheduleCreateRequest ->
                 ScheduleCreateCommand.of(
                         authorizationUser.memberId(),
                         scheduleCreateRequest.description(),
@@ -93,6 +93,17 @@ public class ScheduleApiController implements ScheduleApiDocs {
                         scheduleCreateRequest.tagId()
                 )
         ).toList());
+        return SuccessResponse.of(
+                HttpStatus.CREATED,
+                "반복 스케줄 생성 성공"
+        );
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<SuccessResponse<?>> createGoogleSchedules(
+            @RequestHeader(name = "Authorization") final String accessToken
+    ) {
+        scheduleCreateUseCase.createGoogleSchedules(accessToken);
         return SuccessResponse.of(
                 HttpStatus.CREATED,
                 "반복 스케줄 생성 성공"

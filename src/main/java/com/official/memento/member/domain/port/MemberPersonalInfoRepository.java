@@ -11,4 +11,6 @@ public interface MemberPersonalInfoRepository {
     MemberPersonalInfo create(final MemberPersonalInfo memberPersonalInfo);
 
     MemberPersonalInfo update(final MemberPersonalInfo memberPersonalInfo);
+
+    Optional<MemberPersonalInfo> findNullableByMemberId(Long memberId);
 }

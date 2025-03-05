@@ -3,10 +3,6 @@ package com.official.memento.schedule.service;
 import com.official.memento.global.entity.enums.RepeatOption;
 import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.exception.InvalidRequestBodyException;
-import com.official.memento.orderinfo.domain.OrderInfo;
-import com.official.memento.orderinfo.domain.OrderInfoRepository;
-import com.official.memento.orderinfo.domain.OrderWithScheduleOrToDo;
-import com.official.memento.orderinfo.domain.PlanType;
 import com.official.memento.orderinfo.service.usecase.OrderInfoCreateUseCase;
 import com.official.memento.orderinfo.service.usecase.OrderInfoDeleteUseCase;
 import com.official.memento.schedule.domain.ScheduleRepository;
@@ -61,8 +57,13 @@ public class ScheduleService implements
         for (ScheduleCreateCommand scheduleCreateCommand : command) {
             String scheduleGroupId = UUID.randomUUID().toString();
             Schedule schedule = createAppleSchedule(scheduleCreateCommand, scheduleGroupId);
-            orderInfoCreateUseCase.assignScheduleOrder(scheduleCreateCommand.startDate(), schedule,command.get(0).memberId());
+            orderInfoCreateUseCase.assignScheduleOrder(scheduleCreateCommand.startDate(), schedule, command.get(0).memberId());
         }
+    }
+
+    @Override
+    public void createGoogleSchedules(String command) {
+
     }
 
     @Override

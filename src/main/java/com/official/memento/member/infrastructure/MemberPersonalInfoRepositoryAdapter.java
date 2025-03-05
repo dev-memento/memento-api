@@ -5,25 +5,18 @@ import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.stereotype.Adapter;
 import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.domain.port.MemberPersonalInfoRepository;
-import com.official.memento.member.domain.port.MemberRepository;
-import com.official.memento.member.infrastructure.persistence.MemberPersonalInfoEntity;
-import com.official.memento.member.infrastructure.persistence.MemberPersonalInfoEntityJpaRepository;
 import com.official.memento.member.infrastructure.persistence.MemberPersonalInfoMapper;
+import com.official.memento.member.infrastructure.persistence.entity.MemberPersonalInfoEntity;
+import com.official.memento.member.infrastructure.persistence.repository.MemberPersonalInfoEntityJpaRepository;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
 
 @Adapter
+@RequiredArgsConstructor
 public class MemberPersonalInfoRepositoryAdapter implements MemberPersonalInfoRepository {
+
     private final MemberPersonalInfoEntityJpaRepository memberPersonalInfoEntityJpaRepository;
-    private final MemberRepository memberRepository;
-
-
-    public MemberPersonalInfoRepositoryAdapter(
-            final MemberPersonalInfoEntityJpaRepository memberPersonalInfoEntityJpaRepository,
-            final MemberRepository memberRepository) {
-        this.memberPersonalInfoEntityJpaRepository = memberPersonalInfoEntityJpaRepository;
-        this.memberRepository = memberRepository;
-    }
 
     @Override
     public MemberPersonalInfo findByMemberId(final Long memberId) {
@@ -57,5 +50,23 @@ public class MemberPersonalInfoRepositoryAdapter implements MemberPersonalInfoRe
         );
         MemberPersonalInfoEntity savedEntity = memberPersonalInfoEntityJpaRepository.save(entity);
         return MemberPersonalInfoMapper.toDomain(savedEntity);
+    }
+
+
+    @Override
+    public Optional<MemberPersonalInfo> findNullableByMemberId(Long memberId) {
+        return memberPersonalInfoEntityJpaRepository.findByMemberId(memberId)
+                .map(entity -> new MemberPersonalInfo(
+                        entity.getId(),
+                        entity.getMemberId(),
+                        entity.getWakeUpTime(),
+                        entity.getWindDownTime(),
+                        entity.getJob(),
+                        entity.getJobOtherDetail(),
+                        entity.getIsStressedUnorganizedSchedule(),
+                        entity.getIsForgetImportantThings(),
+                        entity.getIsPreferReminder(),
+                        entity.getIsImportantBreaks()
+                ));
     }
 }

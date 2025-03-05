@@ -1,6 +1,7 @@
 package com.official.memento.member.infrastructure.persistence;
 
 import com.official.memento.member.domain.MemberPersonalInfo;
+import com.official.memento.member.infrastructure.persistence.entity.MemberPersonalInfoEntity;
 
 public class MemberPersonalInfoMapper {
     public static MemberPersonalInfo toDomain(final MemberPersonalInfoEntity entity) {
