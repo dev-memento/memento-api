@@ -39,9 +39,9 @@ public class MemberSyncInfoService implements
     }
 
     @Override
-    public void toggleAppleSync(final long memberId) {
+    public void activateAppleSync(final long memberId) {
         MemberSyncInfo memberSyncInfo = memberSyncInfoRepository.findByMemberId(memberId);
-        memberSyncInfoRepository.save(memberSyncInfo.updateAppleToken());
+        memberSyncInfoRepository.save(memberSyncInfo.activateAppleToken());
     }
 
     private void checkPresentByMemberId(final MemberSyncInfoCreateCommand command) {

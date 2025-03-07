@@ -33,8 +33,8 @@ public class MemberSyncInfo {
         return new MemberSyncInfo(id, memberId, appleSyncToken, googleSyncToken);
     }
 
-    public MemberSyncInfo updateAppleToken() {
-        return new MemberSyncInfo(this.id, this.memberId, !this.appleSync, this.googleSyncToken);
+    public MemberSyncInfo activateAppleToken() {
+        return new MemberSyncInfo(this.id, this.memberId, true, this.googleSyncToken);
     }
 
     public MemberSyncInfo updateGoogleToken(final String googleSyncToken) {
