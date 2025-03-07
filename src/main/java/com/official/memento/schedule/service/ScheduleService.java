@@ -74,25 +74,22 @@ public class ScheduleService implements
 
     @Override
     public void createAppleSchedules(final AppleSchedulesCommand command) {
-        memberSyncInfoUpdateUseCase.updateAppleToken(command.memberId(), command.syncToken());
+        memberSyncInfoUpdateUseCase.activateAppleSync(command.memberId());
         Tag tag = tagGetUseCase.findByMemberIdAndTagColor(command.memberId(), TagColor.GRAY05);
-        for (AppleScheduleCreateCommand scheduleCreateCommand : command.commands()) {
-            Schedule schedule = createAppleSchedule(scheduleCreateCommand, command.memberId(), tag.getId());
-            orderInfoCreateUseCase.assignScheduleOrder(scheduleCreateCommand.startDate().toLocalDate(), schedule,
-                    command.memberId());
+        Map<String, ScheduleVo> newScheduleMap = getScheduleVoMap(command);
+        for (String addedScheduleGroupId : newScheduleMap.keySet()) {
+            createAppleSchedule(command.memberId(), tag.getId(), newScheduleMap.get(addedScheduleGroupId));
         }
     }
 
     @Override
     public void syncAppleSchedules(final AppleSchedulesCommand command) {
         MemberSyncInfo memberSyncInfo = memberSyncInfoGetUseCase.findByMemberId(command.memberId());
-        if (!memberSyncInfo.getAppleSyncToken().equals(command.syncToken())) {
-            Tag tag = tagGetUseCase.findByMemberIdAndTagColor(command.memberId(), TagColor.GRAY05);
-            memberSyncInfoUpdateUseCase.updateAppleToken(command.memberId(), command.syncToken());
+        Tag tag = tagGetUseCase.findByMemberIdAndTagColor(command.memberId(), TagColor.GRAY05);
+        Map<String, ScheduleVo> newScheduleMap = getScheduleVoMap(command);
+        if (memberSyncInfo.isAppleSync()) {
             List<Schedule> existSchedules = scheduleRepository.findAllAppleByMemberId(command.memberId());
-
             Map<String, ScheduleVo> existingScheduleMap = getScheduleVoMap(existSchedules);
-            Map<String, ScheduleVo> newScheduleMap = getScheduleVoMap(command);
 
             Set<String> allScheduleIds = getAllScheduleIds(existingScheduleMap, newScheduleMap);
 
@@ -115,95 +112,17 @@ public class ScheduleService implements
             }
 
             for (String addedScheduleGroupId : addedScheduleGroupIds) {
-                createAppleSchedule(command.memberId(), tag.getId(), addedScheduleGroupId,
-                        newScheduleMap.get(addedScheduleGroupId));
+                createAppleSchedule(command.memberId(), tag.getId(), newScheduleMap.get(addedScheduleGroupId));
             }
             for (String removeScheduleGroupId : removeScheduleGroupIds) {
                 deleteAppleSchedule(removeScheduleGroupId);
             }
             for (String updatedScheduleGroupId : updatedScheduleGroupIds) {
-                updateAppleSchedule(updatedScheduleGroupId, newScheduleMap.get(updatedScheduleGroupId));
+                updateAppleSchedule(newScheduleMap.get(updatedScheduleGroupId));
             }
+        }else {
+            throw new InvalidRequestBodyException(ErrorCode.INVALID_REQUEST_BODY);
         }
-    }
-
-    @NotNull
-    private static Set<String> getAllScheduleIds(
-            final Map<String, ScheduleVo> existingScheduleMap,
-            final Map<String, ScheduleVo> newScheduleMap
-    ) {
-        Set<String> allScheduleIds = new HashSet<>();
-        allScheduleIds.addAll(existingScheduleMap.keySet());
-        allScheduleIds.addAll(newScheduleMap.keySet());
-        return allScheduleIds;
-    }
-
-    @NotNull
-    private static Map<String, ScheduleVo> getScheduleVoMap(final AppleSchedulesCommand command) {
-        Map<String, ScheduleVo> newScheduleMap = new HashMap<>();
-        for (AppleScheduleCreateCommand schedule : command.commands()) {
-            newScheduleMap.put(schedule.scheduleUniqueId() + schedule.startDate() + schedule.endDate(),
-                    ScheduleVo.of(
-                            schedule.description(),
-                            schedule.startDate(),
-                            schedule.endDate(),
-                            schedule.scheduleUniqueId() + schedule.startDate() + schedule.endDate(),
-                            APPLE
-                    ));
-        }
-        return newScheduleMap;
-    }
-
-    @NotNull
-    private static Map<String, ScheduleVo> getScheduleVoMap(final List<Schedule> existSchedules) {
-        Map<String, ScheduleVo> existingScheduleMap = new HashMap<>();
-        for (Schedule schedule : existSchedules) {
-            existingScheduleMap.put(schedule.getScheduleGroupId(),
-                    ScheduleVo.of(
-                            schedule.getDescription(),
-                            schedule.getStartDate(),
-                            schedule.getEndDate(),
-                            schedule.getScheduleGroupId(),
-                            schedule.getType()
-                    ));
-        }
-        return existingScheduleMap;
-    }
-
-    private void updateAppleSchedule(final String updatedScheduleGroupId, final ScheduleVo scheduleVo) {
-        Schedule schedule = scheduleRepository.findByScheduleGroupId(updatedScheduleGroupId);
-        schedule.update(scheduleVo.description(), scheduleVo.startDate(), scheduleVo.endDate(), schedule.isAllDay(),
-                schedule.getTagId());
-        scheduleRepository.save(schedule);
-    }
-
-    private void deleteAppleSchedule(final String removeScheduleId) {
-        Schedule schedule = scheduleRepository.findByScheduleGroupId(removeScheduleId);
-        scheduleRepository.deleteAllByScheduleGroupId(removeScheduleId);
-        orderInfoDeleteUseCase.deleteByScheduleId(schedule.getId());
-    }
-
-
-    private void createAppleSchedule(
-            final long memberId,
-            final long tagId,
-            final String addedScheduleId,
-            final ScheduleVo scheduleVo
-    ) {
-        Schedule schedule = scheduleRepository.save(Schedule.of(
-                memberId,
-                scheduleVo.description(),
-                scheduleVo.startDate(),
-                scheduleVo.endDate(),
-                false,
-                RepeatOption.NONE,
-                null,
-                APPLE,
-                addedScheduleId,
-                tagId
-        ));
-        orderInfoCreateUseCase.assignScheduleOrder(schedule.getStartDate().toLocalDate(), schedule,
-                memberId);
     }
 
     @Override
@@ -363,6 +282,86 @@ public class ScheduleService implements
                 tagId
         ));
     }
+
+    @NotNull
+    private static Set<String> getAllScheduleIds(
+            final Map<String, ScheduleVo> existingScheduleMap,
+            final Map<String, ScheduleVo> newScheduleMap
+    ) {
+        Set<String> allScheduleIds = new HashSet<>();
+        allScheduleIds.addAll(existingScheduleMap.keySet());
+        allScheduleIds.addAll(newScheduleMap.keySet());
+        return allScheduleIds;
+    }
+
+    @NotNull
+    private static Map<String, ScheduleVo> getScheduleVoMap(final AppleSchedulesCommand command) {
+        Map<String, ScheduleVo> newScheduleMap = new HashMap<>();
+        for (AppleScheduleCreateCommand schedule : command.commands()) {
+            newScheduleMap.put(schedule.scheduleUniqueId() + schedule.startDate() + schedule.endDate(),
+                    ScheduleVo.of(
+                            schedule.description(),
+                            schedule.startDate(),
+                            schedule.endDate(),
+                            schedule.scheduleUniqueId() + schedule.startDate() + schedule.endDate(),
+                            schedule.isAllDay(),
+                            APPLE
+                    ));
+        }
+        return newScheduleMap;
+    }
+
+    @NotNull
+    private static Map<String, ScheduleVo> getScheduleVoMap(final List<Schedule> existSchedules) {
+        Map<String, ScheduleVo> existingScheduleMap = new HashMap<>();
+        for (Schedule schedule : existSchedules) {
+            existingScheduleMap.put(schedule.getScheduleGroupId(),
+                    ScheduleVo.of(
+                            schedule.getDescription(),
+                            schedule.getStartDate(),
+                            schedule.getEndDate(),
+                            schedule.getScheduleGroupId(),
+                            schedule.isAllDay(),
+                            schedule.getType()
+                    ));
+        }
+        return existingScheduleMap;
+    }
+
+    private void updateAppleSchedule(final ScheduleVo scheduleVo) {
+        Schedule schedule = scheduleRepository.findByScheduleGroupId(scheduleVo.scheduleGroupId());
+        schedule.update(scheduleVo.description(), scheduleVo.startDate(), scheduleVo.endDate(), scheduleVo.isAllDay(),
+                schedule.getTagId());
+        scheduleRepository.save(schedule);
+    }
+
+    private void deleteAppleSchedule(final String removeScheduleId) {
+        Schedule schedule = scheduleRepository.findByScheduleGroupId(removeScheduleId);
+        scheduleRepository.deleteAllByScheduleGroupId(removeScheduleId);
+        orderInfoDeleteUseCase.deleteByScheduleId(schedule.getId());
+    }
+
+    private void createAppleSchedule(
+            final long memberId,
+            final long tagId,
+            final ScheduleVo scheduleVo
+    ) {
+        Schedule schedule = scheduleRepository.save(Schedule.of(
+                memberId,
+                scheduleVo.description(),
+                scheduleVo.startDate(),
+                scheduleVo.endDate(),
+                scheduleVo.isAllDay(),
+                RepeatOption.NONE,
+                null,
+                APPLE,
+                scheduleVo.scheduleGroupId(),
+                tagId
+        ));
+        orderInfoCreateUseCase.assignScheduleOrder(schedule.getStartDate().toLocalDate(), schedule,
+                memberId);
+    }
+
 
     private List<Schedule> createRepeatSchedules(
             final long memberId,
