@@ -85,7 +85,7 @@ public class ScheduleApiController implements ScheduleApiDocs {
     ) {
         scheduleCreateUseCase.createAppleSchedules(
                 AppleSchedulesCommand.of(
-                        request.memberId(),
+                        authorizationUser.memberId(),
                         request.syncToken(),
                         request.scheduleCreateRequest().stream().map(scheduleCreateRequest ->
                                 AppleScheduleCreateCommand.of(
@@ -107,9 +107,9 @@ public class ScheduleApiController implements ScheduleApiDocs {
             @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final AppleSchedulesRequest request
     ) {
-        scheduleCreateUseCase.updateAppleSchedules(
+        scheduleCreateUseCase.syncAppleSchedules(
                 AppleSchedulesCommand.of(
-                        request.memberId(),
+                        authorizationUser.memberId(),
                         request.syncToken(),
                         request.scheduleCreateRequest().stream().map(scheduleCreateRequest ->
                                 AppleScheduleCreateCommand.of(
