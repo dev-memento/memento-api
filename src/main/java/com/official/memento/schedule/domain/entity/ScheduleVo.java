@@ -10,6 +10,7 @@ public record ScheduleVo(
         LocalDateTime startDate,
         LocalDateTime endDate,
         String scheduleGroupId,
+        boolean isAllDay,
         ScheduleType scheduleType
 ) {
     public static ScheduleVo of(
@@ -17,6 +18,7 @@ public record ScheduleVo(
             final LocalDateTime startDate,
             final LocalDateTime endDate,
             final String scheduleGroupId,
+            final boolean isAllDay,
             final ScheduleType scheduleType
     ) {
         return new ScheduleVo(
@@ -24,19 +26,25 @@ public record ScheduleVo(
                 startDate,
                 endDate,
                 scheduleGroupId,
+                isAllDay,
                 scheduleType
         );
     }
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ScheduleVo that = (ScheduleVo) o;
         return description.equals(that.description) &&
                 startDate.equals(that.startDate) &&
                 endDate.equals(that.endDate) &&
                 scheduleGroupId.equals(that.scheduleGroupId) &&
+                isAllDay == that.isAllDay &&
                 scheduleType == that.scheduleType;
     }
 }
