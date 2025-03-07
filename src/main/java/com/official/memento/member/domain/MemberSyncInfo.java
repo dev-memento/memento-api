@@ -14,7 +14,7 @@ public class MemberSyncInfo {
 
     private String googleSyncToken;
 
-    public MemberSyncInfo(long memberId, String appleSyncToken, String googleSyncToken) {
+    public MemberSyncInfo(final long memberId, final String appleSyncToken, final String googleSyncToken) {
         this.memberId = memberId;
         this.appleSyncToken = appleSyncToken;
         this.googleSyncToken = googleSyncToken;
@@ -24,7 +24,12 @@ public class MemberSyncInfo {
         return new MemberSyncInfo(memberId, null, null);
     }
 
-    public static MemberSyncInfo withId(final long id, final long memberId, final String appleSyncToken, String googleSyncToken) {
+    public static MemberSyncInfo withId(
+            final long id,
+            final long memberId,
+            final String appleSyncToken,
+            final String googleSyncToken
+    ) {
         return new MemberSyncInfo(id, memberId, appleSyncToken, googleSyncToken);
     }
 
