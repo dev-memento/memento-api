@@ -1,11 +1,11 @@
 package com.official.memento.schedule.infrastructure;
 
-import com.official.memento.global.entity.enums.RepeatOption;
 import com.official.memento.global.exception.EntityNotFoundException;
 import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.stereotype.Adapter;
-import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.schedule.domain.ScheduleRepository;
+import com.official.memento.schedule.domain.entity.Schedule;
+import com.official.memento.schedule.domain.enums.ScheduleType;
 import com.official.memento.schedule.infrastructure.persistence.ScheduleEntity;
 import com.official.memento.schedule.infrastructure.persistence.ScheduleEntityJpaRepository;
 import com.official.memento.schedule.infrastructure.persistence.projection.ScheduleOrderInfoProjection;
@@ -155,6 +155,26 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
     }
 
     @Override
+    public List<Schedule> findAllAppleByMemberId(final long memberId) {
+        List<ScheduleEntity> scheduleEntities = scheduleEntityJpaRepository.findAllByMemberIdAndType(memberId, ScheduleType.APPLE);
+        return scheduleEntities.stream().map(scheduleEntity -> Schedule.withId(
+                scheduleEntity.getId(),
+                scheduleEntity.getMemberId(),
+                scheduleEntity.getDescription(),
+                scheduleEntity.getStartDate(),
+                scheduleEntity.getEndDate(),
+                scheduleEntity.isAllDay(),
+                scheduleEntity.getRepeatOption(),
+                scheduleEntity.getRepeatExpiredDate(),
+                scheduleEntity.getType(),
+                scheduleEntity.getScheduleGroupId(),
+                scheduleEntity.getCreatedAt(),
+                scheduleEntity.getUpdatedAt(),
+                scheduleEntity.getTagId()
+        )).toList();
+    }
+
+    @Override
     public List<Schedule> findAllByScheduleGroupId(final String scheduleGroupId) {
         List<ScheduleEntity> scheduleEntities = scheduleEntityJpaRepository.findAllByScheduleGroupId(scheduleGroupId);
         return scheduleEntities.stream().map(scheduleEntity -> Schedule.withId(
@@ -203,6 +223,11 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
     public void deleteAll(final List<Schedule> schedules) {
         List<ScheduleEntity> scheduleEntities = schedules.stream().map(ScheduleEntity::from).toList();
         scheduleEntityJpaRepository.deleteAll(scheduleEntities);
+    }
+
+    @Override
+    public void deleteAllByScheduleGroupId(final String scheduleGroupId) {
+        scheduleEntityJpaRepository.deleteAllByScheduleGroupId(scheduleGroupId);
     }
 
 }

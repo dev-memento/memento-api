@@ -21,9 +21,13 @@ public interface ScheduleRepository {
 
     void deleteAll(final List<Schedule> schedules);
 
+    void deleteAllByScheduleGroupId(final String scheduleGroupId);
+
     List<Schedule> findNonAllDaySchedulesWithOrderInfo(final long memberId);
 
     List<Schedule> findAllAlDaysByMemberId(final long memberId);
 
     List<Schedule> findAllByStartDateAndMemberId(final LocalDate startDate, final long memberId);
+
+    List<Schedule> findAllAppleByMemberId(final long memberId);
 }

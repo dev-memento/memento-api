@@ -1,5 +1,6 @@
 package com.official.memento.schedule.infrastructure.persistence;
 
+import com.official.memento.schedule.domain.enums.ScheduleType;
 import com.official.memento.schedule.infrastructure.persistence.projection.ScheduleOrderInfoProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -87,4 +88,8 @@ public interface ScheduleEntityJpaRepository extends JpaRepository<ScheduleEntit
             long memberId,
             LocalDate date
     );
+
+    List<ScheduleEntity> findAllByMemberIdAndType(long memberId, ScheduleType type);
+
+    void deleteAllByScheduleGroupId(final String groupId);
 }
