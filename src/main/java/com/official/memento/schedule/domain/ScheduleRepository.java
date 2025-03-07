@@ -13,7 +13,7 @@ public interface ScheduleRepository {
 
     Schedule findById(final long scheduleId);
 
-    List<Schedule> findAllByScheduleGroupId(final String scheduleGroupId);
+    Schedule findByScheduleGroupId(final String scheduleGroupId);
 
     List<Schedule> findAllByScheduleGroupIdAndStartDateGreaterThanEqual(final String scheduleGroupId, final LocalDateTime startDate);
 

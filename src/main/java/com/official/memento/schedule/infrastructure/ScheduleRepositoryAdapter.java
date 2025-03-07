@@ -175,9 +175,9 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
     }
 
     @Override
-    public List<Schedule> findAllByScheduleGroupId(final String scheduleGroupId) {
-        List<ScheduleEntity> scheduleEntities = scheduleEntityJpaRepository.findAllByScheduleGroupId(scheduleGroupId);
-        return scheduleEntities.stream().map(scheduleEntity -> Schedule.withId(
+    public Schedule findByScheduleGroupId(final String scheduleGroupId) {
+        ScheduleEntity scheduleEntity = scheduleEntityJpaRepository.findByScheduleGroupId(scheduleGroupId);
+        return Schedule.withId(
                 scheduleEntity.getId(),
                 scheduleEntity.getMemberId(),
                 scheduleEntity.getDescription(),
@@ -191,7 +191,7 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
                 scheduleEntity.getCreatedAt(),
                 scheduleEntity.getUpdatedAt(),
                 scheduleEntity.getTagId()
-        )).toList();
+        );
     }
 
     @Override

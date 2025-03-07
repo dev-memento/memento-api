@@ -12,7 +12,7 @@ import java.util.List;
 public interface ScheduleEntityJpaRepository extends JpaRepository<ScheduleEntity, Long> {
     List<ScheduleEntity> findAllByScheduleGroupIdAndStartDateGreaterThanEqual(final String groupId, final LocalDateTime startDate);
 
-    List<ScheduleEntity> findAllByScheduleGroupId(final String groupId);
+    ScheduleEntity findByScheduleGroupId(final String groupId);
 
     @Query("""
     SELECT s.id AS scheduleId,
