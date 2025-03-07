@@ -64,6 +64,20 @@ public interface ScheduleApiDocs {
             @RequestBody final AppleSchedulesRequest request
     );
 
+    @Operation(summary = "Apple 일정 동기화")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Apple 일정 동기화 성공"),
+                    @ApiResponse(responseCode = "400", description = "Apple 일정 동기화 실패"),
+                    @ApiResponse(responseCode = "500", description = "Apple 일정 동기화 실패")
+            }
+    )
+    ResponseEntity<SuccessResponse<?>> syncAppleSchedules(
+            @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
+            @Authorization final AuthorizationUser authorizationUser,
+            @RequestBody final AppleSchedulesRequest request
+    );
+
     @Operation(summary = "일정 삭제")
     @ApiResponses(
             value = {

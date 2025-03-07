@@ -78,6 +78,7 @@ public class ScheduleApiController implements ScheduleApiDocs {
         );
     }
 
+    @Override
     @PostMapping("/apple")
     public ResponseEntity<SuccessResponse<?>> createAppleSchedules(
             @Authorization final AuthorizationUser authorizationUser,
@@ -102,8 +103,9 @@ public class ScheduleApiController implements ScheduleApiDocs {
         );
     }
 
+    @Override
     @PutMapping("/apple")
-    public ResponseEntity<SuccessResponse<?>> updateAppleSchedules(
+    public ResponseEntity<SuccessResponse<?>> syncAppleSchedules(
             @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final AppleSchedulesRequest request
     ) {
@@ -121,8 +123,8 @@ public class ScheduleApiController implements ScheduleApiDocs {
                                 )
                         ).toList()));
         return SuccessResponse.of(
-                HttpStatus.CREATED,
-                "애플 스케줄 업데이트 성공"
+                HttpStatus.OK,
+                "애플 스케줄 동기화 성공"
         );
     }
 
