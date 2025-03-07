@@ -2,6 +2,7 @@ package com.official.memento.tag.service;
 
 import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.TagRepository;
+import com.official.memento.tag.domain.enums.TagColor;
 import com.official.memento.tag.service.command.TagCreateCommand;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,5 +35,11 @@ public class TagService implements TagCreateUseCase, TagGetUseCase {
     @Override
     public Tag findById(final long tagId){
         return tagRepository.findById(tagId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Tag findByMemberIdAndTagColor(final long memberId, final TagColor tagColor) {
+        return tagRepository.findByMemberIdAndTagColor(memberId, tagColor);
     }
 }
