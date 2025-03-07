@@ -66,43 +66,28 @@ public class OrderInfoService implements
 
     @Override
     @Transactional
-    public void assignScheduleOrder(final LocalDateTime dateTime, final Schedule schedule, final long memberId){
-        LocalDate date = dateTime.toLocalDate();
-        List<OrderWithScheduleOrToDo> orderInfoList = orderInfoRepository.findOrderInfoWithDetails(date,memberId);
-        double insertOrder = 1;
-        boolean isInserted = false;
-
-        for (OrderWithScheduleOrToDo existingOrder : orderInfoList) {
-            if (!isInserted && existingOrder.getType() == PlanType.SCHEDULE) {
-                if (schedule.getStartDate().equals(existingOrder.getStartDate())
-                        && schedule.getEndDate().isBefore(existingOrder.getEndDate())) {
-                    insertOrder = existingOrder.getOrder();
-                    isInserted = true;
+    public void assignScheduleOrder(final LocalDate date, final Schedule schedule, final long memberId) {
+        List<OrderWithScheduleOrToDo> orderInfoList = orderInfoRepository.findOrderInfoWithDetails(date, memberId);
+        double insertOrder = -1;
+        for (int i = 0; i < orderInfoList.size(); i++) {
+            OrderWithScheduleOrToDo existingOrder = orderInfoList.get(i);
+            if (existingOrder.getType() == PlanType.SCHEDULE) {
+                if (schedule.getStartDate().equals(existingOrder.getStartDate())) {
+                    if (schedule.getEndDate().isBefore(existingOrder.getEndDate())) {
+                        double previousOrder = (i > 0) ? orderInfoList.get(i - 1).getOrder() : 0;
+                        insertOrder = (previousOrder + existingOrder.getOrder()) / 2;
+                        break;
+                    }
                 }
                 else if (schedule.getStartDate().isBefore(existingOrder.getStartDate())) {
-                    insertOrder = existingOrder.getOrder();
-                    isInserted = true;
+                    double previousOrder = (i > 0) ? orderInfoList.get(i - 1).getOrder() : 0;
+                    insertOrder = (previousOrder + existingOrder.getOrder()) / 2;
+                    break;
                 }
-            }
-
-            if (isInserted) {
-                existingOrder.shiftBack(); // 내부적으로 order 값을 1 증가시키는 메서드라고 가정
-                orderInfoRepository.update(
-                        OrderInfo.withId(
-                                existingOrder.getOrderInfoId(),
-                                existingOrder.getMemberId(),
-                                existingOrder.getScheduleId(),
-                                existingOrder.getToDoId(),
-                                existingOrder.getOrder(), // 이미 증가된 값
-                                date,
-                                existingOrder.getType(),
-                                existingOrder.getCreatedAt()
-                        )
-                );
             }
         }
 
-        if (!isInserted) {
+        if (insertOrder == -1) {
             insertOrder = orderInfoList.isEmpty() ? 1 : orderInfoList.get(orderInfoList.size() - 1).getOrder() + 1;
         }
 

@@ -48,7 +48,7 @@ public class ScheduleService implements
         Tag tag = tagRepository.findById(command.tagId());
         checkOwnTag(command.memberId(), tag);
         Schedule schedule = createSchedule(command, scheduleGroupId);
-        orderInfoCreateUseCase.assignScheduleOrder(command.startDate(), schedule, command.memberId());
+        orderInfoCreateUseCase.assignScheduleOrder(command.startDate().toLocalDate(), schedule, command.memberId());
     }
 
     @Override
@@ -57,7 +57,7 @@ public class ScheduleService implements
         for (ScheduleCreateCommand scheduleCreateCommand : command) {
             String scheduleGroupId = UUID.randomUUID().toString();
             Schedule schedule = createAppleSchedule(scheduleCreateCommand, scheduleGroupId);
-            orderInfoCreateUseCase.assignScheduleOrder(scheduleCreateCommand.startDate(), schedule, command.get(0).memberId());
+            orderInfoCreateUseCase.assignScheduleOrder(scheduleCreateCommand.startDate().toLocalDate(), schedule, command.get(0).memberId());
         }
     }
 
@@ -87,7 +87,7 @@ public class ScheduleService implements
 
         if (schedule.getStartDate() != command.startDate() || schedule.getEndDate() != command.endDate()) {
             orderInfoDeleteUseCase.deleteByScheduleId(schedule.getId());
-            orderInfoCreateUseCase.assignScheduleOrder(command.startDate(), schedule, command.memberId());
+            orderInfoCreateUseCase.assignScheduleOrder(command.startDate().toLocalDate(), schedule, command.memberId());
 
         }
     }
