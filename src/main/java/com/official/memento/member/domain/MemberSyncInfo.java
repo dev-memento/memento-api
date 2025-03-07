@@ -8,36 +8,36 @@ import lombok.Getter;
 public class MemberSyncInfo {
     private Long id;
 
-    private final long memberId;
+    private long memberId;
 
-    private String appleSyncToken;
+    private boolean appleSync;
 
     private String googleSyncToken;
 
-    public MemberSyncInfo(final long memberId, final String appleSyncToken, final String googleSyncToken) {
+    public MemberSyncInfo(final long memberId, final boolean appleSync, final String googleSyncToken) {
         this.memberId = memberId;
-        this.appleSyncToken = appleSyncToken;
+        this.appleSync = appleSync;
         this.googleSyncToken = googleSyncToken;
     }
 
     public static MemberSyncInfo of(final long memberId) {
-        return new MemberSyncInfo(memberId, null, null);
+        return new MemberSyncInfo(memberId, false, null);
     }
 
     public static MemberSyncInfo withId(
             final long id,
             final long memberId,
-            final String appleSyncToken,
+            final boolean appleSyncToken,
             final String googleSyncToken
     ) {
         return new MemberSyncInfo(id, memberId, appleSyncToken, googleSyncToken);
     }
 
-    public MemberSyncInfo updateAppleToken(final String appleSyncToken) {
-        return new MemberSyncInfo(this.id, this.memberId, appleSyncToken, this.googleSyncToken);
+    public MemberSyncInfo updateAppleToken() {
+        return new MemberSyncInfo(this.id, this.memberId, !this.appleSync, this.googleSyncToken);
     }
 
     public MemberSyncInfo updateGoogleToken(final String googleSyncToken) {
-        return new MemberSyncInfo(this.id, this.memberId, this.appleSyncToken, googleSyncToken);
+        return new MemberSyncInfo(this.id, this.memberId, this.appleSync, googleSyncToken);
     }
 }

@@ -38,11 +38,10 @@ public class MemberSyncInfoService implements
         return memberSyncInfoRepository.findByMemberId(memberId);
     }
 
-    //Todo update로직 고민
     @Override
-    public void updateAppleToken(long memberId, String token) {
+    public void toggleAppleSync(final long memberId) {
         MemberSyncInfo memberSyncInfo = memberSyncInfoRepository.findByMemberId(memberId);
-        memberSyncInfoRepository.save(memberSyncInfo.updateAppleToken(token));
+        memberSyncInfoRepository.save(memberSyncInfo.updateAppleToken());
     }
 
     private void checkPresentByMemberId(final MemberSyncInfoCreateCommand command) {
