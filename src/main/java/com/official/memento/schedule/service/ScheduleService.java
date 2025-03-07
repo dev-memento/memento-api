@@ -10,20 +10,19 @@ import com.official.memento.orderinfo.service.usecase.OrderInfoCreateUseCase;
 import com.official.memento.orderinfo.service.usecase.OrderInfoDeleteUseCase;
 import com.official.memento.schedule.domain.ScheduleRepository;
 import com.official.memento.schedule.domain.entity.Schedule;
+import com.official.memento.schedule.domain.entity.ScheduleVo;
 import com.official.memento.schedule.service.command.*;
 import com.official.memento.schedule.service.usecase.*;
 import com.official.memento.tag.domain.Tag;
-import com.official.memento.tag.domain.TagRepository;
 import com.official.memento.tag.domain.enums.TagColor;
+import com.official.memento.tag.service.TagGetUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static com.official.memento.schedule.domain.enums.ScheduleType.APPLE;
 import static com.official.memento.schedule.domain.enums.ScheduleType.NORMAL;
@@ -40,7 +39,7 @@ public class ScheduleService implements
         ScheduleGroupUpdateUseCase
 {
     private final ScheduleRepository scheduleRepository;
-    private final TagRepository tagRepository;
+    private final TagGetUseCase tagGetUseCase;
     private final OrderInfoDeleteUseCase orderInfoDeleteUseCase;
     private final OrderInfoCreateUseCase orderInfoCreateUseCase;
     private final MemberSyncInfoUpdateUseCase memberSyncInfoUpdateUseCase;
@@ -49,19 +48,19 @@ public class ScheduleService implements
     @Override
     @Transactional
     public void create(final ScheduleCreateCommand command) {
-        Tag tag = tagRepository.findById(command.tagId());
+        Tag tag = tagGetUseCase.findById(command.tagId());
         checkOwnTag(command.memberId(), tag);
         Schedule schedule = createSchedule(command);
-        orderInfoCreateUseCase.assignScheduleOrder(command.startDate(), schedule, command.memberId());
+        orderInfoCreateUseCase.assignScheduleOrder(command.startDate().toLocalDate(), schedule, command.memberId());
     }
 
     @Override
     public void createAppleSchedules(final AppleSchedulesCommand command) {
         memberSyncInfoUpdateUseCase.updateAppleToken(command.memberId(), command.syncToken());
-        Tag tag = tagRepository.findByMemberIdAndTagColor(command.memberId(), TagColor.GRAY05);
+        Tag tag = tagGetUseCase.findByMemberIdAndTagColor(command.memberId(), TagColor.GRAY05);
         for (AppleScheduleCreateCommand scheduleCreateCommand : command.commands()) {
             Schedule schedule = createAppleSchedule(scheduleCreateCommand, command.memberId(), tag.getId());
-            orderInfoCreateUseCase.assignScheduleOrder(scheduleCreateCommand.startDate(), schedule, command.memberId());
+            orderInfoCreateUseCase.assignScheduleOrder(scheduleCreateCommand.startDate().toLocalDate(), schedule, command.memberId());
         }
     }
 
@@ -69,8 +68,93 @@ public class ScheduleService implements
     public void updateAppleSchedules(final AppleSchedulesCommand command) {
         MemberSyncInfo memberSyncInfo = memberSyncInfoGetUseCase.findByMemberId(command.memberId());
         if(!memberSyncInfo.getAppleSyncToken().equals(command.syncToken())){
+            Tag tag = tagGetUseCase.findByMemberIdAndTagColor(command.memberId(), TagColor.GRAY05);
             memberSyncInfoUpdateUseCase.updateAppleToken(command.memberId(), command.syncToken());
+            List<Schedule> existSchedules = scheduleRepository.findAllAppleByMemberId(command.memberId());
 
+            Map<String, ScheduleVo> existingScheduletMap = new HashMap<>();
+            for (Schedule schedule : existSchedules) {
+                existingScheduletMap.put(schedule.getScheduleGroupId(),
+                        ScheduleVo.of(
+                                schedule.getDescription(),
+                                schedule.getStartDate(),
+                                schedule.getEndDate(),
+                                schedule.getScheduleGroupId(),
+                                schedule.getType()
+                        ));
+            }
+            Map<String, ScheduleVo> newScheduletMap = new HashMap<>();
+            for (AppleScheduleCreateCommand schedule : command.commands()) {
+                newScheduletMap.put(schedule.scheduleUniqueId(), ScheduleVo.of(
+                        schedule.description(),
+                        schedule.startDate(),
+                        schedule.endDate(),
+                        schedule.scheduleUniqueId(),
+                        APPLE
+                ));
+            }
+
+            Set<String> allScheduleIds = new HashSet<>();
+            allScheduleIds.addAll(existingScheduletMap.keySet());
+            allScheduleIds.addAll(newScheduletMap.keySet());
+
+            List<String> addedScheduleIds = new ArrayList<>();
+            List<String> removeScheduleIds = new ArrayList<>();
+            List<String> updatedScheduleIds = new ArrayList<>();
+
+
+            for (String eventId : allScheduleIds) {
+                boolean existsInOld = existingScheduletMap.containsKey(eventId);
+                boolean existsInNew = newScheduletMap.containsKey(eventId);
+
+                if (!existsInOld && existsInNew) {
+                    // 추가된 이벤트
+                    addedScheduleIds.add(eventId);
+                } else if (existsInOld && !existsInNew) {
+                    // 삭제된 이벤트
+                    removeScheduleIds.add(eventId);
+                } else if (existsInOld && existsInNew) {
+                    // 수정된 이벤트 (ID는 동일하지만 데이터가 다름)
+                    if (!existingScheduletMap.get(eventId).equals(newScheduletMap.get(eventId))) {
+                        updatedScheduleIds.add(eventId);
+                    }
+                }
+            }
+
+            addNewAppleSchedules(command, addedScheduleIds, newScheduletMap, tag);
+            deleteExistAppleSchedules(removeScheduleIds);
+
+            //Todo 수정된 이벤트 처리
+
+
+        }
+    }
+
+    private void deleteExistAppleSchedules(List<String> removeScheduleIds) {
+        for(String removeScheduleId : removeScheduleIds){
+            List<Schedule> schedules = scheduleRepository.findAllByScheduleGroupId(removeScheduleId);
+            scheduleRepository.deleteAllByScheduleGroupId(removeScheduleId);
+            for(Schedule schedule : schedules){
+                orderInfoDeleteUseCase.deleteByScheduleId(schedule.getId());
+            }
+        }
+    }
+
+    private void addNewAppleSchedules(AppleSchedulesCommand command, List<String> addedScheduleIds, Map<String, ScheduleVo> newScheduletMap, Tag tag) {
+        for(String addedScheduleId : addedScheduleIds){
+            Schedule schedule = scheduleRepository.save(Schedule.of(
+                    command.memberId(),
+                    newScheduletMap.get(addedScheduleId).description(),
+                    newScheduletMap.get(addedScheduleId).startDate(),
+                    newScheduletMap.get(addedScheduleId).endDate(),
+                    false,
+                    RepeatOption.NONE,
+                    null,
+                    APPLE,
+                    addedScheduleId,
+                    tag.getId()
+            ));
+            orderInfoCreateUseCase.assignScheduleOrder(schedule.getStartDate().toLocalDate(), schedule, command.memberId());
         }
     }
 
@@ -86,7 +170,7 @@ public class ScheduleService implements
         checkOwn(command.memberId(), schedule);
 
         if (command.tagId() != schedule.getTagId()) {
-            checkOwnTag(command.memberId(), tagRepository.findById(command.tagId()));
+            checkOwnTag(command.memberId(), tagGetUseCase.findById(command.tagId()));
         }
 
         schedule.update(
@@ -100,7 +184,7 @@ public class ScheduleService implements
 
         if (schedule.getStartDate() != command.startDate() || schedule.getEndDate() != command.endDate()) {
             orderInfoDeleteUseCase.deleteByScheduleId(schedule.getId());
-            orderInfoCreateUseCase.assignScheduleOrder(command.startDate(), schedule, command.memberId());
+            orderInfoCreateUseCase.assignScheduleOrder(command.startDate().toLocalDate(), schedule, command.memberId());
 
         }
     }
@@ -218,7 +302,6 @@ public class ScheduleService implements
 
     private Schedule createAppleSchedule(final AppleScheduleCreateCommand command, final long memberId,
                                          final long tagId) {
-        String scheduleGroupId = UUID.randomUUID().toString();
         return scheduleRepository.save(Schedule.of(
                 memberId,
                 command.description(),
@@ -228,7 +311,7 @@ public class ScheduleService implements
                 RepeatOption.NONE,
                 null,
                 APPLE,
-                scheduleGroupId,
+                command.scheduleUniqueId(),
                 tagId
         ));
     }
