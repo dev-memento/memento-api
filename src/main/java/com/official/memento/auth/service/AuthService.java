@@ -16,9 +16,11 @@ import com.official.memento.global.exception.UnauthorizedException;
 import com.official.memento.member.domain.Member;
 import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.service.command.MemberPersonalInfoCreateCommand;
+import com.official.memento.member.service.command.MemberSyncInfoCreateCommand;
 import com.official.memento.member.service.usecase.MemberCreateUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoCreateUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoGetUseCase;
+import com.official.memento.member.service.usecase.MemberSyncInfoCreateUseCase;
 import com.official.memento.tag.domain.enums.TagColor;
 import com.official.memento.tag.service.TagCreateUseCase;
 import com.official.memento.tag.service.command.TagCreateCommand;
@@ -37,6 +39,7 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase, Ex
     private final MemberCreateUseCase memberCreateUseCase;
     private final MemberPersonalInfoCreateUseCase memberPersonalInfoCreateUseCase;
     private final MemberPersonalInfoGetUseCase memberPersonalInfoGetUseCase;
+    private final MemberSyncInfoCreateUseCase memberSyncInfoCreateUseCase;
     private final TagCreateUseCase tagCreateUseCase;
     private final Map<AuthProvider, AuthClientOutputPort> authClientAdapters;
     private final JwtUtil jwtUtil;
@@ -94,6 +97,7 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase, Ex
         Member newMember = memberCreateUseCase.create();
         Long memberId = newMember.getId();
         memberPersonalInfoCreateUseCase.create(MemberPersonalInfoCreateCommand.from(memberId));
+        memberSyncInfoCreateUseCase.create(MemberSyncInfoCreateCommand.from(memberId));
         createOwnTags(memberId);
         Auth newAuth = Auth.of(memberId, provider, platformId, "");
         return authRepository.save(newAuth);

@@ -1,5 +1,7 @@
 package com.official.memento.member.service;
 
+import com.official.memento.global.exception.DataBaseIntegrityException;
+import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.domain.port.MemberPersonalInfoRepository;
 import com.official.memento.member.service.command.MemberPersonalInfoCommand;
@@ -23,6 +25,7 @@ public class MemberPersonalInfoService implements MemberPersonalInfoCreateUseCas
     @Override
     @Transactional
     public MemberPersonalInfo create(final MemberPersonalInfoCreateCommand command) {
+        checkPresentByMemberId(command);
         MemberPersonalInfo memberPersonalInfo = MemberPersonalInfo.of(command.memberId());
         memberPersonalInfoRepository.create(memberPersonalInfo);
         return memberPersonalInfo;
@@ -55,5 +58,11 @@ public class MemberPersonalInfoService implements MemberPersonalInfoCreateUseCas
     @Transactional(readOnly = true)
     public Optional<MemberPersonalInfo> findNullableByMemberId(long memberId) {
         return memberPersonalInfoRepository.findNullableByMemberId(memberId);
+    }
+
+    private void checkPresentByMemberId(final MemberPersonalInfoCreateCommand command) {
+        if(memberPersonalInfoRepository.findNullableByMemberId(command.memberId()).isPresent()){
+            throw new DataBaseIntegrityException(ErrorCode.DB_INTEGRITY_CONFLICT);
+        }
     }
 }

@@ -66,8 +66,7 @@ public class OrderInfoService implements
 
     @Override
     @Transactional
-    public void assignScheduleOrder(final LocalDateTime dateTime, final Schedule schedule, final long memberId){
-        LocalDate date = dateTime.toLocalDate();
+    public void assignScheduleOrder(final LocalDate date, final Schedule schedule, final long memberId){
         List<OrderWithScheduleOrToDo> orderInfoList = orderInfoRepository.findOrderInfoWithDetails(date,memberId);
         double insertOrder = 1;
         boolean isInserted = false;

@@ -1,6 +1,7 @@
 package com.official.memento.tag.infrastructure.persistence;
 
 import com.official.memento.tag.domain.enums.TagColor;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -13,5 +14,5 @@ public interface TagJpaRepository extends JpaRepository<TagEntity, Long> {
     )
     List<TagEntity> findAllByMemberId(Long memberId);
 
-    TagEntity findByMemberIdAndColor(Long memberId, TagColor color);
+    Optional<TagEntity> findByMemberIdAndColor(Long memberId, TagColor color);
 }

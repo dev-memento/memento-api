@@ -13,7 +13,7 @@ public interface ScheduleRepository {
 
     Schedule findById(final long scheduleId);
 
-    List<Schedule> findAllByScheduleGroupId(final String scheduleGroupId);
+    Schedule findByScheduleGroupId(final String scheduleGroupId);
 
     List<Schedule> findAllByScheduleGroupIdAndStartDateGreaterThanEqual(final String scheduleGroupId, final LocalDateTime startDate);
 
@@ -21,9 +21,13 @@ public interface ScheduleRepository {
 
     void deleteAll(final List<Schedule> schedules);
 
+    void deleteAllByScheduleGroupId(final String scheduleGroupId);
+
     List<Schedule> findNonAllDaySchedulesWithOrderInfo(final long memberId);
 
     List<Schedule> findAllAlDaysByMemberId(final long memberId);
 
     List<Schedule> findAllByStartDateAndMemberId(final LocalDate startDate, final long memberId);
+
+    List<Schedule> findAllAppleByMemberId(final long memberId);
 }
