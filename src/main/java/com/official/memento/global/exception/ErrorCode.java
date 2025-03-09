@@ -7,6 +7,7 @@ public enum ErrorCode {
 
     /* 서버 내부  에러 */
     INTERNAL_SERVER_ERROR("서버 내부에서 에러가 발생했습니다."),
+    DB_INTEGRITY_CONFLICT("데이터 무결성 오류 발생"),
 
     /* 존재하지 않는 데이터 */
     NOT_FOUND_ENTITY("찾을 수 없는 데이터입니다."),

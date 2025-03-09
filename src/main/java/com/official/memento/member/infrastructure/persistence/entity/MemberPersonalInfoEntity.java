@@ -2,11 +2,16 @@ package com.official.memento.member.infrastructure.persistence.entity;
 
 import com.official.memento.member.domain.enums.JobType;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
 
 @Entity
 @Table(name = "member_personal_info")
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberPersonalInfoEntity {
 
     @Id
@@ -32,31 +37,6 @@ public class MemberPersonalInfoEntity {
 
     private Boolean isImportantBreaks;
 
-    public MemberPersonalInfoEntity() {
-    }
-
-    private MemberPersonalInfoEntity(
-            final long memberId,
-            final LocalTime wakeUpTime,
-            final LocalTime windDownTime,
-            final JobType job,
-            final String jobOtherDetail,
-            final Boolean isStressedUnorganizedSchedule,
-            final Boolean isForgetImportantThings,
-            final Boolean isPreferReminder,
-            final Boolean isImportantBreaks)
-    {
-        this.memberId = memberId;
-        this.wakeUpTime = wakeUpTime;
-        this.windDownTime = windDownTime;
-        this.job = job;
-        this.jobOtherDetail = jobOtherDetail;
-        this.isStressedUnorganizedSchedule = isStressedUnorganizedSchedule;
-        this.isForgetImportantThings = isForgetImportantThings;
-        this.isPreferReminder = isPreferReminder;
-        this.isImportantBreaks = isImportantBreaks;
-    }
-
     public static MemberPersonalInfoEntity of(
             final long memberId,
             final LocalTime wakeUpTime,
@@ -66,10 +46,9 @@ public class MemberPersonalInfoEntity {
             final Boolean isStressedUnorganizedSchedule,
             final Boolean isForgetImportantThings,
             final Boolean isPreferReminder,
-            final Boolean isImportantBreaks)
-    {
+            final Boolean isImportantBreaks) {
         return new MemberPersonalInfoEntity(
-                memberId, wakeUpTime, windDownTime, job, jobOtherDetail,
+                null, memberId, wakeUpTime, windDownTime, job, jobOtherDetail,
                 isStressedUnorganizedSchedule, isForgetImportantThings,
                 isPreferReminder, isImportantBreaks
         );

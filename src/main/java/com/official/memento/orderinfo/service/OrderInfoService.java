@@ -66,9 +66,10 @@ public class OrderInfoService implements
 
     @Override
     @Transactional
-    public void assignScheduleOrder(final LocalDate date, final Schedule schedule, final long memberId) {
-        List<OrderWithScheduleOrToDo> orderInfoList = orderInfoRepository.findOrderInfoWithDetails(date, memberId);
-        double insertOrder = -1;
+    public void assignScheduleOrder(final LocalDate date, final Schedule schedule, final long memberId){
+        List<OrderWithScheduleOrToDo> orderInfoList = orderInfoRepository.findOrderInfoWithDetails(date,memberId);
+        double insertOrder = 1;
+        boolean isInserted = false;
 
         for (int i = 0; i < orderInfoList.size(); i++) {
             OrderWithScheduleOrToDo existingOrder = orderInfoList.get(i);
@@ -100,7 +101,7 @@ public class OrderInfoService implements
             }
         }
 
-        if (insertOrder == -1) {
+        if (!isInserted) {
             insertOrder = orderInfoList.isEmpty() ? 1 : orderInfoList.get(orderInfoList.size() - 1).getOrder() + 1;
         }
 

@@ -3,15 +3,7 @@ package com.official.memento.global.handler;
 import com.official.memento.alarm.service.command.AlarmExceptionCommand;
 import com.official.memento.alarm.service.command.AlarmSendUseCase;
 import com.official.memento.global.dto.ErrorResponse;
-import com.official.memento.global.exception.ClaudeException;
-import com.official.memento.global.exception.EntityNotFoundException;
-import com.official.memento.global.exception.ErrorCode;
-import com.official.memento.global.exception.InvalidAiRequestException;
-import com.official.memento.global.exception.InvalidJwtTokenException;
-import com.official.memento.global.exception.InvalidRequestBodyException;
-import com.official.memento.global.exception.MementoException;
-import com.official.memento.global.exception.UnauthorizedException;
-import com.official.memento.global.exception.UnexpectedTokenException;
+import com.official.memento.global.exception.*;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.io.DecodingException;
 import org.slf4j.Logger;
@@ -122,6 +114,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnexpectedTokenException.class)
     public ResponseEntity<ErrorResponse> unexpectedTokenException(final UnexpectedTokenException exception) {
         logger.error("Unauthorized access attempt", exception.getMessage());
+        alarmSendUseCase.sendException(new AlarmExceptionCommand(exception));
+        return ErrorResponse.of(HttpStatus.BAD_REQUEST, ErrorCode.UNEXPECTED_TOKEN_ERROR);
+    }
+
+    @ExceptionHandler(DataBaseIntegrityException.class)
+    public ResponseEntity<ErrorResponse> dataBaseIntegrityException(final DataBaseIntegrityException exception) {
+        logger.warn("Database exception occurred", exception.getMessage());
         alarmSendUseCase.sendException(new AlarmExceptionCommand(exception));
         return ErrorResponse.of(HttpStatus.BAD_REQUEST, ErrorCode.UNEXPECTED_TOKEN_ERROR);
     }

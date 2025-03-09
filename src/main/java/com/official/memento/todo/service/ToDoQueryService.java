@@ -32,6 +32,8 @@ public class ToDoQueryService implements ToDoGetUseCase {
                 .peek(todo -> {
                     double order = orderInfoGetUseCase.findByToDoId(todo.getId()).getOrderNum();
                     todo.updateOrderNum(order);
+                    Tag tag = tagGetUseCase.findById(todo.getTagId());
+                    todo.updateTag(tag);
                 })
                 .toList();
         return sortToDosByStartDateAndOrder(toDos);
