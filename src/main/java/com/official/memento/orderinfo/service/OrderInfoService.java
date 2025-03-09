@@ -69,17 +69,30 @@ public class OrderInfoService implements
     public void assignScheduleOrder(final LocalDate date, final Schedule schedule, final long memberId) {
         List<OrderWithScheduleOrToDo> orderInfoList = orderInfoRepository.findOrderInfoWithDetails(date, memberId);
         double insertOrder = -1;
+
         for (int i = 0; i < orderInfoList.size(); i++) {
             OrderWithScheduleOrToDo existingOrder = orderInfoList.get(i);
             if (existingOrder.getType() == PlanType.SCHEDULE) {
                 if (schedule.getStartDate().equals(existingOrder.getStartDate())) {
+                    // 케이스 1: 시작 시간이 동일한 경우
                     if (schedule.getEndDate().isBefore(existingOrder.getEndDate())) {
+                        // 내 종료시간이 기존보다 빠르다면, 이전 순서와 현재 순서의 평균값
                         double previousOrder = (i > 0) ? orderInfoList.get(i - 1).getOrder() : 0;
                         insertOrder = (previousOrder + existingOrder.getOrder()) / 2;
                         break;
+                    } else if (schedule.getEndDate().equals(existingOrder.getEndDate())) {
+                        // 종료 시간도 동일하다면, 현재 순서와 다음 순서의 평균값
+                        if (i < orderInfoList.size() - 1) {
+                            double nextOrder = orderInfoList.get(i + 1).getOrder();
+                            insertOrder = (existingOrder.getOrder() + nextOrder) / 2;
+                        } else {
+                            // 다음 순서가 없으면 현재 순서에 1을 더함
+                            insertOrder = existingOrder.getOrder() + 1;
+                        }
+                        break;
                     }
-                }
-                else if (schedule.getStartDate().isBefore(existingOrder.getStartDate())) {
+                } else if (schedule.getStartDate().isBefore(existingOrder.getStartDate())) {
+                    // 케이스 2: 새 스케줄의 시작시간이 기존 스케줄보다 빠른 경우
                     double previousOrder = (i > 0) ? orderInfoList.get(i - 1).getOrder() : 0;
                     insertOrder = (previousOrder + existingOrder.getOrder()) / 2;
                     break;
