@@ -71,33 +71,22 @@ public class OrderInfoService implements
         double insertOrder = 1;
         boolean isInserted = false;
 
-        for (OrderWithScheduleOrToDo existingOrder : orderInfoList) {
-            if (!isInserted && existingOrder.getType() == PlanType.SCHEDULE) {
-                if (schedule.getStartDate().equals(existingOrder.getStartDate())
-                        && schedule.getEndDate().isBefore(existingOrder.getEndDate())) {
-                    insertOrder = existingOrder.getOrder();
+        for (int i = 0; i < orderInfoList.size(); i++) {
+            OrderWithScheduleOrToDo existingOrder = orderInfoList.get(i);
+            if (existingOrder.getType() == PlanType.SCHEDULE) {
+                if (schedule.getStartDate().equals(existingOrder.getStartDate())) {
+                    if (schedule.getEndDate().isBefore(existingOrder.getEndDate())) {
+                        double previousOrder = (i > 0) ? orderInfoList.get(i - 1).getOrder() : 0;
+                        insertOrder = (previousOrder + existingOrder.getOrder()) / 2;
+                        isInserted = true;
+                        break;
+                    }
+                } else if (schedule.getStartDate().isBefore(existingOrder.getStartDate())) {
+                    double previousOrder = (i > 0) ? orderInfoList.get(i - 1).getOrder() : 0;
+                    insertOrder = (previousOrder + existingOrder.getOrder()) / 2;
                     isInserted = true;
+                    break;
                 }
-                else if (schedule.getStartDate().isBefore(existingOrder.getStartDate())) {
-                    insertOrder = existingOrder.getOrder();
-                    isInserted = true;
-                }
-            }
-
-            if (isInserted) {
-                existingOrder.shiftBack(); // 내부적으로 order 값을 1 증가시키는 메서드라고 가정
-                orderInfoRepository.update(
-                        OrderInfo.withId(
-                                existingOrder.getOrderInfoId(),
-                                existingOrder.getMemberId(),
-                                existingOrder.getScheduleId(),
-                                existingOrder.getToDoId(),
-                                existingOrder.getOrder(), // 이미 증가된 값
-                                date,
-                                existingOrder.getType(),
-                                existingOrder.getCreatedAt()
-                        )
-                );
             }
         }
 
