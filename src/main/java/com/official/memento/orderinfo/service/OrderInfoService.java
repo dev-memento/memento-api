@@ -80,15 +80,6 @@ public class OrderInfoService implements
                         insertOrder = (previousOrder + existingOrder.getOrder()) / 2;
                         isInserted = true;
                         break;
-                    } else if (schedule.getEndDate().equals(existingOrder.getEndDate())) {
-                        if (i < orderInfoList.size() - 1) {
-                            double nextOrder = orderInfoList.get(i + 1).getOrder();
-                            insertOrder = (existingOrder.getOrder() + nextOrder) / 2;
-                        } else {
-                            insertOrder = existingOrder.getOrder() + 1;
-                        }
-                        isInserted = true;
-                        break;
                     }
                 } else if (schedule.getStartDate().isBefore(existingOrder.getStartDate())) {
                     double previousOrder = (i > 0) ? orderInfoList.get(i - 1).getOrder() : 0;
