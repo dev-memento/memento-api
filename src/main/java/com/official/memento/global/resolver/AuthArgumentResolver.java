@@ -46,6 +46,8 @@ public class AuthArgumentResolver implements HandlerMethodArgumentResolver {
     }
 
     private Long validateToken(String token) {
+        System.out.println(token);
+        System.out.println(AUTHORIZATION_HEADER_ADMIN_PREFIX);
         if (token.startsWith(AUTHORIZATION_HEADER_ADMIN_PREFIX)) {
             String adminId = token.substring(AUTHORIZATION_HEADER_ADMIN_PREFIX.length());
             return Long.parseLong(adminId);
