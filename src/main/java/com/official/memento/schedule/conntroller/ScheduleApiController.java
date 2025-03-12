@@ -218,8 +218,7 @@ public class ScheduleApiController implements ScheduleApiDocs {
             @RequestParam LocalDate date
     ) {
         Validator.isNull(date);
-        //List<Schedule> schedules = scheduleGetUseCase.getSchedules(authorizationUser.memberId(), date);
-        List<Schedule> schedules = scheduleGetUseCase.getSchedules(1, date);
+        List<Schedule> schedules = scheduleGetUseCase.getSchedules(authorizationUser.memberId(), date);
 
         return SuccessResponse.of(
                 HttpStatus.CREATED,
