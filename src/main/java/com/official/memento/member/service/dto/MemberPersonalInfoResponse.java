@@ -1,4 +1,4 @@
-package com.official.memento.member.controller.dto;
+package com.official.memento.member.service.dto;
 
 import com.official.memento.member.domain.enums.JobType;
 import io.swagger.v3.oas.annotations.media.Schema;

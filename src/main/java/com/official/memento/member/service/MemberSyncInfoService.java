@@ -5,6 +5,7 @@ import com.official.memento.member.domain.MemberSyncInfo;
 import com.official.memento.member.domain.port.MemberSyncInfoRepository;
 import com.official.memento.member.service.command.MemberSyncInfoCreateCommand;
 import com.official.memento.member.service.command.MemberSyncInfoGetUseCase;
+import com.official.memento.member.service.dto.MemberSyncInfoDto;
 import com.official.memento.member.service.usecase.MemberSyncInfoCreateUseCase;
 import com.official.memento.member.service.usecase.MemberSyncInfoUpdateUseCase;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +19,7 @@ import static com.official.memento.global.exception.ErrorCode.DB_INTEGRITY_CONFL
 public class MemberSyncInfoService implements
         MemberSyncInfoCreateUseCase,
         MemberSyncInfoGetUseCase,
-        MemberSyncInfoUpdateUseCase
-{
+        MemberSyncInfoUpdateUseCase {
 
     private final MemberSyncInfoRepository memberSyncInfoRepository;
 
@@ -34,7 +34,14 @@ public class MemberSyncInfoService implements
 
     @Override
     @Transactional(readOnly = true)
-    public MemberSyncInfo findByMemberId(final long memberId){
+    public MemberSyncInfoDto getMemberSync(final long memberId) {
+        MemberSyncInfo memberSyncInfo = memberSyncInfoRepository.findByMemberId(memberId);
+        return new MemberSyncInfoDto(memberSyncInfo.isAppleSync(), !memberSyncInfo.getGoogleSyncToken().isEmpty());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberSyncInfo findByMemberId(final long memberId) {
         return memberSyncInfoRepository.findByMemberId(memberId);
     }
 
@@ -45,7 +52,7 @@ public class MemberSyncInfoService implements
     }
 
     private void checkPresentByMemberId(final MemberSyncInfoCreateCommand command) {
-        if(memberSyncInfoRepository.findNullableByMemberId(command.memberId()).isPresent()){
+        if (memberSyncInfoRepository.findNullableByMemberId(command.memberId()).isPresent()) {
             throw new DataBaseIntegrityException(DB_INTEGRITY_CONFLICT);
         }
     }

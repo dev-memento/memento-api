@@ -4,7 +4,7 @@ import com.official.memento.global.annotation.Authorization;
 import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
 import com.official.memento.member.controller.dto.MemberPersonalInfoRequest;
-import com.official.memento.member.controller.dto.MemberUptimeResponse;
+import com.official.memento.member.service.dto.MemberUptimeResponse;
 import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.service.command.MemberPersonalInfoCommand;
 import com.official.memento.member.service.usecase.MemberPersonalInfoRetrieveUseCase;

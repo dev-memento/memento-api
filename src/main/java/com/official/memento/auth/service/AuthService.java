@@ -42,7 +42,6 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase {
     private final MemberPersonalInfoCreateUseCase memberPersonalInfoCreateUseCase;
     private final MemberPersonalInfoGetUseCase memberPersonalInfoGetUseCase;
     private final MemberSyncInfoCreateUseCase memberSyncInfoCreateUseCase;
-    private final MemberSyncInfoGetUseCase memberSyncInfoGetUseCase;
     private final TagCreateUseCase tagCreateUseCase;
     private final Map<AuthProvider, AuthClientOutputPort> authClientAdapters;
     private final JwtUtil jwtUtil;
@@ -60,7 +59,6 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase {
                 .orElseGet(() -> createNewMember(platformId, provider));
 
         Optional<MemberPersonalInfo> personalInfo = memberPersonalInfoGetUseCase.findNullableByMemberId(auth.getMemberId());
-        MemberSyncInfo memberSyncInfo = memberSyncInfoGetUseCase.findByMemberId(auth.getMemberId());
         boolean isNewUser = isFirstLogin(personalInfo) || isOnboardingIncomplete(personalInfo);
 
         AccessToken accessToken = jwtUtil.generateAccessToken(auth.getMemberId());
@@ -68,7 +66,7 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase {
 
         auth.withUpdatedToken(refreshToken.getToken());
         authRepository.save(auth);
-        return MemberInfoDto.of(accessToken.getToken(),refreshToken.getToken(),isNewUser, memberSyncInfo.isAppleSync(), !memberSyncInfo.getGoogleSyncToken().isEmpty());
+        return MemberInfoDto.of(accessToken.getToken(),refreshToken.getToken(),isNewUser);
 
     }
 
