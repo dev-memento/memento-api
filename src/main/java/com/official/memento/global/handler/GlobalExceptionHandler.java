@@ -99,9 +99,9 @@ public class GlobalExceptionHandler {
         return ErrorResponse.of(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_REQUEST_BODY);
     }
 
-    @ExceptionHandler(ExpiredJwtException.class)
-    public ResponseEntity<ErrorResponse> expiredJwtException(final ExpiredJwtException exception) {
-        return ErrorResponse.of(HttpStatus.BAD_REQUEST, ErrorCode.EXPIRED_TOKEN);
+    @ExceptionHandler(ExpiredTokenException.class)
+    public ResponseEntity<ErrorResponse> expiredJwtException(final ExpiredTokenException exception) {
+        return ErrorResponse.of(HttpStatus.UNAUTHORIZED, ErrorCode.EXPIRED_TOKEN);
     }
 
     @ExceptionHandler(InvalidJwtTokenException.class)
