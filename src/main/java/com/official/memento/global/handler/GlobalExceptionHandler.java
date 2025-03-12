@@ -99,8 +99,8 @@ public class GlobalExceptionHandler {
         return ErrorResponse.of(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_REQUEST_BODY);
     }
 
-    @ExceptionHandler(ExpiredJwtException.class)
-    public ResponseEntity<ErrorResponse> expiredJwtException(final ExpiredJwtException exception) {
+    @ExceptionHandler(ExpiredTokenException.class)
+    public ResponseEntity<ErrorResponse> expiredJwtException(final ExpiredTokenException exception) {
         return ErrorResponse.of(HttpStatus.BAD_REQUEST, ErrorCode.EXPIRED_TOKEN);
     }
 
@@ -108,7 +108,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> invalidJwtTokenException(final InvalidJwtTokenException exception) {
         logger.error("Unauthorized access attempt", exception.getMessage());
         alarmSendUseCase.sendException(new AlarmExceptionCommand(exception));
-        return ErrorResponse.of(HttpStatus.BAD_REQUEST, ErrorCode.EXPECTED_TOKEN_ERROR);
+        return ErrorResponse.of(HttpStatus.UNAUTHORIZED, ErrorCode.EXPECTED_TOKEN_ERROR);
     }
 
     @ExceptionHandler(UnexpectedTokenException.class)
