@@ -1,4 +1,4 @@
-package com.official.memento.schedule.conntroller.dto.response;
+package com.official.memento.schedule.controller.dto.response;
 
 import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.schedule.domain.enums.ScheduleType;
