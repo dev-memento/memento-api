@@ -55,6 +55,11 @@ public class TagRepositoryAdapter implements TagRepository {
     }
 
     @Override
+    public void deleteById(final long tagId){
+        tagJpaRepository.deleteById(tagId);
+    }
+
+    @Override
     public Tag findById(Long id) {
         final TagEntity entity = tagJpaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_ENTITY));

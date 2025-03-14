@@ -9,9 +9,11 @@ import com.official.memento.tag.controller.dto.TagGetResponse;
 import com.official.memento.tag.controller.dto.TagUpdateRequest;
 import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.service.TagCreateUseCase;
+import com.official.memento.tag.service.TagDeleteUseCase;
 import com.official.memento.tag.service.TagGetUseCase;
 import com.official.memento.tag.service.TagUpdateUseCase;
 import com.official.memento.tag.service.command.TagCreateCommand;
+import com.official.memento.tag.service.command.TagDeleteCommand;
 import com.official.memento.tag.service.command.TagUpdateCommand;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,11 +28,13 @@ public class TagApiController implements TagApiDocs {
     private final TagCreateUseCase tagCreateUseCase;
     private final TagGetUseCase tagGetUseCase;
     private final TagUpdateUseCase tagUpdateUseCase;
+    private final TagDeleteUseCase tagDeleteUseCase;
 
-    public TagApiController(TagCreateUseCase tagCreateUseCase, TagGetUseCase tagGetUseCase, TagUpdateUseCase tagUpdateUseCase) {
+    public TagApiController(TagCreateUseCase tagCreateUseCase, TagGetUseCase tagGetUseCase, TagUpdateUseCase tagUpdateUseCase, TagDeleteUseCase tagDeleteUseCase) {
         this.tagCreateUseCase = tagCreateUseCase;
         this.tagGetUseCase = tagGetUseCase;
         this.tagUpdateUseCase = tagUpdateUseCase;
+        this.tagDeleteUseCase = tagDeleteUseCase;
     }
 
     @Override
@@ -84,5 +88,18 @@ public class TagApiController implements TagApiDocs {
                 "태그 업데이트 성공"
         );
 
+    }
+
+    @Override
+    @DeleteMapping("/{tagId}")
+    public ResponseEntity<SuccessResponse<?>> deleteTag(
+            @Authorization final AuthorizationUser authorizationUser,
+            @PathVariable final long tagId
+    ){
+        tagDeleteUseCase.delete(TagDeleteCommand.of(authorizationUser.memberId(), tagId));
+        return SuccessResponse.of(
+                HttpStatus.OK,
+                "태그 삭제 성공"
+        );
     }
 }

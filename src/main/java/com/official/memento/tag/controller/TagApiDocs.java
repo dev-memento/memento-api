@@ -57,4 +57,17 @@ public interface TagApiDocs {
             @PathVariable final long tagId,
             @RequestBody final TagUpdateRequest request
     );
+
+    @Operation(summary = "태그 삭제 API")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Bad Request")
+            }
+    )
+    ResponseEntity<SuccessResponse<?>> deleteTag(
+            @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
+            @Authorization final AuthorizationUser authorizationUser,
+            @PathVariable final long tagId
+    );
 }

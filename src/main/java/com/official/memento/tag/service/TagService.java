@@ -5,6 +5,7 @@ import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.TagRepository;
 import com.official.memento.tag.domain.enums.TagColor;
 import com.official.memento.tag.service.command.TagCreateCommand;
+import com.official.memento.tag.service.command.TagDeleteCommand;
 import com.official.memento.tag.service.command.TagUpdateCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class TagService implements TagCreateUseCase, TagGetUseCase, TagUpdateUseCase {
+public class TagService implements TagCreateUseCase, TagGetUseCase, TagUpdateUseCase, TagDeleteUseCase {
 
     private final TagRepository tagRepository;
 
@@ -37,6 +38,14 @@ public class TagService implements TagCreateUseCase, TagGetUseCase, TagUpdateUse
         );
 
         tagRepository.update(tag);
+    }
+
+    @Override
+    @Transactional
+    public void delete(final TagDeleteCommand command){
+        Tag tag = tagRepository.findById(command.tagId());
+        checkOwn(command.memberId(),tag);
+        tagRepository.deleteById(tag.getId());
     }
 
     @Transactional(readOnly = true)
