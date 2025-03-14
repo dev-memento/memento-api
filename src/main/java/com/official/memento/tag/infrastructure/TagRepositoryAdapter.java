@@ -39,6 +39,22 @@ public class TagRepositoryAdapter implements TagRepository {
     }
 
     @Override
+    public Tag update(Tag tag) {
+        TagEntity updatedEntity = tagJpaRepository.save(TagEntity.from(
+                tag.getId(),
+                tag.getName(),
+                tag.getColor(),
+                tag.getMemberId()
+        ));
+        return Tag.withId(
+                updatedEntity.getId(),
+                updatedEntity.getName(),
+                updatedEntity.getColor(),
+                updatedEntity.getMemberId()
+        );
+    }
+
+    @Override
     public Tag findById(Long id) {
         final TagEntity entity = tagJpaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_ENTITY));

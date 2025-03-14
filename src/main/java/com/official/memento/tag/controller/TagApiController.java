@@ -6,10 +6,13 @@ import com.official.memento.global.dto.SuccessResponse;
 import com.official.memento.tag.controller.dto.TagCreateRequest;
 import com.official.memento.tag.controller.dto.TagCreateResponse;
 import com.official.memento.tag.controller.dto.TagGetResponse;
+import com.official.memento.tag.controller.dto.TagUpdateRequest;
 import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.service.TagCreateUseCase;
 import com.official.memento.tag.service.TagGetUseCase;
+import com.official.memento.tag.service.TagUpdateUseCase;
 import com.official.memento.tag.service.command.TagCreateCommand;
+import com.official.memento.tag.service.command.TagUpdateCommand;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,10 +25,12 @@ public class TagApiController implements TagApiDocs {
 
     private final TagCreateUseCase tagCreateUseCase;
     private final TagGetUseCase tagGetUseCase;
+    private final TagUpdateUseCase tagUpdateUseCase;
 
-    public TagApiController(TagCreateUseCase tagCreateUseCase, TagGetUseCase tagGetUseCase) {
+    public TagApiController(TagCreateUseCase tagCreateUseCase, TagGetUseCase tagGetUseCase, TagUpdateUseCase tagUpdateUseCase) {
         this.tagCreateUseCase = tagCreateUseCase;
         this.tagGetUseCase = tagGetUseCase;
+        this.tagUpdateUseCase = tagUpdateUseCase;
     }
 
     @Override
@@ -59,5 +64,25 @@ public class TagApiController implements TagApiDocs {
                 "Tag 조회 성공",
                 tags.stream().map(tag -> TagGetResponse.of(tag.getId(), tag.getName(), tag.getColor().getHexCode())).toList()
         );
+    }
+
+    @Override
+    @PatchMapping("/{tagId}")
+    public ResponseEntity<SuccessResponse<?>> updateTag(
+            @Authorization final AuthorizationUser authorizationUser,
+            @PathVariable final long tagId,
+            @RequestBody final TagUpdateRequest tagUpdateRequest
+    ) {
+        tagUpdateUseCase.update(TagUpdateCommand.of(
+                authorizationUser.memberId(),
+                tagId,
+                tagUpdateRequest.color(),
+                tagUpdateRequest.name()
+        ));
+        return SuccessResponse.of(
+                HttpStatus.OK,
+                "태그 업데이트 성공"
+        );
+
     }
 }

@@ -29,6 +29,18 @@ public class Tag {
         this.memberId = memberId;
     }
 
+    public Tag update(
+            final String name,
+            final TagColor color
+    ){
+        return Tag.withId(
+                id,
+                name,
+                color,
+                memberId
+        );
+    }
+
     public Long getId() {
         return id;
     }

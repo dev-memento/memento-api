@@ -5,11 +5,13 @@ import com.official.memento.tag.domain.enums.TagColor;
 import java.util.List;
 
 public interface TagRepository {
-    Tag save(Tag tag);
+    Tag save(final Tag tag);
 
-    Tag findById(Long id);
+    Tag update(final Tag tag);
 
-    List<Tag> findAllByMemberId(Long memberId);
+    Tag findById(final Long id);
 
-    Tag findByMemberIdAndTagColor(Long memberId, TagColor tagColor);
+    List<Tag> findAllByMemberId(final Long memberId);
+
+    Tag findByMemberIdAndTagColor(final Long memberId, TagColor tagColor);
 }
