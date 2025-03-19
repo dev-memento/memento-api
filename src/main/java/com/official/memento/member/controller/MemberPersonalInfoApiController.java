@@ -4,7 +4,7 @@ import com.official.memento.global.annotation.Authorization;
 import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
 import com.official.memento.member.controller.dto.MemberPersonalInfoRequest;
-import com.official.memento.member.controller.dto.MemberUptimeResponse;
+import com.official.memento.member.controller.dto.MemberUptimeDto;
 import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.service.command.MemberPersonalInfoCommand;
 import com.official.memento.member.service.usecase.MemberPersonalInfoRetrieveUseCase;
@@ -42,10 +42,10 @@ public class MemberPersonalInfoApiController implements MemberPersonalInfoApiDoc
     }
 
     @GetMapping("/uptime")
-    public ResponseEntity<SuccessResponse<MemberUptimeResponse>> getUpTime(
+    public ResponseEntity<SuccessResponse<MemberUptimeDto>> getUpTime(
             @Authorization final AuthorizationUser authorizationUser) {
         final MemberPersonalInfo personalInfo = memberPersonalInfoRetrieveUseCase.retrieveUptime(authorizationUser.memberId());
-        final MemberUptimeResponse response = MemberUptimeResponse.of(
+        final MemberUptimeDto response = MemberUptimeDto.of(
                 personalInfo.getWakeUpTime().toString(),
                 personalInfo.getWindDownTime().toString()
         );

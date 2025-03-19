@@ -130,9 +130,9 @@ public class ScheduleApiController implements ScheduleApiDocs {
 
     @PostMapping("/google")
     public ResponseEntity<SuccessResponse<?>> createGoogleSchedules(
-            @RequestHeader(name = "Authorization") final String accessToken
+            @Authorization final AuthorizationUser authorizationUser
     ) {
-        scheduleCreateUseCase.createGoogleSchedules(accessToken);
+        scheduleCreateUseCase.createGoogleSchedules(authorizationUser.memberId());
         return SuccessResponse.of(
                 HttpStatus.CREATED,
                 "반복 스케줄 생성 성공"

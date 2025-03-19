@@ -1,7 +1,10 @@
 package com.official.memento.member.service.command;
 
+import com.official.memento.member.service.result.MemberSyncInfoResult;
 import com.official.memento.member.domain.MemberSyncInfo;
 
 public interface MemberSyncInfoGetUseCase {
-    MemberSyncInfo findByMemberId(final long memberId);
+    MemberSyncInfoResult findByMemberId(final long memberId);
+
+    MemberSyncInfoResult getMemberSync(final long memberId);
 }

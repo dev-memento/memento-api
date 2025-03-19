@@ -1,4 +1,4 @@
-package com.official.memento.member.controller.dto;
+package com.official.memento.member.service.result;
 
 import com.official.memento.member.domain.enums.JobType;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalTime;
 
 @Schema(name = "사용자 개인화 정보 응답")
-public record MemberPersonalInfoResponse(
+public record MemberPersonalInfoResult(
         @Schema(description = "기상 시간", example = "06:00:00")
         LocalTime wakeUpTime,
         @Schema(description = "일정 마무리 시간", example = "22:00:00")
@@ -24,7 +24,7 @@ public record MemberPersonalInfoResponse(
         @Schema(description = "중요한 휴식 여부", example = "true")
         Boolean isImportantBreaks
 ) {
-    public static MemberPersonalInfoResponse of(
+    public static MemberPersonalInfoResult of(
             final LocalTime wakeUpTime,
             final LocalTime windDownTime,
             final JobType job,
@@ -34,7 +34,7 @@ public record MemberPersonalInfoResponse(
             final Boolean isPreferReminder,
             final Boolean isImportantBreaks)
     {
-        return new MemberPersonalInfoResponse(
+        return new MemberPersonalInfoResult(
                 wakeUpTime,
                 windDownTime,
                 job,
