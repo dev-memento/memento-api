@@ -1,4 +1,4 @@
-package com.official.memento.member.service.dto;
+package com.official.memento.member.controller.dto;
 
 public record MemberSyncInfoDto(
         boolean isAppleSync,

@@ -1,8 +1,8 @@
 package com.official.memento.auth.service.usecase;
 
-import com.official.memento.auth.service.AuthResultDto;
+import com.official.memento.auth.service.result.AuthResult;
 
 @FunctionalInterface
 public interface RefreshTokenUseCase {
-    AuthResultDto refreshTokens(final String authorizationHeader);
+    AuthResult refreshTokens(final String authorizationHeader);
 }

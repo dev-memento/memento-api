@@ -2,9 +2,8 @@ package com.official.memento.auth.controller;
 
 import com.official.memento.auth.controller.dto.AuthApiRequest;
 import com.official.memento.auth.controller.dto.LoginResponse;
-import com.official.memento.auth.controller.dto.TokenRefreshResponse;
-import com.official.memento.auth.service.AuthResultDto;
-import com.official.memento.auth.service.dto.MemberInfoDto;
+import com.official.memento.auth.service.result.AuthResult;
+import com.official.memento.auth.service.result.NewAuthResult;
 import com.official.memento.global.dto.ErrorResponse;
 import com.official.memento.global.dto.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,7 +29,7 @@ public interface AuthApiDocs {
                     @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content)
             }
     )
-    ResponseEntity<SuccessResponse<MemberInfoDto>> login(
+    ResponseEntity<SuccessResponse<NewAuthResult>> login(
             @Parameter(name = "AuthApiRequest", description = "로그인 요청 DTO", required = true, schema = @Schema(implementation = AuthApiRequest.class))
             @RequestBody final AuthApiRequest request);
 
@@ -43,7 +42,7 @@ public interface AuthApiDocs {
                     @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content)
             }
     )
-    ResponseEntity<SuccessResponse<AuthResultDto>> refreshTokens(
+    ResponseEntity<SuccessResponse<AuthResult>> refreshTokens(
             @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer 리프레시 토큰", required = true, example = "Bearer refresh_token")
             @RequestHeader String authorizationHeader);
 }

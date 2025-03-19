@@ -1,17 +1,17 @@
-package com.official.memento.auth.service;
+package com.official.memento.auth.service.result;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class AuthResultDto {
+public class AuthResult {
     private final String accessToken;
     private final String refreshToken;
 
-    public static AuthResultDto of(
+    public static AuthResult of(
             String accessToken,
             String refreshToken) {
-        return new AuthResultDto(accessToken, refreshToken);
+        return new AuthResult(accessToken, refreshToken);
     }
 }

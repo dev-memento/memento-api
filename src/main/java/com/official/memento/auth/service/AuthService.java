@@ -7,7 +7,8 @@ import com.official.memento.auth.domain.RefreshToken;
 import com.official.memento.auth.domain.port.AuthClientOutputPort;
 import com.official.memento.auth.domain.port.AuthRepository;
 import com.official.memento.auth.service.command.AuthCommand;
-import com.official.memento.auth.service.dto.MemberInfoDto;
+import com.official.memento.auth.service.result.AuthResult;
+import com.official.memento.auth.service.result.NewAuthResult;
 import com.official.memento.auth.service.usecase.AuthenticateUseCase;
 import com.official.memento.auth.service.usecase.RefreshTokenUseCase;
 import com.official.memento.auth.util.AuthValidation;
@@ -15,10 +16,8 @@ import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.exception.UnauthorizedException;
 import com.official.memento.member.domain.Member;
 import com.official.memento.member.domain.MemberPersonalInfo;
-import com.official.memento.member.domain.MemberSyncInfo;
 import com.official.memento.member.service.command.MemberPersonalInfoCreateCommand;
 import com.official.memento.member.service.command.MemberSyncInfoCreateCommand;
-import com.official.memento.member.service.command.MemberSyncInfoGetUseCase;
 import com.official.memento.member.service.usecase.MemberCreateUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoCreateUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoGetUseCase;
@@ -49,7 +48,7 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase {
 
     @Override
     @Transactional
-    public MemberInfoDto authenticate(final AuthCommand command) {
+    public NewAuthResult authenticate(final AuthCommand command) {
         final AuthProvider provider = command.providerName();
         final Map<String, Object> tokenInfo = verifyIdToken(provider, command.idToken());
         final String platformId = (String) tokenInfo.get("sub");
@@ -66,13 +65,13 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase {
 
         auth.withUpdatedToken(refreshToken.getToken());
         authRepository.save(auth);
-        return MemberInfoDto.of(accessToken.getToken(),refreshToken.getToken(),isNewUser);
+        return NewAuthResult.of(accessToken.getToken(),refreshToken.getToken(),isNewUser);
 
     }
 
     @Override
     @Transactional
-    public AuthResultDto refreshTokens(final String authorizationHeader) {
+    public AuthResult refreshTokens(final String authorizationHeader) {
         String refreshToken = extractRefreshToken(authorizationHeader);
         if (!jwtUtil.validateToken(extractRefreshToken(refreshToken))) {
             throw new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN);
@@ -88,7 +87,7 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase {
         auth.withUpdatedToken(newRefreshToken.getToken());
         authRepository.save(auth);
 
-        return AuthResultDto.of(newAccessToken.getToken(), newRefreshToken.getToken());
+        return AuthResult.of(newAccessToken.getToken(), newRefreshToken.getToken());
     }
 
     private String extractRefreshToken(String authorizationHeader) {
