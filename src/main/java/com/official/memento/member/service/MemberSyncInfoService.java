@@ -5,7 +5,7 @@ import com.official.memento.member.domain.MemberSyncInfo;
 import com.official.memento.member.domain.port.MemberSyncInfoRepository;
 import com.official.memento.member.service.command.MemberSyncInfoCreateCommand;
 import com.official.memento.member.service.command.MemberSyncInfoGetUseCase;
-import com.official.memento.member.service.dto.MemberSyncInfoDto;
+import com.official.memento.member.service.result.MemberSyncInfoResult;
 import com.official.memento.member.service.usecase.MemberSyncInfoCreateUseCase;
 import com.official.memento.member.service.usecase.MemberSyncInfoUpdateUseCase;
 import lombok.RequiredArgsConstructor;
@@ -25,24 +25,24 @@ public class MemberSyncInfoService implements
 
     @Override
     @Transactional
-    public MemberSyncInfo create(final MemberSyncInfoCreateCommand command) {
+    public MemberSyncInfoResult create(final MemberSyncInfoCreateCommand command) {
         checkPresentByMemberId(command);
         MemberSyncInfo memberSyncInfo = MemberSyncInfo.of(command.memberId());
         memberSyncInfoRepository.save(memberSyncInfo);
-        return memberSyncInfo;
+        return MemberSyncInfoResult.of(memberSyncInfo);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public MemberSyncInfoDto getMemberSync(final long memberId) {
+    public MemberSyncInfoResult getMemberSync(final long memberId) {
         MemberSyncInfo memberSyncInfo = memberSyncInfoRepository.findByMemberId(memberId);
-        return new MemberSyncInfoDto(memberSyncInfo.isAppleSync(), !memberSyncInfo.getGoogleSyncToken().isEmpty());
+        return MemberSyncInfoResult.of(memberSyncInfo);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public MemberSyncInfo findByMemberId(final long memberId) {
-        return memberSyncInfoRepository.findByMemberId(memberId);
+    public MemberSyncInfoResult findByMemberId(final long memberId) {
+        return MemberSyncInfoResult.of(memberSyncInfoRepository.findByMemberId(memberId));
     }
 
     @Override
