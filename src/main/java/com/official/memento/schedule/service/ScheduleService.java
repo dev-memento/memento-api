@@ -15,6 +15,8 @@ import com.official.memento.orderinfo.service.usecase.OrderInfoDeleteUseCase;
 import com.official.memento.schedule.domain.ScheduleRepository;
 import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.schedule.domain.entity.ScheduleVo;
+import com.official.memento.schedule.infrastructure.google.GoogleCalendarAdapter;
+import com.official.memento.schedule.infrastructure.google.GoogleCalendarEvent;
 import com.official.memento.schedule.service.command.AppleScheduleCreateCommand;
 import com.official.memento.schedule.service.command.AppleSchedulesCommand;
 import com.official.memento.schedule.service.command.RepeatScheduleCreateCommand;
@@ -63,6 +65,7 @@ public class ScheduleService implements
     private final OrderInfoCreateUseCase orderInfoCreateUseCase;
     private final MemberSyncInfoUpdateUseCase memberSyncInfoUpdateUseCase;
     private final MemberSyncInfoGetUseCase memberSyncInfoGetUseCase;
+    private final GoogleCalendarAdapter googleCalendarAdapter;
 
     @Override
     @Transactional
@@ -128,7 +131,9 @@ public class ScheduleService implements
 
     @Override
     public void createGoogleSchedules(final long memberId) {
-        //Todo memberId 로 연동 정보 찾고
+        //Todo memberId 로 연동 정보 찾고 어떻게든 일단 엑세스토큰을 얻어와서 엑세스토큰으로 구글 접속해서 데이터 가져오고 저장.
+        List<GoogleCalendarEvent> googleSchedules = googleCalendarAdapter.getCalendarEvents("accessToken");
+
     }
 
     @Override
