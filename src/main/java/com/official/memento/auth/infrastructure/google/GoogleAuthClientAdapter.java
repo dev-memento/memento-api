@@ -44,7 +44,6 @@ public class GoogleAuthClientAdapter implements AuthClientOutputPort {
         return response.getBody();
     }
 
-    @Override
     public String refreshAccessToken(final String refreshToken) {
         String tokenUrl = "https://oauth2.googleapis.com/token";
 
