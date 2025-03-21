@@ -101,7 +101,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ExpiredJwtException.class)
     public ResponseEntity<ErrorResponse> expiredJwtException(final ExpiredJwtException exception) {
-        return ErrorResponse.of(HttpStatus.BAD_REQUEST, ErrorCode.EXPIRED_TOKEN);
+        return ErrorResponse.of(HttpStatus.UNAUTHORIZED, ErrorCode.EXPIRED_TOKEN);
     }
 
     @ExceptionHandler(InvalidJwtTokenException.class)
