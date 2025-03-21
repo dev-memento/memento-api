@@ -51,6 +51,12 @@ public class MemberSyncInfoService implements
         memberSyncInfoRepository.save(memberSyncInfo.activateAppleToken());
     }
 
+    @Override
+    public void updateGoogleSyncToken(final long memberId, final String googleToken) {
+        MemberSyncInfo memberSyncInfo = memberSyncInfoRepository.findByMemberId(memberId);
+        memberSyncInfoRepository.save(memberSyncInfo.updateGoogleToken(googleToken));
+    }
+
     private void checkPresentByMemberId(final MemberSyncInfoCreateCommand command) {
         if (memberSyncInfoRepository.findNullableByMemberId(command.memberId()).isPresent()) {
             throw new DataBaseIntegrityException(DB_INTEGRITY_CONFLICT);
