@@ -11,5 +11,5 @@ public interface ScheduleCreateUseCase {
 
     void syncAppleSchedules(final AppleSchedulesCommand command);
 
-    void createGoogleSchedules(final long memberId);
+    void syncGoogleSchedules(final long memberId);
 }

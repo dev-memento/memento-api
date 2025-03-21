@@ -128,14 +128,14 @@ public class ScheduleApiController implements ScheduleApiDocs {
         );
     }
 
-    @PostMapping("/google")
-    public ResponseEntity<SuccessResponse<?>> createGoogleSchedules(
+    @PutMapping("/google")
+    public ResponseEntity<SuccessResponse<?>> syncGoogleSchedules(
             @Authorization final AuthorizationUser authorizationUser
     ) {
-        scheduleCreateUseCase.createGoogleSchedules(authorizationUser.memberId());
+        scheduleCreateUseCase.syncGoogleSchedules(authorizationUser.memberId());
         return SuccessResponse.of(
                 HttpStatus.CREATED,
-                "반복 스케줄 생성 성공"
+                "구글 스케줄 동기화 성공"
         );
     }
 
@@ -180,7 +180,9 @@ public class ScheduleApiController implements ScheduleApiDocs {
                 scheduleUpdateRequest.startDate(),
                 scheduleUpdateRequest.endDate(),
                 scheduleUpdateRequest.isAllDay(),
-                scheduleUpdateRequest.tagId()
+                scheduleUpdateRequest.tagId(),
+                scheduleUpdateRequest.repeatOption(),
+                scheduleUpdateRequest.repeatEndDate()
         ));
         return SuccessResponse.of(
                 HttpStatus.OK,
