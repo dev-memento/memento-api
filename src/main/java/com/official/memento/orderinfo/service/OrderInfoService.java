@@ -48,9 +48,9 @@ public class OrderInfoService implements
             insertOrder = (previousOrder + orderInfoRepository.findByToDoId(command.nextToDoId()).getOrderNum()) / 2;
         }
         checkInValidRequest(previousOrder, insertOrder);
+        insertOrder = checkReOrdering(selectedTodoOrderInfo.getDate(), command.memberId(), insertOrder);
         selectedTodoOrderInfo.updateOrderNum(insertOrder);
         orderInfoRepository.update(selectedTodoOrderInfo);
-        checkReOrdering(selectedTodoOrderInfo.getDate(), command.memberId(), insertOrder);
     }
 
     @Override
@@ -60,14 +60,37 @@ public class OrderInfoService implements
         double preOrder = 0;
         double nextOrder = orderInfoList.isEmpty() ? 1 : orderInfoList.get(0).getOrderNum();
         double insertOrder = (preOrder + nextOrder) / 2;
-        boolean checked = checkReOrdering(date, memberId, insertOrder);
-        createToDoOrderInfo(date, toDo, checked ? 1 : insertOrder, memberId);
+        insertOrder = checkReOrdering(date, memberId, insertOrder);
+        createToDoOrderInfo(date, toDo, insertOrder, memberId);
     }
 
     @Override
     @Transactional
-    public void assignScheduleOrder(final LocalDate date, final Schedule schedule, final long memberId){
-        List<OrderWithScheduleOrToDo> orderInfoList = orderInfoRepository.findOrderInfoWithDetails(date,memberId);
+    public void assignScheduleOrder(final LocalDate date, final Schedule schedule, final long memberId) {
+        List<OrderWithScheduleOrToDo> orderInfoList = orderInfoRepository.findOrderInfoWithDetails(date, memberId);
+        double insertOrder = getInsertOrder(date, schedule, memberId, orderInfoList);
+        createScheduleOrderInfo(date, schedule, insertOrder, memberId);
+    }
+
+    private double checkReOrdering(final LocalDate date, final long memberId, final double insertOrder) {
+        if (insertOrder < 1e-10) {
+            List<OrderInfo> afterOrderInfoList = orderInfoRepository.findAllByMemberIdAndDateOrderByOrderNum(memberId,
+                    date);
+            for (int i = 0; i < afterOrderInfoList.size(); i++) {
+                afterOrderInfoList.get(i).updateOrderNum(i + 1);
+                orderInfoRepository.update(afterOrderInfoList.get(i));
+            }
+            return 1;
+        }
+        return insertOrder;
+    }
+
+    private double getInsertOrder(
+            final LocalDate date,
+            final Schedule schedule,
+            final long memberId,
+            final List<OrderWithScheduleOrToDo> orderInfoList
+    ) {
         double insertOrder = 1;
         boolean isInserted = false;
 
@@ -77,8 +100,7 @@ public class OrderInfoService implements
                         && schedule.getEndDate().isBefore(existingOrder.getEndDate())) {
                     insertOrder = existingOrder.getOrder();
                     isInserted = true;
-                }
-                else if (schedule.getStartDate().isBefore(existingOrder.getStartDate())) {
+                } else if (schedule.getStartDate().isBefore(existingOrder.getStartDate())) {
                     insertOrder = existingOrder.getOrder();
                     isInserted = true;
                 }
@@ -105,21 +127,8 @@ public class OrderInfoService implements
             insertOrder = orderInfoList.isEmpty() ? 1 : orderInfoList.get(orderInfoList.size() - 1).getOrder() + 1;
         }
 
-        boolean checked = checkReOrdering(date, memberId, insertOrder);
-        createScheduleOrderInfo(date, schedule, checked ? 1 : insertOrder, memberId);
-    }
-
-    private boolean checkReOrdering(final LocalDate date, final long memberId, final double insertOrder) {
-        if (insertOrder < 1e-10) {
-            List<OrderInfo> afterOrderInfoList = orderInfoRepository.findAllByMemberIdAndDateOrderByOrderNum(memberId,
-                    date);
-            for (int i = 0; i < afterOrderInfoList.size(); i++) {
-                afterOrderInfoList.get(i).updateOrderNum(i + 1);
-                orderInfoRepository.update(afterOrderInfoList.get(i));
-            }
-            return true;
-        }
-        return false;
+        insertOrder = checkReOrdering(date, memberId, insertOrder);
+        return insertOrder;
     }
 
     private void createToDoOrderInfo(final LocalDate date, final ToDo toDo, final double insertOrder,
@@ -136,7 +145,7 @@ public class OrderInfoService implements
     }
 
     private void createScheduleOrderInfo(final LocalDate date, final Schedule schedule, final double insertOrder,
-                                     final long memberId) {
+                                         final long memberId) {
         orderInfoRepository.save(OrderInfo.of(
                 memberId,
                 schedule.getId(),
@@ -164,7 +173,9 @@ public class OrderInfoService implements
     }
 
     @Override
-    public OrderInfo findByScheduleId(final long scheduleId) {return  orderInfoRepository.findByScheduleId(scheduleId);}
+    public OrderInfo findByScheduleId(final long scheduleId) {
+        return orderInfoRepository.findByScheduleId(scheduleId);
+    }
 
     private static void checkInValidRequest(final double previousOrder, final double insertOrder) {
         if (previousOrder > insertOrder) {
