@@ -75,6 +75,7 @@ public class ScheduleService implements
     public void create(final ScheduleCreateCommand command) {
         Tag tag = tagGetUseCase.findById(command.tagId());
         checkOwnTag(command.memberId(), tag);
+        checkOwnSchedule(command.startDate(),command.endDate());
         Schedule schedule = createSchedule(command);
         orderInfoCreateUseCase.assignScheduleOrder(command.startDate().toLocalDate(), schedule, command.memberId());
     }
@@ -200,6 +201,10 @@ public class ScheduleService implements
             checkOwnTag(command.memberId(), tagGetUseCase.findById(command.tagId()));
         }
 
+        if(command.startDate() != schedule.getStartDate() || command.endDate() != schedule.getEndDate()){
+            checkOwnSchedule(command.startDate(),command.endDate());
+        }
+
         schedule.update(
                 command.description(),
                 command.startDate(),
@@ -309,6 +314,12 @@ public class ScheduleService implements
 
     private static void checkOwnTag(final long memberId, final Tag tag) {
         if (tag.getMemberId() != memberId) {
+            throw new InvalidRequestBodyException(ErrorCode.INVALID_REQUEST_BODY);
+        }
+    }
+
+    private static void checkOwnSchedule(final LocalDateTime startDate, final LocalDateTime endDate){
+        if (endDate.isBefore(startDate)) {
             throw new InvalidRequestBodyException(ErrorCode.INVALID_REQUEST_BODY);
         }
     }
