@@ -1,5 +1,10 @@
 package com.official.memento.schedule.infrastructure.google;
 
+import com.official.memento.global.exception.ErrorCode;
+import com.official.memento.global.exception.ExpiredTokenException;
+import com.official.memento.global.exception.InvalidRequestBodyException;
+import com.official.memento.global.exception.MementoException;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -13,26 +18,32 @@ public class GoogleCalendarAdapter {
 
     private final RestTemplate restTemplate;
 
-    public List<GoogleCalendarEvent> getCalendarEvents(final String accessToken) {
-        String url = "https://www.googleapis.com/calendar/v3/calendars/primary/events";
+    public GoogleCalendarResponse getCalendarEvents(final String accessToken,final String syncToken) {
+        final String GOOGLE_CALENDAR_EVENTS_URL = "https://www.googleapis.com/calendar/v3/calendars/primary/events";
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-
-        HttpEntity<String> entity = new HttpEntity<>(headers);
+        HttpHeaders headers = createAuthHeaders(accessToken);
+        HttpEntity<String> request = new HttpEntity<>(headers);
 
         ResponseEntity<GoogleCalendarResponse> response = restTemplate.exchange(
-                url,
+                GOOGLE_CALENDAR_EVENTS_URL,
                 HttpMethod.GET,
-                entity,
+                request,
                 GoogleCalendarResponse.class
         );
 
-        if (response.getStatusCode() == HttpStatus.OK) {
-            return response.getBody().items();
-        } else {
-            throw new RuntimeException("Failed to fetch calendar events: " + response.getStatusCode());
+        if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+            throw new InvalidRequestBodyException(ErrorCode.EXPIRED_TOKEN);
         }
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new MementoException(ErrorCode.EXTERNAL_SERVER_ERROR);
+        }
+
+        return response.getBody();
+    }
+
+    private HttpHeaders createAuthHeaders(final String accessToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        return headers;
     }
 }
