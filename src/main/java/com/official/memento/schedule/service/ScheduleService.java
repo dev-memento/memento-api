@@ -3,10 +3,10 @@ package com.official.memento.schedule.service;
 import static com.official.memento.schedule.domain.enums.ScheduleType.APPLE;
 import static com.official.memento.schedule.domain.enums.ScheduleType.NORMAL;
 
+import com.official.memento.auth.infrastructure.google.GoogleAuthClientAdapter;
 import com.official.memento.global.entity.enums.RepeatOption;
 import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.exception.InvalidRequestBodyException;
-import com.official.memento.member.domain.MemberSyncInfo;
 import com.official.memento.member.service.command.MemberSyncInfoGetUseCase;
 import com.official.memento.member.service.result.MemberSyncInfoResult;
 import com.official.memento.member.service.usecase.MemberSyncInfoUpdateUseCase;
@@ -17,6 +17,7 @@ import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.schedule.domain.entity.ScheduleVo;
 import com.official.memento.schedule.infrastructure.google.GoogleCalendarAdapter;
 import com.official.memento.schedule.infrastructure.google.GoogleCalendarEvent;
+import com.official.memento.schedule.infrastructure.google.GoogleCalendarResponse;
 import com.official.memento.schedule.service.command.AppleScheduleCreateCommand;
 import com.official.memento.schedule.service.command.AppleSchedulesCommand;
 import com.official.memento.schedule.service.command.RepeatScheduleCreateCommand;
@@ -42,6 +43,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -66,6 +68,7 @@ public class ScheduleService implements
     private final MemberSyncInfoUpdateUseCase memberSyncInfoUpdateUseCase;
     private final MemberSyncInfoGetUseCase memberSyncInfoGetUseCase;
     private final GoogleCalendarAdapter googleCalendarAdapter;
+    private final GoogleAuthClientAdapter googleAuthClientAdapter;
 
     @Override
     @Transactional
@@ -124,16 +127,67 @@ public class ScheduleService implements
             for (String updatedScheduleGroupId : updatedScheduleGroupIds) {
                 updateAppleSchedule(newScheduleMap.get(updatedScheduleGroupId));
             }
-        }else {
+        } else {
             throw new InvalidRequestBodyException(ErrorCode.INVALID_REQUEST_BODY);
         }
     }
 
     @Override
-    public void createGoogleSchedules(final long memberId) {
-        //Todo memberId 로 연동 정보 찾고 어떻게든 일단 엑세스토큰을 얻어와서 엑세스토큰으로 구글 접속해서 데이터 가져오고 저장.
-        List<GoogleCalendarEvent> googleSchedules = googleCalendarAdapter.getCalendarEvents("accessToken");
+    public void syncGoogleSchedules(final long memberId) {
+        MemberSyncInfoResult memberSyncInfo = memberSyncInfoGetUseCase.findByMemberId(memberId);
+        String accessToken = googleAuthClientAdapter.refreshAccessToken(memberSyncInfo.googleSyncToken());
 
+        GoogleCalendarResponse googleCalendarEvents = googleCalendarAdapter.getCalendarEvents(accessToken,
+                memberSyncInfo.googleSyncToken());
+        memberSyncInfoUpdateUseCase.updateGoogleSyncToken(memberId, googleCalendarEvents.nextSyncToken());
+
+        List<Schedule> createOrNormalUpdateSchedules = new ArrayList<>();
+        List<String> dateUpdateSchedules = new ArrayList<>();
+        List<String> deleteSchedule = new ArrayList<>();
+
+        Tag tag = tagGetUseCase.findByMemberIdAndTagColor(memberId, TagColor.GRAY05);
+        for (GoogleCalendarEvent event : googleCalendarEvents.items()) {
+            if (event.status().equals("cancelled")) {
+                deleteSchedule.add(event.id());
+            }
+            if (event.status().equals("confirmed")) {
+                Schedule newSchedule = event.toSchedule(memberId, tag.getId());
+                scheduleRepository.findNullableByScheduleGroupId(event.id()).ifPresentOrElse(
+                        schedule -> {
+                            if (!schedule.getStartDate().equals(newSchedule.getStartDate())) {
+                                dateUpdateSchedules.add(event.id());
+                            }
+                            schedule.update(
+                                    newSchedule.getDescription(),
+                                    newSchedule.getStartDate(),
+                                    newSchedule.getEndDate(),
+                                    newSchedule.isAllDay(),
+                                    newSchedule.getTagId(),
+                                    newSchedule.getRepeatOption(),
+                                    newSchedule.getRepeatExpiredDate()
+                            );
+                            createOrNormalUpdateSchedules.add(schedule);
+                        },
+                        () -> createOrNormalUpdateSchedules.add(newSchedule)
+                );
+            }
+        }
+
+        for (String deleteScheduleId : deleteSchedule) {
+            scheduleRepository.findNullableByScheduleGroupId(deleteScheduleId).ifPresent(schedule -> {
+                scheduleRepository.deleteAllByScheduleGroupId(deleteScheduleId);
+                orderInfoDeleteUseCase.deleteByScheduleId(schedule.getId());
+            });
+        }
+        for (String dateUpdateScheduleId : dateUpdateSchedules) {
+            scheduleRepository.findNullableByScheduleGroupId(dateUpdateScheduleId).ifPresent(schedule -> {
+                orderInfoDeleteUseCase.deleteByScheduleId(schedule.getId());
+            });
+        }
+        for (Schedule schedule : createOrNormalUpdateSchedules) {
+            Schedule saved = scheduleRepository.save(schedule);
+            orderInfoCreateUseCase.assignScheduleOrder(saved.getStartDate().toLocalDate(), saved, memberId);
+        }
     }
 
     @Override
@@ -151,7 +205,9 @@ public class ScheduleService implements
                 command.startDate(),
                 command.endDate(),
                 command.isAllDay(),
-                command.tagId()
+                command.tagId(),
+                command.repeatOption(),
+                command.repeatEndDate()
         );
         scheduleRepository.update(schedule);
 
@@ -335,16 +391,22 @@ public class ScheduleService implements
     }
 
     private void updateAppleSchedule(final ScheduleVo scheduleVo) {
-        Schedule schedule = scheduleRepository.findByScheduleGroupId(scheduleVo.scheduleGroupId());
-        schedule.update(scheduleVo.description(), scheduleVo.startDate(), scheduleVo.endDate(), scheduleVo.isAllDay(),
-                schedule.getTagId());
-        scheduleRepository.save(schedule);
+        Optional<Schedule> schedule = scheduleRepository.findNullableByScheduleGroupId(scheduleVo.scheduleGroupId());
+        if (schedule.isPresent()) {
+            schedule.get().update(scheduleVo.description(), scheduleVo.startDate(), scheduleVo.endDate(),
+                    scheduleVo.isAllDay(),
+                    schedule.get().getTagId(), schedule.get().getRepeatOption(), schedule.get().getRepeatExpiredDate());
+            scheduleRepository.save(schedule.get());
+        }
+
     }
 
     private void deleteAppleSchedule(final String removeScheduleId) {
-        Schedule schedule = scheduleRepository.findByScheduleGroupId(removeScheduleId);
-        scheduleRepository.deleteAllByScheduleGroupId(removeScheduleId);
-        orderInfoDeleteUseCase.deleteByScheduleId(schedule.getId());
+        Optional<Schedule> schedule = scheduleRepository.findNullableByScheduleGroupId(removeScheduleId);
+        if (schedule.isPresent()) {
+            scheduleRepository.deleteAllByScheduleGroupId(removeScheduleId);
+            orderInfoDeleteUseCase.deleteByScheduleId(schedule.get().getId());
+        }
     }
 
     private void createAppleSchedule(
