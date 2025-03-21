@@ -5,6 +5,7 @@ import com.official.memento.schedule.domain.entity.Schedule;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface ScheduleRepository {
     Schedule save(final Schedule schedule);
@@ -13,7 +14,7 @@ public interface ScheduleRepository {
 
     Schedule findById(final long scheduleId);
 
-    Schedule findByScheduleGroupId(final String scheduleGroupId);
+    Optional<Schedule> findNullableByScheduleGroupId(final String scheduleGroupId);
 
     List<Schedule> findAllByScheduleGroupIdAndStartDateGreaterThanEqual(final String scheduleGroupId, final LocalDateTime startDate);
 

@@ -2,6 +2,7 @@ package com.official.memento.schedule.infrastructure.persistence;
 
 import com.official.memento.schedule.domain.enums.ScheduleType;
 import com.official.memento.schedule.infrastructure.persistence.projection.ScheduleOrderInfoProjection;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -12,7 +13,7 @@ import java.util.List;
 public interface ScheduleEntityJpaRepository extends JpaRepository<ScheduleEntity, Long> {
     List<ScheduleEntity> findAllByScheduleGroupIdAndStartDateGreaterThanEqual(final String groupId, final LocalDateTime startDate);
 
-    ScheduleEntity findByScheduleGroupId(final String groupId);
+    Optional<ScheduleEntity> findByScheduleGroupId(final String groupId);
 
     @Query("""
     SELECT s.id AS scheduleId,
