@@ -24,7 +24,8 @@ public class MemberSyncInfoRepositoryAdapter implements MemberSyncInfoRepository
                         entity.getId(),
                         entity.getMemberId(),
                         entity.isAppleSync(),
-                        entity.getGoogleSyncToken()
+                        entity.getGoogleSyncToken(),
+                        entity.getGoogleRefreshToken()
                 ));
     }
 
@@ -32,13 +33,25 @@ public class MemberSyncInfoRepositoryAdapter implements MemberSyncInfoRepository
     public MemberSyncInfo findByMemberId(final long memberId){
         MemberSyncInfoEntity entity = memberSyncInfoEntityJpaRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY));
-        return MemberSyncInfo.withId(entity.getId(), entity.getMemberId(), entity.isAppleSync(), entity.getGoogleSyncToken());
+        return MemberSyncInfo.withId(
+                entity.getId(),
+                entity.getMemberId(),
+                entity.isAppleSync(),
+                entity.getGoogleSyncToken(),
+                entity.getGoogleRefreshToken()
+        );
     }
 
     @Override
     public MemberSyncInfo save(final MemberSyncInfo memberSyncInfo) {
         MemberSyncInfoEntity entity = memberSyncInfoEntityJpaRepository.save(MemberSyncInfoEntity.of(memberSyncInfo));
-        return MemberSyncInfo.withId(entity.getId(), entity.getMemberId(), entity.isAppleSync(), entity.getGoogleSyncToken());
+        return MemberSyncInfo.withId(
+                entity.getId(),
+                entity.getMemberId(),
+                entity.isAppleSync(),
+                entity.getGoogleSyncToken(),
+                entity.getGoogleRefreshToken()
+        );
     }
 
 }
