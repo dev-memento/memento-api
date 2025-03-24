@@ -1,8 +1,5 @@
 package com.official.memento.schedule.service;
 
-import static com.official.memento.schedule.domain.enums.ScheduleType.APPLE;
-import static com.official.memento.schedule.domain.enums.ScheduleType.NORMAL;
-
 import com.official.memento.auth.infrastructure.google.GoogleAuthClientAdapter;
 import com.official.memento.global.entity.enums.RepeatOption;
 import com.official.memento.global.exception.ErrorCode;
@@ -50,6 +47,8 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.official.memento.schedule.domain.enums.ScheduleType.*;
 
 @Service
 @RequiredArgsConstructor
@@ -193,7 +192,7 @@ public class ScheduleService implements
 
     @Override
     @Transactional
-    public void update(final ScheduleUpdateCommand command) {
+    public ScheduleResult update(final ScheduleUpdateCommand command) {
         Schedule schedule = scheduleRepository.findById(command.scheduleId());
         checkOwn(command.memberId(), schedule);
 
@@ -221,37 +220,28 @@ public class ScheduleService implements
             orderInfoCreateUseCase.assignScheduleOrder(command.startDate().toLocalDate(), schedule, command.memberId());
 
         }
+        return ScheduleResult.of(schedule);
     }
 
     @Override
     @Transactional
     public void updateGoogle(final ScheduleUpdateCommand command) {
-        Schedule schedule = scheduleRepository.findById(command.scheduleId());
-        checkOwn(command.memberId(), schedule);
-
-        if (command.tagId() != schedule.getTagId()) {
-            checkOwnTag(command.memberId(), tagGetUseCase.findById(command.tagId()));
-        }
-
-        if(command.startDate() != schedule.getStartDate() || command.endDate() != schedule.getEndDate()){
-            checkDate(command.startDate(),command.endDate());
-        }
-
-        schedule.update(
-                command.description(),
-                command.startDate(),
-                command.endDate(),
-                command.isAllDay(),
-                command.tagId(),
-                command.repeatOption(),
-                command.repeatEndDate()
+        ScheduleResult scheduleResult = update(command);
+        MemberSyncInfoResult memberSyncInfo = memberSyncInfoGetUseCase.findByMemberId(command.memberId());
+        String accessToken = googleAuthClientAdapter.refreshAccessToken(memberSyncInfo.googleSyncToken());
+        Schedule schedule = Schedule.of(
+                command.memberId(),
+                scheduleResult.description(),
+                scheduleResult.startDate(),
+                scheduleResult.endDate(),
+                scheduleResult.isAllDay(),
+                scheduleResult.repeatOption(),
+                scheduleResult.repeatEndDate(),
+                GOOGLE,
+                scheduleResult.scheduleGroupId(),
+                scheduleResult.tagId()
         );
-        scheduleRepository.update(schedule);
-
-        if (schedule.getStartDate() != command.startDate() || schedule.getEndDate() != command.endDate()) {
-            orderInfoDeleteUseCase.deleteByScheduleId(schedule.getId());
-            orderInfoCreateUseCase.assignScheduleOrder(command.startDate().toLocalDate(), schedule, command.memberId());
-        }
+        googleCalendarAdapter.updateCalendarEvent(accessToken,schedule);
     }
 
     @Override
