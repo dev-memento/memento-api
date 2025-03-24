@@ -190,6 +190,29 @@ public class ScheduleApiController implements ScheduleApiDocs {
         );
     }
 
+    @PatchMapping("/{scheduleId}/google")
+    public ResponseEntity<SuccessResponse<?>> updateGoogleSchedule(
+            @Authorization final AuthorizationUser authorizationUser,
+            @PathVariable final long scheduleId,
+            @RequestBody final ScheduleUpdateRequest scheduleUpdateRequest
+    ) {
+        scheduleUpdateUseCase.updateGoogle(ScheduleUpdateCommand.of(
+                authorizationUser.memberId(),
+                scheduleId,
+                scheduleUpdateRequest.description(),
+                scheduleUpdateRequest.startDate(),
+                scheduleUpdateRequest.endDate(),
+                scheduleUpdateRequest.isAllDay(),
+                scheduleUpdateRequest.tagId(),
+                scheduleUpdateRequest.repeatOption(),
+                scheduleUpdateRequest.repeatEndDate()
+        ));
+        return SuccessResponse.of(
+                HttpStatus.OK,
+                "구글 스케줄 업데이트 성공"
+        );
+    }
+
     @PatchMapping("/{scheduleId}/group")
     public ResponseEntity<SuccessResponse<?>> updateScheduleGroup(
             @Authorization final AuthorizationUser authorizationUser,
