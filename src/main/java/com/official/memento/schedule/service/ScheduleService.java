@@ -8,6 +8,7 @@ import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.exception.InvalidRequestBodyException;
 import com.official.memento.member.domain.MemberSyncInfo;
 import com.official.memento.member.service.command.MemberSyncInfoGetUseCase;
+import com.official.memento.member.service.result.MemberSyncInfoResult;
 import com.official.memento.member.service.usecase.MemberSyncInfoUpdateUseCase;
 import com.official.memento.orderinfo.service.usecase.OrderInfoCreateUseCase;
 import com.official.memento.orderinfo.service.usecase.OrderInfoDeleteUseCase;
@@ -85,7 +86,7 @@ public class ScheduleService implements
 
     @Override
     public void syncAppleSchedules(final AppleSchedulesCommand command) {
-        MemberSyncInfo memberSyncInfo = memberSyncInfoGetUseCase.findByMemberId(command.memberId());
+        MemberSyncInfoResult memberSyncInfo = memberSyncInfoGetUseCase.findByMemberId(command.memberId());
         Tag tag = tagGetUseCase.findByMemberIdAndTagColor(command.memberId(), TagColor.GRAY05);
         Map<String, ScheduleVo> newScheduleMap = getScheduleVoMap(command);
         if (memberSyncInfo.isAppleSync()) {
@@ -127,8 +128,8 @@ public class ScheduleService implements
     }
 
     @Override
-    public void createGoogleSchedules(String command) {
-
+    public void createGoogleSchedules(final long memberId) {
+        //Todo memberId 로 연동 정보 찾고
     }
 
     @Override
