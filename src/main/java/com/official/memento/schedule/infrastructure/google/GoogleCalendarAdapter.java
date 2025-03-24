@@ -2,6 +2,7 @@ package com.official.memento.schedule.infrastructure.google;
 
 import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.exception.MementoException;
+import com.official.memento.schedule.domain.entity.Schedule;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpEntity;
@@ -35,11 +36,12 @@ public class GoogleCalendarAdapter {
         return response.getBody();
     }
 
-    public void updateCalendarEvent(final String accessToken, final GoogleCalendarEvent event) {
+    public void updateCalendarEvent(final String accessToken, final Schedule schedule) {
         final String url = "https://www.googleapis.com/calendar/v3/calendars/primary/events";
 
         HttpHeaders headers = createAuthHeaders(accessToken);
-        HttpEntity<GoogleCalendarEvent> request = new HttpEntity<>(event, headers);
+        GoogleCalendarUpdateRequest body = GoogleCalendarUpdateRequest.of(schedule);
+        HttpEntity<GoogleCalendarUpdateRequest> request = new HttpEntity<>(body, headers);
 
         ResponseEntity<Void> response = restTemplate.exchange(
                 url,
