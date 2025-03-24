@@ -35,7 +35,24 @@ public class GoogleCalendarAdapter {
         return response.getBody();
     }
 
-    @NotNull
+    public void updateCalendarEvent(final String accessToken, final GoogleCalendarEvent event) {
+        final String url = "https://www.googleapis.com/calendar/v3/calendars/primary/events";
+
+        HttpHeaders headers = createAuthHeaders(accessToken);
+        HttpEntity<GoogleCalendarEvent> request = new HttpEntity<>(event, headers);
+
+        ResponseEntity<Void> response = restTemplate.exchange(
+                url,
+                HttpMethod.PUT,
+                request,
+                Void.class
+        );
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new MementoException(ErrorCode.EXTERNAL_SERVER_ERROR);
+        }
+    }
+
     private ResponseEntity<GoogleCalendarResponse> getGoogleCalendarResponseResponseEntity(
             String accessToken,
             String syncToken) {
