@@ -97,7 +97,6 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
         toDoJpaRepository.deleteById(toDoId);
     }
 
-
     @Override
     public List<ToDo> findAllByMemberId(long memberId) {
         List<ToDoEntity> toDoEntityList = toDoJpaRepository.findAllByMemberId(memberId);

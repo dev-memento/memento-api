@@ -1,5 +1,6 @@
 package com.official.memento.tag.service;
 
+import com.official.memento.schedule.domain.ScheduleRepository;
 import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.TagRepository;
@@ -7,6 +8,8 @@ import com.official.memento.tag.domain.enums.TagColor;
 import com.official.memento.tag.service.command.TagCreateCommand;
 import com.official.memento.tag.service.command.TagDeleteCommand;
 import com.official.memento.tag.service.command.TagUpdateCommand;
+import com.official.memento.todo.domain.entity.ToDo;
+import com.official.memento.todo.domain.repository.ToDoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +21,8 @@ import java.util.List;
 public class TagService implements TagCreateUseCase, TagGetUseCase, TagUpdateUseCase, TagDeleteUseCase {
 
     private final TagRepository tagRepository;
+    private final ScheduleRepository scheduleRepository;
+    private final ToDoRepository toDoRepository;
 
     @Override
     @Transactional
@@ -30,7 +35,7 @@ public class TagService implements TagCreateUseCase, TagGetUseCase, TagUpdateUse
     @Transactional
     public void update(final TagUpdateCommand command) {
         Tag tag = tagRepository.findById(command.tagId());
-        checkOwn(command.memberId(), tag);
+        Tag.checkOwn(command.memberId(), tag);
 
         tag = tag.update(
                 command.name(),
@@ -44,7 +49,12 @@ public class TagService implements TagCreateUseCase, TagGetUseCase, TagUpdateUse
     @Transactional
     public void delete(final TagDeleteCommand command){
         Tag tag = tagRepository.findById(command.tagId());
-        checkOwn(command.memberId(),tag);
+        Tag.checkOwn(command.memberId(),tag);
+
+        Tag defaultTag = tagRepository.findDefaultTag(command.memberId());
+
+        scheduleRepository.updateTagForSchedules(tag.getId(), defaultTag.getId());
+
         tagRepository.deleteById(tag.getId());
     }
 
@@ -64,11 +74,5 @@ public class TagService implements TagCreateUseCase, TagGetUseCase, TagUpdateUse
     @Transactional(readOnly = true)
     public Tag findByMemberIdAndTagColor(final long memberId, final TagColor tagColor) {
         return tagRepository.findByMemberIdAndTagColor(memberId, tagColor);
-    }
-
-    private static void checkOwn(final long memberId, final Tag tag) {
-        if (tag.getMemberId() != memberId) {
-            throw new IllegalArgumentException("해당 태그를 소유하지 않음");
-        }
     }
 }

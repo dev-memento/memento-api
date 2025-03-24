@@ -3,7 +3,6 @@ package com.official.memento.tag.infrastructure;
 import static com.official.memento.global.exception.ErrorCode.NOT_FOUND_ENTITY;
 
 import com.official.memento.global.exception.EntityNotFoundException;
-import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.stereotype.Adapter;
 import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.TagRepository;
@@ -39,8 +38,8 @@ public class TagRepositoryAdapter implements TagRepository {
     }
 
     @Override
-    public Tag update(Tag tag) {
-        TagEntity updatedEntity = tagJpaRepository.save(TagEntity.from(
+    public Tag update(final Tag tag) {
+        TagEntity updatedEntity = tagJpaRepository.save(TagEntity.withId(
                 tag.getId(),
                 tag.getName(),
                 tag.getColor(),
@@ -87,6 +86,18 @@ public class TagRepositoryAdapter implements TagRepository {
     @Override
     public Tag findByMemberIdAndTagColor(Long memberId, TagColor tagColor) {
         TagEntity entity = tagJpaRepository.findByMemberIdAndColor(memberId, tagColor)
+                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_ENTITY));
+        return Tag.withId(
+                entity.getId(),
+                entity.getName(),
+                entity.getColor(),
+                entity.getMemberId()
+        );
+    }
+
+    @Override
+    public Tag findDefaultTag(Long memberId){
+        TagEntity entity = tagJpaRepository.findDefaultTag(memberId)
                 .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_ENTITY));
         return Tag.withId(
                 entity.getId(),

@@ -17,6 +17,8 @@ public interface ScheduleRepository {
 
     List<Schedule> findAllByScheduleGroupIdAndStartDateGreaterThanEqual(final String scheduleGroupId, final LocalDateTime startDate);
 
+    void updateTagForSchedules(final long oldTagId, final long defaultTagId);
+
     void deleteById(final long scheduleId);
 
     void deleteAll(final List<Schedule> schedules);

@@ -1,16 +1,11 @@
 package com.official.memento.tag.infrastructure.persistence;
 
-
-import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
-import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.enums.TagColor;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 @Entity
 @Table(name = "tag")
@@ -32,7 +27,7 @@ public class TagEntity {
         this.memberId = memberId;
     }
 
-    private TagEntity(final Long id, final String name, TagColor color, Long memberId){
+    public TagEntity(Long id, String name, TagColor color, Long memberId) {
         this.id = id;
         this.name = name;
         this.color = color;
@@ -47,7 +42,7 @@ public class TagEntity {
         );
     }
 
-    public static TagEntity from(Long id, String name, TagColor color, Long memberId) {
+    public static TagEntity withId(Long id, String name, TagColor color, Long memberId) {
         return new TagEntity(
                 id,
                 name,
