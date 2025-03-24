@@ -75,7 +75,7 @@ public class ScheduleService implements
     public void create(final ScheduleCreateCommand command) {
         Tag tag = tagGetUseCase.findById(command.tagId());
         checkOwnTag(command.memberId(), tag);
-        checkOwnSchedule(command.startDate(),command.endDate());
+        checkDate(command.startDate(),command.endDate());
         Schedule schedule = createSchedule(command);
         orderInfoCreateUseCase.assignScheduleOrder(command.startDate().toLocalDate(), schedule, command.memberId());
     }
@@ -202,7 +202,7 @@ public class ScheduleService implements
         }
 
         if(command.startDate() != schedule.getStartDate() || command.endDate() != schedule.getEndDate()){
-            checkOwnSchedule(command.startDate(),command.endDate());
+            checkDate(command.startDate(),command.endDate());
         }
 
         schedule.update(
@@ -220,6 +220,37 @@ public class ScheduleService implements
             orderInfoDeleteUseCase.deleteByScheduleId(schedule.getId());
             orderInfoCreateUseCase.assignScheduleOrder(command.startDate().toLocalDate(), schedule, command.memberId());
 
+        }
+    }
+
+    @Override
+    @Transactional
+    public void updateGoogle(final ScheduleUpdateCommand command) {
+        Schedule schedule = scheduleRepository.findById(command.scheduleId());
+        checkOwn(command.memberId(), schedule);
+
+        if (command.tagId() != schedule.getTagId()) {
+            checkOwnTag(command.memberId(), tagGetUseCase.findById(command.tagId()));
+        }
+
+        if(command.startDate() != schedule.getStartDate() || command.endDate() != schedule.getEndDate()){
+            checkDate(command.startDate(),command.endDate());
+        }
+
+        schedule.update(
+                command.description(),
+                command.startDate(),
+                command.endDate(),
+                command.isAllDay(),
+                command.tagId(),
+                command.repeatOption(),
+                command.repeatEndDate()
+        );
+        scheduleRepository.update(schedule);
+
+        if (schedule.getStartDate() != command.startDate() || schedule.getEndDate() != command.endDate()) {
+            orderInfoDeleteUseCase.deleteByScheduleId(schedule.getId());
+            orderInfoCreateUseCase.assignScheduleOrder(command.startDate().toLocalDate(), schedule, command.memberId());
         }
     }
 
@@ -318,7 +349,7 @@ public class ScheduleService implements
         }
     }
 
-    private static void checkOwnSchedule(final LocalDateTime startDate, final LocalDateTime endDate){
+    private static void checkDate(final LocalDateTime startDate, final LocalDateTime endDate){
         if (endDate.isBefore(startDate)) {
             throw new InvalidRequestBodyException(ErrorCode.INVALID_REQUEST_BODY);
         }
