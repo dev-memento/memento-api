@@ -32,7 +32,7 @@ public class GoogleCalendarAdapter {
             } else {
                 throw new MementoException(ErrorCode.INTERNAL_SERVER_ERROR);
             }
-        } catch (RestClientException ex) {  //기타 통신 오류 처리
+        } catch (RestClientException ex) {  //기타 통신 오류 처리, 타임아웃 및 연결 에러
             throw new MementoException(ErrorCode.INTERNAL_SERVER_ERROR);
         } catch (Exception ex) {
             throw new MementoException(ErrorCode.INTERNAL_SERVER_ERROR);
