@@ -152,7 +152,7 @@ public class ScheduleService implements
             }
             if (event.status().equals("confirmed")) {
                 Schedule newSchedule = event.toSchedule(memberId, tag.getId());
-                scheduleRepository.findNullableByScheduleGroupId(event.id()).ifPresentOrElse(
+                scheduleRepository.findByScheduleGroupIdOrNull(event.id()).ifPresentOrElse(
                         schedule -> {
                             if (!schedule.getStartDate().equals(newSchedule.getStartDate())) {
                                 dateUpdateSchedules.add(event.id());
@@ -174,13 +174,13 @@ public class ScheduleService implements
         }
 
         for (String deleteScheduleId : deleteSchedule) {
-            scheduleRepository.findNullableByScheduleGroupId(deleteScheduleId).ifPresent(schedule -> {
+            scheduleRepository.findByScheduleGroupIdOrNull(deleteScheduleId).ifPresent(schedule -> {
                 scheduleRepository.deleteAllByScheduleGroupId(deleteScheduleId);
                 orderInfoDeleteUseCase.deleteByScheduleId(schedule.getId());
             });
         }
         for (String dateUpdateScheduleId : dateUpdateSchedules) {
-            scheduleRepository.findNullableByScheduleGroupId(dateUpdateScheduleId).ifPresent(schedule -> {
+            scheduleRepository.findByScheduleGroupIdOrNull(dateUpdateScheduleId).ifPresent(schedule -> {
                 orderInfoDeleteUseCase.deleteByScheduleId(schedule.getId());
             });
         }
@@ -423,7 +423,7 @@ public class ScheduleService implements
     }
 
     private void updateAppleSchedule(final ScheduleVo scheduleVo) {
-        Optional<Schedule> schedule = scheduleRepository.findNullableByScheduleGroupId(scheduleVo.scheduleGroupId());
+        Optional<Schedule> schedule = scheduleRepository.findByScheduleGroupIdOrNull(scheduleVo.scheduleGroupId());
         if (schedule.isPresent()) {
             schedule.get().update(scheduleVo.description(), scheduleVo.startDate(), scheduleVo.endDate(),
                     scheduleVo.isAllDay(),
@@ -434,7 +434,7 @@ public class ScheduleService implements
     }
 
     private void deleteAppleSchedule(final String removeScheduleId) {
-        Optional<Schedule> schedule = scheduleRepository.findNullableByScheduleGroupId(removeScheduleId);
+        Optional<Schedule> schedule = scheduleRepository.findByScheduleGroupIdOrNull(removeScheduleId);
         if (schedule.isPresent()) {
             scheduleRepository.deleteAllByScheduleGroupId(removeScheduleId);
             orderInfoDeleteUseCase.deleteByScheduleId(schedule.get().getId());

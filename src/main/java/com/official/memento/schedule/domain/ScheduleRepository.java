@@ -14,7 +14,7 @@ public interface ScheduleRepository {
 
     Schedule findById(final long scheduleId);
 
-    Optional<Schedule> findNullableByScheduleGroupId(final String scheduleGroupId);
+    Optional<Schedule> findByScheduleGroupIdOrNull(final String scheduleGroupId);
 
     List<Schedule> findAllByScheduleGroupIdAndStartDateGreaterThanEqual(final String scheduleGroupId, final LocalDateTime startDate);
 

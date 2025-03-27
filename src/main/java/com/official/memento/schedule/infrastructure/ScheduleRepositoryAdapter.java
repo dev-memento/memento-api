@@ -178,7 +178,7 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
     }
 
     @Override
-    public Optional<Schedule> findNullableByScheduleGroupId(final String scheduleGroupId) {
+    public Optional<Schedule> findByScheduleGroupIdOrNull(final String scheduleGroupId) {
         Optional<ScheduleEntity> scheduleEntity = scheduleEntityJpaRepository.findByScheduleGroupId(scheduleGroupId);
         return scheduleEntity.map(entity -> Schedule.withId(
                 entity.getId(),
