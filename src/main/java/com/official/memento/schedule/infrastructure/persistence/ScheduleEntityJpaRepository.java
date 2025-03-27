@@ -96,6 +96,6 @@ public interface ScheduleEntityJpaRepository extends JpaRepository<ScheduleEntit
     void deleteAllByScheduleGroupId(final String groupId);
 
     @Modifying
-    @Query("UPDATE ScheduleEntity s SET s.tagId = :defaultTagId WHERE s.tagId = :oldTagId")
-    void updateTagForSchedules(@Param("oldTagId") Long oldTagId, @Param("defaultTagId") Long defaultTagId);
+    @Query("UPDATE ScheduleEntity s SET s.tagId = :newTagId WHERE s.tagId = :oldTagId")
+    void updateTagForSchedules(@Param("oldTagId") Long oldTagId, @Param("newTagId") Long newTagId);
 }

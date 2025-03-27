@@ -96,7 +96,7 @@ public class TagRepositoryAdapter implements TagRepository {
     }
 
     @Override
-    public Tag findDefaultTag(Long memberId){
+    public Tag findDefaultTag(final Long memberId){
         TagEntity entity = tagJpaRepository.findDefaultTag(memberId)
                 .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_ENTITY));
         return Tag.withId(

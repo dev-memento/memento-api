@@ -41,8 +41,8 @@ public class Tag {
         );
     }
 
-    public static void checkOwn(final long memberId, final Tag tag) {
-        if (tag.getMemberId() != memberId) {
+    public void checkOwn(final long memberId) {
+        if (this.memberId != memberId) {
             throw new IllegalArgumentException("해당 태그를 소유하지 않음");
         }
     }

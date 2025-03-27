@@ -2,6 +2,7 @@ package com.official.memento.tag.service;
 
 import com.official.memento.schedule.domain.ScheduleRepository;
 import com.official.memento.schedule.domain.entity.Schedule;
+import com.official.memento.schedule.service.usecase.ScheduleUpdateUseCase;
 import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.TagRepository;
 import com.official.memento.tag.domain.enums.TagColor;
@@ -35,7 +36,7 @@ public class TagService implements TagCreateUseCase, TagGetUseCase, TagUpdateUse
     @Transactional
     public void update(final TagUpdateCommand command) {
         Tag tag = tagRepository.findById(command.tagId());
-        Tag.checkOwn(command.memberId(), tag);
+        tag.checkOwn(command.memberId());
 
         tag = tag.update(
                 command.name(),
@@ -49,7 +50,7 @@ public class TagService implements TagCreateUseCase, TagGetUseCase, TagUpdateUse
     @Transactional
     public void delete(final TagDeleteCommand command){
         Tag tag = tagRepository.findById(command.tagId());
-        Tag.checkOwn(command.memberId(),tag);
+        tag.checkOwn(command.memberId());
 
         Tag defaultTag = tagRepository.findDefaultTag(command.memberId());
 

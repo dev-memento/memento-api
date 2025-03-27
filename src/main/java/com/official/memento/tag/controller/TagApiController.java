@@ -15,6 +15,7 @@ import com.official.memento.tag.service.TagUpdateUseCase;
 import com.official.memento.tag.service.command.TagCreateCommand;
 import com.official.memento.tag.service.command.TagDeleteCommand;
 import com.official.memento.tag.service.command.TagUpdateCommand;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,19 +24,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/tags")
+@RequiredArgsConstructor
 public class TagApiController implements TagApiDocs {
 
     private final TagCreateUseCase tagCreateUseCase;
     private final TagGetUseCase tagGetUseCase;
     private final TagUpdateUseCase tagUpdateUseCase;
     private final TagDeleteUseCase tagDeleteUseCase;
-
-    public TagApiController(TagCreateUseCase tagCreateUseCase, TagGetUseCase tagGetUseCase, TagUpdateUseCase tagUpdateUseCase, TagDeleteUseCase tagDeleteUseCase) {
-        this.tagCreateUseCase = tagCreateUseCase;
-        this.tagGetUseCase = tagGetUseCase;
-        this.tagUpdateUseCase = tagUpdateUseCase;
-        this.tagDeleteUseCase = tagDeleteUseCase;
-    }
 
     @Override
     @PostMapping
