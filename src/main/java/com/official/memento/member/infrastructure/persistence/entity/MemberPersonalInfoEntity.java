@@ -4,6 +4,7 @@ import com.official.memento.member.domain.enums.JobType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
@@ -12,6 +13,7 @@ import java.time.LocalTime;
 @Table(name = "member_personal_info")
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class MemberPersonalInfoEntity {
 
     @Id
@@ -23,6 +25,7 @@ public class MemberPersonalInfoEntity {
     private LocalTime wakeUpTime;
 
     private LocalTime windDownTime;
+    private int timeZoneOffset;
 
     @Enumerated(EnumType.STRING)
     private JobType job;
@@ -41,6 +44,7 @@ public class MemberPersonalInfoEntity {
             final long memberId,
             final LocalTime wakeUpTime,
             final LocalTime windDownTime,
+            final int timeZoneOffset,
             final JobType job,
             final String jobOtherDetail,
             final Boolean isStressedUnorganizedSchedule,
@@ -48,54 +52,10 @@ public class MemberPersonalInfoEntity {
             final Boolean isPreferReminder,
             final Boolean isImportantBreaks) {
         return new MemberPersonalInfoEntity(
-                null, memberId, wakeUpTime, windDownTime, job, jobOtherDetail,
+                null, memberId, wakeUpTime, windDownTime, timeZoneOffset, job, jobOtherDetail,
                 isStressedUnorganizedSchedule, isForgetImportantThings,
                 isPreferReminder, isImportantBreaks
         );
-    }
-
-    public void setId(final Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public long getMemberId() {
-        return memberId;
-    }
-
-    public LocalTime getWakeUpTime() {
-        return wakeUpTime;
-    }
-
-    public LocalTime getWindDownTime() {
-        return windDownTime;
-    }
-
-    public JobType getJob() {
-        return job;
-    }
-
-    public String getJobOtherDetail() {
-        return jobOtherDetail;
-    }
-
-    public Boolean getIsStressedUnorganizedSchedule() {
-        return isStressedUnorganizedSchedule;
-    }
-
-    public Boolean getIsForgetImportantThings() {
-        return isForgetImportantThings;
-    }
-
-    public Boolean getIsPreferReminder() {
-        return isPreferReminder;
-    }
-
-    public Boolean getIsImportantBreaks() {
-        return isImportantBreaks;
     }
 
     // 추가된 updateFields 메서드
