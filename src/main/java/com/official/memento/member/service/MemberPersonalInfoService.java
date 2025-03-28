@@ -26,7 +26,7 @@ public class MemberPersonalInfoService implements MemberPersonalInfoCreateUseCas
     @Transactional
     public MemberPersonalInfo create(final MemberPersonalInfoCreateCommand command) {
         checkPresentByMemberId(command);
-        MemberPersonalInfo memberPersonalInfo = MemberPersonalInfo.of(command.memberId());
+        MemberPersonalInfo memberPersonalInfo = MemberPersonalInfo.of(command.memberId(), command.timeZoneOffset());
         memberPersonalInfoRepository.create(memberPersonalInfo);
         return memberPersonalInfo;
     }
@@ -49,6 +49,12 @@ public class MemberPersonalInfoService implements MemberPersonalInfoCreateUseCas
     }
 
     @Override
+    public void updateTimeZone(Long memberId, int timeZoneOffset) {
+        MemberPersonalInfo memberPersonalInfo = memberPersonalInfoRepository.findByMemberId(memberId);
+        memberPersonalInfoRepository.update(memberPersonalInfo.updateTimeZoneOffset(timeZoneOffset));
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public MemberPersonalInfo retrieveUptime(final Long memberId) {
         return memberPersonalInfoRepository.findByMemberId(memberId);
@@ -56,7 +62,7 @@ public class MemberPersonalInfoService implements MemberPersonalInfoCreateUseCas
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<MemberPersonalInfo> findNullableByMemberId(long memberId) {
+    public Optional<MemberPersonalInfo> findByMemberIdOrNull(long memberId) {
         return memberPersonalInfoRepository.findNullableByMemberId(memberId);
     }
 
