@@ -18,6 +18,7 @@ import com.official.memento.member.domain.Member;
 import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.service.command.MemberPersonalInfoCreateCommand;
 import com.official.memento.member.service.command.MemberSyncInfoCreateCommand;
+import com.official.memento.member.service.command.MemberTimeZoneUpdateCommand;
 import com.official.memento.member.service.usecase.*;
 import com.official.memento.tag.domain.enums.TagColor;
 import com.official.memento.tag.service.TagCreateUseCase;
@@ -129,7 +130,10 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase {
 
     private void updateTimeZone(final Optional<MemberPersonalInfo> personalInfo, final int timeZoneOffset) {
         if (personalInfo.isPresent() && personalInfo.get().getTimeZoneOffset() != timeZoneOffset) {
-            memberPersonalInfoUpdateUseCase.updateTimeZone(personalInfo.get().getMemberId(), timeZoneOffset);
+            memberPersonalInfoUpdateUseCase.updateTimeZone(MemberTimeZoneUpdateCommand.of(
+                    personalInfo.get().getMemberId(),
+                    timeZoneOffset
+            ));
         }
     }
 }

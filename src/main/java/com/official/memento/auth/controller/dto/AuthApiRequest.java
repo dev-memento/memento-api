@@ -14,14 +14,14 @@ public record AuthApiRequest(
         int timeZoneOffset
 ) {
     public AuthApiRequest(final AuthProvider provider,final String idToken,final String authorizationCode,final int timeZoneOffset) {
-        validation(provider, idToken, authorizationCode);
+        validate(provider, idToken, authorizationCode);
         this.provider = provider;
         this.idToken = idToken;
         this.authorizationCode = authorizationCode;
         this.timeZoneOffset = timeZoneOffset;
     }
 
-    private static void validation(AuthProvider provider, String idToken, String authorizationCode) {
+    private static void validate(AuthProvider provider, String idToken, String authorizationCode) {
         Validator.isNull(provider);
         Validator.isNull(idToken);
     }
