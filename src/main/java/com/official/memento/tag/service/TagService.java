@@ -1,28 +1,62 @@
 package com.official.memento.tag.service;
 
+import com.official.memento.schedule.domain.ScheduleRepository;
+import com.official.memento.schedule.domain.entity.Schedule;
+import com.official.memento.schedule.service.usecase.ScheduleUpdateUseCase;
 import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.TagRepository;
 import com.official.memento.tag.domain.enums.TagColor;
 import com.official.memento.tag.service.command.TagCreateCommand;
+import com.official.memento.tag.service.command.TagDeleteCommand;
+import com.official.memento.tag.service.command.TagUpdateCommand;
+import com.official.memento.todo.domain.entity.ToDo;
+import com.official.memento.todo.domain.repository.ToDoRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
-public class TagService implements TagCreateUseCase, TagGetUseCase {
+@RequiredArgsConstructor
+public class TagService implements TagCreateUseCase, TagGetUseCase, TagUpdateUseCase, TagDeleteUseCase {
 
     private final TagRepository tagRepository;
-
-    public TagService(TagRepository tagRepository) {
-        this.tagRepository = tagRepository;
-    }
+    private final ScheduleRepository scheduleRepository;
+    private final ToDoRepository toDoRepository;
 
     @Override
     @Transactional
     public Tag create(final TagCreateCommand command) {
         final Tag tag = Tag.of(command.name(), command.color(), command.memberId());
         return tagRepository.save(tag);
+    }
+
+    @Override
+    @Transactional
+    public void update(final TagUpdateCommand command) {
+        Tag tag = tagRepository.findById(command.tagId());
+        tag.checkOwn(command.memberId());
+
+        tag = tag.update(
+                command.name(),
+                command.color()
+        );
+
+        tagRepository.update(tag);
+    }
+
+    @Override
+    @Transactional
+    public void delete(final TagDeleteCommand command){
+        Tag tag = tagRepository.findById(command.tagId());
+        tag.checkOwn(command.memberId());
+
+        Tag defaultTag = tagRepository.findDefaultTag(command.memberId());
+
+        scheduleRepository.updateTagForSchedules(tag.getId(), defaultTag.getId());
+
+        tagRepository.deleteById(tag.getId());
     }
 
     @Transactional(readOnly = true)

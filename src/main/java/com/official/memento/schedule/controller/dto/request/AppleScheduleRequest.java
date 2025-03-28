@@ -1,4 +1,4 @@
-package com.official.memento.schedule.conntroller.dto.request;
+package com.official.memento.schedule.controller.dto.request;
 
 import com.official.memento.global.util.Validator;
 import io.swagger.v3.oas.annotations.media.Schema;

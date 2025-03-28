@@ -1,5 +1,6 @@
 package com.official.memento.todo.infrastructure.persistence;
 
+import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.official.memento.global.entity.BaseTimeEntity;
@@ -16,6 +17,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,6 +26,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "todo")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
+@AllArgsConstructor(access = PRIVATE)
 public class ToDoEntity extends BaseTimeEntity {
 
     @Id

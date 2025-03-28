@@ -29,6 +29,24 @@ public class Tag {
         this.memberId = memberId;
     }
 
+    public Tag update(
+            final String name,
+            final TagColor color
+    ){
+        return Tag.withId(
+                id,
+                name,
+                color,
+                memberId
+        );
+    }
+
+    public void checkOwn(final long memberId) {
+        if (this.memberId != memberId) {
+            throw new IllegalArgumentException("해당 태그를 소유하지 않음");
+        }
+    }
+
     public Long getId() {
         return id;
     }

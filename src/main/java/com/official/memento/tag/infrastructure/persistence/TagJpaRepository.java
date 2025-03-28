@@ -15,4 +15,10 @@ public interface TagJpaRepository extends JpaRepository<TagEntity, Long> {
     List<TagEntity> findAllByMemberId(Long memberId);
 
     Optional<TagEntity> findByMemberIdAndColor(Long memberId, TagColor color);
+
+    @Query(
+            value = "SELECT * FROM tag WHERE member_id = :memberId AND name = 'Untitled' AND color = 'GRAY05'",
+            nativeQuery = true
+    )
+    Optional<TagEntity> findDefaultTag(Long memberId);
 }
