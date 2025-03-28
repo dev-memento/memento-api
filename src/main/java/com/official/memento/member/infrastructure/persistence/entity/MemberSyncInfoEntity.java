@@ -27,8 +27,10 @@ public class MemberSyncInfoEntity extends BaseTimeEntity {
 
     private String googleSyncToken;
 
+    private String googleRefreshToken;
+
 
     public static MemberSyncInfoEntity of(final MemberSyncInfo memberSyncInfo) {
-        return new MemberSyncInfoEntity(null, memberSyncInfo.getMemberId(), memberSyncInfo.isAppleSync(), memberSyncInfo.getGoogleSyncToken());
+        return new MemberSyncInfoEntity(null, memberSyncInfo.getMemberId(), memberSyncInfo.isAppleSync(), memberSyncInfo.getGoogleSyncToken(), memberSyncInfo.getGoogleRefreshToken());
     }
 }

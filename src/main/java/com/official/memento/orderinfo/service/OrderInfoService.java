@@ -48,9 +48,9 @@ public class OrderInfoService implements
             insertOrder = (previousOrder + orderInfoRepository.findByToDoId(command.nextToDoId()).getOrderNum()) / 2;
         }
         checkInValidRequest(previousOrder, insertOrder);
+        insertOrder = checkReOrdering(selectedTodoOrderInfo.getDate(), command.memberId(), insertOrder);
         selectedTodoOrderInfo.updateOrderNum(insertOrder);
         orderInfoRepository.update(selectedTodoOrderInfo);
-        checkReOrdering(selectedTodoOrderInfo.getDate(), command.memberId(), insertOrder);
     }
 
     @Override
@@ -60,8 +60,8 @@ public class OrderInfoService implements
         double preOrder = 0;
         double nextOrder = orderInfoList.isEmpty() ? 1 : orderInfoList.get(0).getOrderNum();
         double insertOrder = (preOrder + nextOrder) / 2;
-        boolean checked = checkReOrdering(date, memberId, insertOrder);
-        createToDoOrderInfo(date, toDo, checked ? 1 : insertOrder, memberId);
+        insertOrder = checkReOrdering(date, memberId, insertOrder);
+        createToDoOrderInfo(date, toDo, insertOrder, memberId);
     }
 
     @Override
@@ -94,11 +94,11 @@ public class OrderInfoService implements
             insertOrder = orderInfoList.isEmpty() ? 1 : orderInfoList.get(orderInfoList.size() - 1).getOrder() + 1;
         }
 
-        boolean checked = checkReOrdering(date, memberId, insertOrder);
-        createScheduleOrderInfo(date, schedule, checked ? 1 : insertOrder, memberId);
+        insertOrder = checkReOrdering(date, memberId, insertOrder);
+        createScheduleOrderInfo(date, schedule, insertOrder, memberId);
     }
 
-    private boolean checkReOrdering(final LocalDate date, final long memberId, final double insertOrder) {
+    private double checkReOrdering(final LocalDate date, final long memberId, final double insertOrder) {
         if (insertOrder < 1e-10) {
             List<OrderInfo> afterOrderInfoList = orderInfoRepository.findAllByMemberIdAndDateOrderByOrderNum(memberId,
                     date);
@@ -106,9 +106,9 @@ public class OrderInfoService implements
                 afterOrderInfoList.get(i).updateOrderNum(i + 1);
                 orderInfoRepository.update(afterOrderInfoList.get(i));
             }
-            return true;
+            return 1;
         }
-        return false;
+        return insertOrder;
     }
 
     private void createToDoOrderInfo(final LocalDate date, final ToDo toDo, final double insertOrder,

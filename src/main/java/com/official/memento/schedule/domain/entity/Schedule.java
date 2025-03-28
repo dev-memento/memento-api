@@ -287,7 +287,9 @@ public class Schedule extends BaseTimeEntity {
             final LocalDateTime startDate,
             final LocalDateTime endDate,
             final boolean isAllDay,
-            final long tagId
+            final long tagId,
+            final RepeatOption repeatOption,
+            final LocalDate repeatExpiredDate
     ) {
         return Schedule.withId(
                 id,

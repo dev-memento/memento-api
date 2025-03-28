@@ -32,3 +32,8 @@ claude:
     api-key: ${CLAUDE.API-KEY.dev}
 discord:
   error-alert-url: ${DISCORD.ERROR_ALERT_URL.dev}
+
+google:
+  client:
+    id: ${GOOGLE.CLIENT_ID}
+    secret: ${GOOGLE.CLIENT_SECRET}

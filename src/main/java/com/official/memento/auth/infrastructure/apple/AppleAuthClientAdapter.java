@@ -5,8 +5,8 @@ import com.official.memento.auth.domain.port.AuthClientOutputPort;
 import com.official.memento.auth.util.AuthValidation;
 import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.exception.InvalidIdTokenException;
-import com.official.memento.global.exception.MementoException;
 import io.jsonwebtoken.Jwts;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -18,16 +18,12 @@ import java.util.Base64;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class AppleAuthClientAdapter implements AuthClientOutputPort {
 
-    private static final String APPLE_KEYS_URL = "https://appleid.apple.com/auth/keys";
-    private final RestClient restClient;
+    private final RestClient appleRestClient;
     private final ObjectMapper objectMapper;
-
-    public AppleAuthClientAdapter(RestClient restClient, ObjectMapper objectMapper) {
-        this.restClient = restClient;
-        this.objectMapper = objectMapper;
-    }
+    private static final String APPLE_KEYS_URL = "/auth/keys";
 
     @Override
     public Map<String, Object> verifyIdToken(final String idToken) {
@@ -60,7 +56,7 @@ public class AppleAuthClientAdapter implements AuthClientOutputPort {
     }
 
     private AppleKeysResponse fetchApplePublicKeys() {
-        return restClient.get()
+        return appleRestClient.get()
                 .uri(APPLE_KEYS_URL)
                 .retrieve()
                 .body(AppleKeysResponse.class);
@@ -91,4 +87,4 @@ public class AppleAuthClientAdapter implements AuthClientOutputPort {
             throw new InvalidIdTokenException(ErrorCode.INVALID_ID_TOKEN);
         }
     }
-    }
+}
