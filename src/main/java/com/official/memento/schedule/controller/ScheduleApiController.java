@@ -1,13 +1,13 @@
-package com.official.memento.schedule.conntroller;
+package com.official.memento.schedule.controller;
 
 import com.official.memento.global.annotation.Authorization;
 import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
 import com.official.memento.global.util.Validator;
-import com.official.memento.schedule.conntroller.dto.request.*;
-import com.official.memento.schedule.conntroller.dto.response.ScheduleAllAllDaysGetResponse;
-import com.official.memento.schedule.conntroller.dto.response.ScheduleAllGetResponse;
-import com.official.memento.schedule.conntroller.dto.response.ScheduleDetailResponse;
+import com.official.memento.schedule.controller.dto.request.*;
+import com.official.memento.schedule.controller.dto.response.ScheduleAllAllDaysGetResponse;
+import com.official.memento.schedule.controller.dto.response.ScheduleAllGetResponse;
+import com.official.memento.schedule.controller.dto.response.ScheduleDetailResponse;
 import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.schedule.service.command.*;
 import com.official.memento.schedule.service.usecase.*;

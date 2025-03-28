@@ -3,16 +3,21 @@ package com.official.memento.orderinfo.infrastructure.persistence;
 import com.official.memento.orderinfo.domain.PlanType;
 import com.official.memento.orderinfo.domain.OrderInfo;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static lombok.AccessLevel.PRIVATE;
+import static lombok.AccessLevel.PROTECTED;
+
 @Entity
 @Getter
 @Table(name = "order_info")
-@NoArgsConstructor
+@NoArgsConstructor(access = PROTECTED)
+@AllArgsConstructor(access = PRIVATE)
 public class OrderInfoEntity {
 
     @Id
@@ -27,25 +32,6 @@ public class OrderInfoEntity {
     private PlanType planType;
     private LocalDateTime createdAt;
 
-    private OrderInfoEntity(
-            final Long id,
-            final long memberId,
-            final Long scheduleId,
-            final Long toDoId,
-            final double orderNum,
-            final LocalDate date,
-            final PlanType planType,
-            final LocalDateTime createdAt
-    ) {
-        this.id = id;
-        this.memberId = memberId;
-        this.scheduleId = scheduleId;
-        this.toDoId = toDoId;
-        this.orderNum = orderNum;
-        this.date = date;
-        this.planType = planType;
-        this.createdAt = createdAt;
-    }
 
     private OrderInfoEntity(
             final long memberId,

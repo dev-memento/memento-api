@@ -220,6 +220,11 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
     }
 
     @Override
+    public void updateTagForSchedules(final long oldTagId, final long newTagId){
+        scheduleEntityJpaRepository.updateTagForSchedules(oldTagId, newTagId);
+    }
+
+    @Override
     public void deleteById(final long scheduleId) {
         scheduleEntityJpaRepository.deleteById(scheduleId);
     }

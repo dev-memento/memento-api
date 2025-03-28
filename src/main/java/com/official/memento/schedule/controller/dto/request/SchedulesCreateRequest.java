@@ -1,4 +1,4 @@
-package com.official.memento.schedule.conntroller.dto.request;
+package com.official.memento.schedule.controller.dto.request;
 
 import java.util.List;
 

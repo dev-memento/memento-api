@@ -4,7 +4,9 @@ import com.official.memento.schedule.domain.enums.ScheduleType;
 import com.official.memento.schedule.infrastructure.persistence.projection.ScheduleOrderInfoProjection;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -93,4 +95,8 @@ public interface ScheduleEntityJpaRepository extends JpaRepository<ScheduleEntit
     List<ScheduleEntity> findAllByMemberIdAndType(long memberId, ScheduleType type);
 
     void deleteAllByScheduleGroupId(final String groupId);
+
+    @Modifying
+    @Query("UPDATE ScheduleEntity s SET s.tagId = :newTagId WHERE s.tagId = :oldTagId")
+    void updateTagForSchedules(@Param("oldTagId") Long oldTagId, @Param("newTagId") Long newTagId);
 }
