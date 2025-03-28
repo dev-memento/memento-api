@@ -18,10 +18,7 @@ import com.official.memento.member.domain.Member;
 import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.service.command.MemberPersonalInfoCreateCommand;
 import com.official.memento.member.service.command.MemberSyncInfoCreateCommand;
-import com.official.memento.member.service.usecase.MemberCreateUseCase;
-import com.official.memento.member.service.usecase.MemberPersonalInfoCreateUseCase;
-import com.official.memento.member.service.usecase.MemberPersonalInfoGetUseCase;
-import com.official.memento.member.service.usecase.MemberSyncInfoCreateUseCase;
+import com.official.memento.member.service.usecase.*;
 import com.official.memento.tag.domain.enums.TagColor;
 import com.official.memento.tag.service.TagCreateUseCase;
 import com.official.memento.tag.service.command.TagCreateCommand;
@@ -40,6 +37,7 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase {
     private final MemberCreateUseCase memberCreateUseCase;
     private final MemberPersonalInfoCreateUseCase memberPersonalInfoCreateUseCase;
     private final MemberPersonalInfoGetUseCase memberPersonalInfoGetUseCase;
+    private final MemberPersonalInfoUpdateUseCase memberPersonalInfoUpdateUseCase;
     private final MemberSyncInfoCreateUseCase memberSyncInfoCreateUseCase;
     private final TagCreateUseCase tagCreateUseCase;
     private final Map<AuthProvider, AuthClientOutputPort> authClientAdapters;
@@ -50,14 +48,16 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase {
     @Transactional
     public NewAuthResult authenticate(final AuthCommand command) {
         final AuthProvider provider = command.providerName();
+        final int timeZoneOffset = command.timeZoneOffset();
         final Map<String, Object> tokenInfo = verifyIdToken(provider, command.idToken());
         final String platformId = (String) tokenInfo.get("sub");
         final String email = (String) tokenInfo.get("email");
 
         Auth auth = authRepository.findByPlatformIdAndProvider(platformId, provider)
-                .orElseGet(() -> createNewMember(platformId, provider));
+                .orElseGet(() -> createNewMember(platformId, provider, timeZoneOffset));
 
-        Optional<MemberPersonalInfo> personalInfo = memberPersonalInfoGetUseCase.findNullableByMemberId(auth.getMemberId());
+        Optional<MemberPersonalInfo> personalInfo = memberPersonalInfoGetUseCase.findByMemberIdOrNull(auth.getMemberId());
+        updateTimeZone(personalInfo, timeZoneOffset);
         boolean isNewUser = isFirstLogin(personalInfo) || isOnboardingIncomplete(personalInfo);
 
         AccessToken accessToken = jwtUtil.generateAccessToken(auth.getMemberId());
@@ -65,7 +65,7 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase {
 
         auth.withUpdatedToken(refreshToken.getToken());
         authRepository.save(auth);
-        return NewAuthResult.of(accessToken.getToken(),refreshToken.getToken(),isNewUser);
+        return NewAuthResult.of(accessToken.getToken(), refreshToken.getToken(), isNewUser);
 
     }
 
@@ -94,10 +94,10 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase {
         return authorizationHeader.substring(7);
     }
 
-    private Auth createNewMember(String platformId, AuthProvider provider) {
+    private Auth createNewMember(final String platformId, final AuthProvider provider, final int timeZoneOffset) {
         Member newMember = memberCreateUseCase.create();
         Long memberId = newMember.getId();
-        memberPersonalInfoCreateUseCase.create(MemberPersonalInfoCreateCommand.from(memberId));
+        memberPersonalInfoCreateUseCase.create(MemberPersonalInfoCreateCommand.from(memberId, timeZoneOffset));
         memberSyncInfoCreateUseCase.create(MemberSyncInfoCreateCommand.from(memberId));
         createOwnTags(memberId);
         Auth newAuth = Auth.of(memberId, provider, platformId, "");
@@ -125,6 +125,12 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase {
 
     private boolean isOnboardingIncomplete(Optional<MemberPersonalInfo> personalInfo) {
         return personalInfo.isPresent() && personalInfo.get().getWakeUpTime() == null;
+    }
+
+    private void updateTimeZone(final Optional<MemberPersonalInfo> personalInfo, final int timeZoneOffset) {
+        if (personalInfo.isPresent() && personalInfo.get().getTimeZoneOffset() != timeZoneOffset) {
+            memberPersonalInfoUpdateUseCase.updateTimeZone(personalInfo.get().getMemberId(), timeZoneOffset);
+        }
     }
 }
 
