@@ -5,5 +5,5 @@ import com.official.memento.member.domain.MemberPersonalInfo;
 import java.util.Optional;
 
 public interface MemberPersonalInfoGetUseCase {
-    Optional<MemberPersonalInfo> findNullableByMemberId(final long memberId);
+    Optional<MemberPersonalInfo> findByMemberIdOrNull(final long memberId);
 }

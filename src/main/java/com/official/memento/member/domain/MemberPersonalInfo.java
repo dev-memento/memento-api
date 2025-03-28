@@ -1,15 +1,20 @@
 package com.official.memento.member.domain;
 
 import com.official.memento.member.domain.enums.JobType;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.time.LocalTime;
 
+@AllArgsConstructor
+@Getter
 public class MemberPersonalInfo {
 
     private Long id;
     private long memberId;
     private LocalTime wakeUpTime;
     private LocalTime windDownTime;
+    private int timeZoneOffset;
     private JobType job;
     private String jobOtherDetail;
     private Boolean isStressedUnorganizedSchedule;
@@ -22,6 +27,7 @@ public class MemberPersonalInfo {
         return "MemberPersonalInfo" +
                 ", wakeUpTime=" + wakeUpTime +
                 ", windDownTime=" + windDownTime +
+                ", timeZoneOffset=" + timeZoneOffset +
                 ", job=" + job +
                 ", stressed unorganized schedule isStressedUnorganizedSchedule=" + isStressedUnorganizedSchedule +
                 ", often forget important things =" + isForgetImportantThings +
@@ -31,12 +37,15 @@ public class MemberPersonalInfo {
     }
 
     public static MemberPersonalInfo of(
-            final Long memberId)
-    {
+            final Long memberId,
+            final int timeZoneOffset
+    ) {
         return new MemberPersonalInfo(
+                null,
                 memberId,
                 null,
                 null,
+                timeZoneOffset,
                 null,
                 null,
                 null,
@@ -50,70 +59,25 @@ public class MemberPersonalInfo {
             final Long memberId,
             final LocalTime wakeUpTime,
             final LocalTime windDownTime,
+            final int timeZoneOffset,
             final JobType job,
             final String jobOtherDetail,
             final Boolean isStressedUnorganizedSchedule,
             final Boolean isForgetImportantThings,
             final Boolean isPreferReminder,
-            final Boolean isImportantBreaks)
-    {
+            final Boolean isImportantBreaks) {
         return new MemberPersonalInfo(
                 id,
                 memberId,
                 wakeUpTime,
                 windDownTime,
+                timeZoneOffset,
                 job,
                 jobOtherDetail,
                 isStressedUnorganizedSchedule,
                 isForgetImportantThings,
                 isPreferReminder,
                 isImportantBreaks);
-    }
-
-    public MemberPersonalInfo(
-            final Long memberId,
-            final LocalTime wakeUpTime,
-            final LocalTime windDownTime,
-            final JobType job,
-            final String jobOtherDetail,
-            final Boolean isStressedUnorganizedSchedule,
-            final Boolean isForgetImportantThings,
-            final Boolean isPreferReminder,
-            final Boolean isImportantBreaks)
-    {
-        this.memberId = memberId;
-        this.wakeUpTime = wakeUpTime;
-        this.windDownTime = windDownTime;
-        this.job = job;
-        this.jobOtherDetail = jobOtherDetail;
-        this.isStressedUnorganizedSchedule = isStressedUnorganizedSchedule;
-        this.isForgetImportantThings = isForgetImportantThings;
-        this.isPreferReminder = isPreferReminder;
-        this.isImportantBreaks = isImportantBreaks;
-    }
-
-    public MemberPersonalInfo(
-            final Long id,
-            final Long memberId,
-            final LocalTime wakeUpTime,
-            final LocalTime windDownTime,
-            final JobType job,
-            final String jobOtherDetail,
-            final Boolean isStressedUnorganizedSchedule,
-            final Boolean isForgetImportantThings,
-            final Boolean isPreferReminder,
-            final Boolean isImportantBreaks)
-    {
-        this.id = id;
-        this.memberId = memberId;
-        this.wakeUpTime = wakeUpTime;
-        this.windDownTime = windDownTime;
-        this.job = job;
-        this.jobOtherDetail = jobOtherDetail;
-        this.isStressedUnorganizedSchedule = isStressedUnorganizedSchedule;
-        this.isForgetImportantThings = isForgetImportantThings;
-        this.isPreferReminder = isPreferReminder;
-        this.isImportantBreaks = isImportantBreaks;
     }
 
     public void update(
@@ -124,8 +88,7 @@ public class MemberPersonalInfo {
             final Boolean isStressedUnorganizedSchedule,
             final Boolean isForgetImportantThings,
             final Boolean isPreferReminder,
-            final Boolean isImportantBreaks)
-    {
+            final Boolean isImportantBreaks) {
         this.wakeUpTime = wakeUpTime;
         this.windDownTime = windDownTime;
         this.job = job;
@@ -136,43 +99,18 @@ public class MemberPersonalInfo {
         this.isImportantBreaks = isImportantBreaks;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public Long getMemberId() {
-        return memberId;
-    }
-
-    public LocalTime getWakeUpTime() {
-        return wakeUpTime;
-    }
-
-    public LocalTime getWindDownTime() {
-        return windDownTime;
-    }
-
-    public JobType getJob() {
-        return job;
-    }
-
-    public String getJobOtherDetail() {
-        return jobOtherDetail;
-    }
-
-    public Boolean getIsStressedUnorganizedSchedule() {
-        return isStressedUnorganizedSchedule;
-    }
-
-    public Boolean getIsForgetImportantThings() {
-        return isForgetImportantThings;
-    }
-
-    public Boolean getIsPreferReminder() {
-        return isPreferReminder;
-    }
-
-    public Boolean getIsImportantBreaks() {
-        return isImportantBreaks;
+    public MemberPersonalInfo updateTimeZoneOffset(int timeZoneOffset) {
+        return MemberPersonalInfo.withId(
+                this.id,
+                this.memberId,
+                this.wakeUpTime,
+                this.windDownTime,
+                timeZoneOffset,
+                this.job,
+                this.jobOtherDetail,
+                this.isStressedUnorganizedSchedule,
+                this.isForgetImportantThings,
+                this.isPreferReminder,
+                this.isImportantBreaks);
     }
 }

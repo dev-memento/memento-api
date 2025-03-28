@@ -4,9 +4,11 @@ import com.official.memento.global.annotation.Authorization;
 import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
 import com.official.memento.member.controller.dto.MemberPersonalInfoRequest;
+import com.official.memento.member.controller.dto.MemberTimeZoneUpdateRequest;
 import com.official.memento.member.controller.dto.MemberUptimeDto;
 import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.service.command.MemberPersonalInfoCommand;
+import com.official.memento.member.service.command.MemberTimeZoneUpdateCommand;
 import com.official.memento.member.service.usecase.MemberPersonalInfoRetrieveUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoUpdateUseCase;
 import lombok.RequiredArgsConstructor;
@@ -50,5 +52,16 @@ public class MemberPersonalInfoApiController implements MemberPersonalInfoApiDoc
                 personalInfo.getWindDownTime().toString()
         );
         return SuccessResponse.of(HttpStatus.OK, "사용자 업타임 조회 성공", response);
+    }
+
+    @PatchMapping("/timezone")
+    public ResponseEntity<SuccessResponse<?>> updateTimeZone(
+            @Authorization AuthorizationUser authorizationUser,
+            @RequestBody final MemberTimeZoneUpdateRequest request) {
+        memberPersonalInfoUpdateUseCase.updateTimeZone(MemberTimeZoneUpdateCommand.of(
+                authorizationUser.memberId(),
+                request.timeZoneOffset()
+        ));
+        return SuccessResponse.of(HttpStatus.OK, "사용자 시간대 업데이트 성공");
     }
 }

@@ -6,6 +6,7 @@ import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.domain.port.MemberPersonalInfoRepository;
 import com.official.memento.member.service.command.MemberPersonalInfoCommand;
 import com.official.memento.member.service.command.MemberPersonalInfoCreateCommand;
+import com.official.memento.member.service.command.MemberTimeZoneUpdateCommand;
 import com.official.memento.member.service.usecase.MemberPersonalInfoCreateUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoGetUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoRetrieveUseCase;
@@ -26,7 +27,7 @@ public class MemberPersonalInfoService implements MemberPersonalInfoCreateUseCas
     @Transactional
     public MemberPersonalInfo create(final MemberPersonalInfoCreateCommand command) {
         checkPresentByMemberId(command);
-        MemberPersonalInfo memberPersonalInfo = MemberPersonalInfo.of(command.memberId());
+        MemberPersonalInfo memberPersonalInfo = MemberPersonalInfo.of(command.memberId(), command.timeZoneOffset());
         memberPersonalInfoRepository.create(memberPersonalInfo);
         return memberPersonalInfo;
     }
@@ -49,6 +50,12 @@ public class MemberPersonalInfoService implements MemberPersonalInfoCreateUseCas
     }
 
     @Override
+    public void updateTimeZone(final MemberTimeZoneUpdateCommand command){
+        MemberPersonalInfo memberPersonalInfo = memberPersonalInfoRepository.findByMemberId(command.memberId());
+        memberPersonalInfoRepository.update(memberPersonalInfo.updateTimeZoneOffset(command.timeZoneOffset()));
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public MemberPersonalInfo retrieveUptime(final Long memberId) {
         return memberPersonalInfoRepository.findByMemberId(memberId);
@@ -56,7 +63,7 @@ public class MemberPersonalInfoService implements MemberPersonalInfoCreateUseCas
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<MemberPersonalInfo> findNullableByMemberId(long memberId) {
+    public Optional<MemberPersonalInfo> findByMemberIdOrNull(long memberId) {
         return memberPersonalInfoRepository.findNullableByMemberId(memberId);
     }
 
