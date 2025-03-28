@@ -56,11 +56,12 @@ public class MemberPersonalInfoRepositoryAdapter implements MemberPersonalInfoRe
     @Override
     public Optional<MemberPersonalInfo> findNullableByMemberId(Long memberId) {
         return memberPersonalInfoEntityJpaRepository.findByMemberId(memberId)
-                .map(entity -> new MemberPersonalInfo(
+                .map(entity -> MemberPersonalInfo.withId(
                         entity.getId(),
                         entity.getMemberId(),
                         entity.getWakeUpTime(),
                         entity.getWindDownTime(),
+                        entity.getTimeZoneOffset(),
                         entity.getJob(),
                         entity.getJobOtherDetail(),
                         entity.getIsStressedUnorganizedSchedule(),
