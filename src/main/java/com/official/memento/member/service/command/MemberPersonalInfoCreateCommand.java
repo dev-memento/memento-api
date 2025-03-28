@@ -1,9 +1,10 @@
 package com.official.memento.member.service.command;
 
 public record MemberPersonalInfoCreateCommand(
-        long memberId
+        long memberId,
+        int timeZoneOffset
 ) {
-    public static MemberPersonalInfoCreateCommand from(final Long memberId) {
-        return new MemberPersonalInfoCreateCommand(memberId);
+    public static MemberPersonalInfoCreateCommand from(final Long memberId, final int timeZoneOffset) {
+        return new MemberPersonalInfoCreateCommand(memberId, timeZoneOffset);
     }
 }
