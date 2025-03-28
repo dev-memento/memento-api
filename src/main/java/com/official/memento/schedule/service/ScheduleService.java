@@ -33,6 +33,7 @@ import com.official.memento.schedule.service.usecase.ScheduleUpdateUseCase;
 import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.enums.TagColor;
 import com.official.memento.tag.service.TagGetUseCase;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -74,7 +76,7 @@ public class ScheduleService implements
     public void create(final ScheduleCreateCommand command) {
         Tag tag = tagGetUseCase.findById(command.tagId());
         checkOwnTag(command.memberId(), tag);
-        checkDate(command.startDate(),command.endDate());
+        checkDate(command.startDate(), command.endDate());
         Schedule schedule = createSchedule(command);
         orderInfoCreateUseCase.assignScheduleOrder(command.startDate().toLocalDate(), schedule, command.memberId());
     }
@@ -200,11 +202,11 @@ public class ScheduleService implements
             checkOwnTag(command.memberId(), tagGetUseCase.findById(command.tagId()));
         }
 
-        if(command.startDate() != schedule.getStartDate() || command.endDate() != schedule.getEndDate()){
-            checkDate(command.startDate(),command.endDate());
+        if (command.startDate() != schedule.getStartDate() || command.endDate() != schedule.getEndDate()) {
+            checkDate(command.startDate(), command.endDate());
         }
 
-        schedule.update(
+        scheduleRepository.update(schedule.update(
                 command.description(),
                 command.startDate(),
                 command.endDate(),
@@ -212,8 +214,7 @@ public class ScheduleService implements
                 command.tagId(),
                 command.repeatOption(),
                 command.repeatEndDate()
-        );
-        scheduleRepository.update(schedule);
+        ));
 
         if (schedule.getStartDate() != command.startDate() || schedule.getEndDate() != command.endDate()) {
             orderInfoDeleteUseCase.deleteByScheduleId(schedule.getId());
@@ -241,7 +242,7 @@ public class ScheduleService implements
                 scheduleResult.scheduleGroupId(),
                 scheduleResult.tagId()
         );
-        googleCalendarAdapter.updateCalendarEvent(accessToken,schedule);
+        googleCalendarAdapter.updateCalendarEvent(accessToken, schedule);
     }
 
     @Override
@@ -339,7 +340,7 @@ public class ScheduleService implements
         }
     }
 
-    private static void checkDate(final LocalDateTime startDate, final LocalDateTime endDate){
+    private static void checkDate(final LocalDateTime startDate, final LocalDateTime endDate) {
         if (endDate.isBefore(startDate)) {
             throw new InvalidRequestBodyException(ErrorCode.INVALID_REQUEST_BODY);
         }
