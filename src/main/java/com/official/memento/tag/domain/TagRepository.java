@@ -15,7 +15,7 @@ public interface TagRepository {
 
     List<Tag> findAllByMemberId(final Long memberId);
 
-    Tag findByMemberIdAndTagColor(final Long memberId, TagColor tagColor);
+    Tag findByMemberIdAndTagColor(final Long memberId, final TagColor tagColor);
 
     Tag findDefaultTag(final Long memberId);
 }
