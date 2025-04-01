@@ -74,7 +74,7 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase {
     @Transactional
     public AuthResult refreshTokens(final String authorizationHeader) {
         String refreshToken = extractRefreshToken(authorizationHeader);
-        if (!jwtUtil.validateToken(extractRefreshToken(refreshToken))) {
+        if (!jwtUtil.validateToken(refreshToken)) {
             throw new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
         String memberId = jwtUtil.getUserIdFromToken(refreshToken);
