@@ -333,6 +333,11 @@ public class ScheduleService implements
         return scheduleRepository.findAllByStartDateAndMemberId(date, memberId);
     }
 
+    @Override
+    public List<Schedule> getSchedulesBetween(final LocalDateTime startDateTime,final LocalDateTime endDateTime) {
+        return scheduleRepository.findByStartDateAfterAndEndDateLessThanEqual(startDateTime, endDateTime);
+    }
+
     private static void checkOwnTag(final long memberId, final Tag tag) {
         if (tag.getMemberId() != memberId) {
             throw new InvalidRequestBodyException(ErrorCode.INVALID_REQUEST_BODY);

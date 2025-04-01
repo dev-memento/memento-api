@@ -96,6 +96,8 @@ public interface ScheduleEntityJpaRepository extends JpaRepository<ScheduleEntit
 
     void deleteAllByScheduleGroupId(final String groupId);
 
+    List<ScheduleEntity> findByStartDateAfterAndEndDateLessThanEqual(final LocalDateTime startTime, final LocalDateTime endTime);
+
     @Modifying
     @Query("UPDATE ScheduleEntity s SET s.tagId = :newTagId WHERE s.tagId = :oldTagId")
     void updateTagForSchedules(@Param("oldTagId") Long oldTagId, @Param("newTagId") Long newTagId);

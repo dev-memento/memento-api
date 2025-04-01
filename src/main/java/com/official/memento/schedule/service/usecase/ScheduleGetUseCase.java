@@ -3,6 +3,7 @@ package com.official.memento.schedule.service.usecase;
 import com.official.memento.schedule.domain.entity.Schedule;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ScheduleGetUseCase {
@@ -13,5 +14,7 @@ public interface ScheduleGetUseCase {
     Schedule getDetail(final long memberId, final long scheduleId);
 
     List<Schedule> getSchedules(final long memberId, final LocalDate date);
+
+    List<Schedule> getSchedulesBetween(final LocalDateTime startDateTime, final LocalDateTime endDateTime);
 
 }
