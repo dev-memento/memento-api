@@ -7,6 +7,7 @@ import com.official.memento.member.domain.port.MemberPersonalInfoRepository;
 import com.official.memento.member.service.command.MemberPersonalInfoCommand;
 import com.official.memento.member.service.command.MemberPersonalInfoCreateCommand;
 import com.official.memento.member.service.command.MemberTimeZoneUpdateCommand;
+import com.official.memento.member.service.command.MemberUpTimeUpdateCommand;
 import com.official.memento.member.service.usecase.MemberPersonalInfoCreateUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoGetUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoRetrieveUseCase;
@@ -53,6 +54,12 @@ public class MemberPersonalInfoService implements MemberPersonalInfoCreateUseCas
     public void updateTimeZone(final MemberTimeZoneUpdateCommand command){
         MemberPersonalInfo memberPersonalInfo = memberPersonalInfoRepository.findByMemberId(command.memberId());
         memberPersonalInfoRepository.update(memberPersonalInfo.updateTimeZoneOffset(command.timeZoneOffset()));
+    }
+
+    @Override
+    public void updateUpTime(final MemberUpTimeUpdateCommand command){
+        MemberPersonalInfo memberPersonalInfo = memberPersonalInfoRepository.findByMemberId(command.memberId());
+        memberPersonalInfoRepository.update(memberPersonalInfo.updateUpTime(command.wakeUpTime()));
     }
 
     @Override

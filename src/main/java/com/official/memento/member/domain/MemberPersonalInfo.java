@@ -113,4 +113,19 @@ public class MemberPersonalInfo {
                 this.isPreferReminder,
                 this.isImportantBreaks);
     }
+
+    public MemberPersonalInfo updateUpTime(LocalTime wakeUpTime) {
+        return MemberPersonalInfo.withId(
+                this.id,
+                this.memberId,
+                wakeUpTime,
+                this.windDownTime,
+                this.timeZoneOffset,
+                this.job,
+                this.jobOtherDetail,
+                this.isStressedUnorganizedSchedule,
+                this.isForgetImportantThings,
+                this.isPreferReminder,
+                this.isImportantBreaks);
+    }
 }
