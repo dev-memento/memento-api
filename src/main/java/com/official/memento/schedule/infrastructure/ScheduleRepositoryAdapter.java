@@ -220,6 +220,26 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
     }
 
     @Override
+    public List<Schedule> findByStartDateAfterAndEndDateLessThanEqual(final LocalDateTime startTime, final LocalDateTime endTime) {
+        List<ScheduleEntity> scheduleEntities = scheduleEntityJpaRepository.findByStartDateAfterAndEndDateLessThanEqual(startTime, endTime);
+        return scheduleEntities.stream().map(scheduleEntity -> Schedule.withId(
+                scheduleEntity.getId(),
+                scheduleEntity.getMemberId(),
+                scheduleEntity.getDescription(),
+                scheduleEntity.getStartDate(),
+                scheduleEntity.getEndDate(),
+                scheduleEntity.isAllDay(),
+                scheduleEntity.getRepeatOption(),
+                scheduleEntity.getRepeatExpiredDate(),
+                scheduleEntity.getType(),
+                scheduleEntity.getScheduleGroupId(),
+                scheduleEntity.getCreatedAt(),
+                scheduleEntity.getUpdatedAt(),
+                scheduleEntity.getTagId()
+        )).toList();
+    }
+
+    @Override
     public void updateTagForSchedules(final long oldTagId, final long newTagId){
         scheduleEntityJpaRepository.updateTagForSchedules(oldTagId, newTagId);
     }
