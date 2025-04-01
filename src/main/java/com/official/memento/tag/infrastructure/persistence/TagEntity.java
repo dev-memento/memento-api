@@ -3,6 +3,7 @@ package com.official.memento.tag.infrastructure.persistence;
 import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
+import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.enums.TagColor;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,8 @@ import lombok.NoArgsConstructor;
 @Getter
 public class TagEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     @Enumerated(EnumType.STRING)
@@ -39,12 +41,12 @@ public class TagEntity {
         );
     }
 
-    public static TagEntity withId(Long id, String name, TagColor color, Long memberId) {
+    public static TagEntity withId(final Tag tag) {
         return new TagEntity(
-                id,
-                name,
-                color,
-                memberId
+                tag.getId(),
+                tag.getName(),
+                tag.getColor(),
+                tag.getMemberId()
         );
     }
 }

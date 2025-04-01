@@ -39,12 +39,7 @@ public class TagRepositoryAdapter implements TagRepository {
 
     @Override
     public Tag update(final Tag tag) {
-        TagEntity updatedEntity = tagJpaRepository.save(TagEntity.withId(
-                tag.getId(),
-                tag.getName(),
-                tag.getColor(),
-                tag.getMemberId()
-        ));
+        TagEntity updatedEntity = tagJpaRepository.save(TagEntity.withId(tag));
         return Tag.withId(
                 updatedEntity.getId(),
                 updatedEntity.getName(),
