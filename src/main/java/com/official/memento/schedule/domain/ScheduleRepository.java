@@ -34,5 +34,5 @@ public interface ScheduleRepository {
 
     List<Schedule> findAllAppleByMemberId(final long memberId);
 
-    List<Schedule> findByStartDateAfterAndEndDateLessThanEqual(final LocalDateTime startTime, final LocalDateTime endTime);
+    List<Schedule> findSchedulesWithMemberInfoBetween(final LocalDateTime startTime, final LocalDateTime endTime);
 }

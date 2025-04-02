@@ -220,8 +220,8 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
     }
 
     @Override
-    public List<Schedule> findByStartDateAfterAndEndDateLessThanEqual(final LocalDateTime startTime, final LocalDateTime endTime) {
-        List<ScheduleEntity> scheduleEntities = scheduleEntityJpaRepository.findByStartDateAfterAndEndDateLessThanEqual(startTime, endTime);
+    public List<Schedule> findSchedulesWithMemberInfoBetween(final LocalDateTime startTime, final LocalDateTime endTime) {
+        List<ScheduleEntity> scheduleEntities = scheduleEntityJpaRepository.findSchedulesWithMemberInfoBetween(startTime, endTime);
         return scheduleEntities.stream().map(scheduleEntity -> Schedule.withId(
                 scheduleEntity.getId(),
                 scheduleEntity.getMemberId(),

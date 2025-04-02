@@ -335,7 +335,7 @@ public class ScheduleService implements
 
     @Override
     public List<Schedule> getSchedulesBetween(final LocalDateTime startDateTime,final LocalDateTime endDateTime) {
-        return scheduleRepository.findByStartDateAfterAndEndDateLessThanEqual(startDateTime, endDateTime);
+        return scheduleRepository.findSchedulesWithMemberInfoBetween(startDateTime, endDateTime);
     }
 
     private static void checkOwnTag(final long memberId, final Tag tag) {
