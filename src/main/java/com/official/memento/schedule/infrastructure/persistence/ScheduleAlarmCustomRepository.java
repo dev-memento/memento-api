@@ -1,18 +1,14 @@
 package com.official.memento.schedule.infrastructure.persistence;
 
-import com.official.memento.member.domain.MemberPersonalInfo;
-import com.official.memento.member.infrastructure.persistence.entity.MemberPersonalInfoEntity;
 import com.official.memento.member.infrastructure.persistence.entity.QMemberPersonalInfoEntity;
 import com.official.memento.schedule.infrastructure.persistence.projection.ScheduleAlarmProjection;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
-
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
