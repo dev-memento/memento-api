@@ -1,6 +1,7 @@
 package com.official.memento.schedule.domain;
 
 import com.official.memento.schedule.domain.entity.Schedule;
+import com.official.memento.schedule.domain.entity.ScheduleAlarm;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,5 +35,5 @@ public interface ScheduleRepository {
 
     List<Schedule> findAllAppleByMemberId(final long memberId);
 
-    List<Schedule> findSchedulesWithMemberInfoBetween(final LocalDateTime startTime, final LocalDateTime endTime);
+    List<ScheduleAlarm> findSchedulesWithMemberInfoBetween(final LocalDateTime startTime, final LocalDateTime endTime);
 }
