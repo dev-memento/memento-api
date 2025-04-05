@@ -80,6 +80,13 @@ dependencies {
     //Google Cloud Task
     implementation ("com.google.cloud:google-cloud-tasks:2.40.0")
     implementation ("com.google.auth:google-auth-library-oauth2-http:1.20.0")
+
+    //queryDsl
+
+    implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
+    annotationProcessor("com.querydsl:querydsl-apt:5.0.0:jakarta")
+    annotationProcessor ("jakarta.annotation:jakarta.annotation-api")
+    annotationProcessor ("jakarta.persistence:jakarta.persistence-api")
 }
 
 kotlin {
