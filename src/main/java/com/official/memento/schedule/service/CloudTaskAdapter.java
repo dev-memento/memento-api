@@ -6,6 +6,7 @@ import com.google.cloud.tasks.v2.*;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Timestamp;
 import com.official.memento.schedule.domain.entity.ScheduleAlarm;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -41,12 +42,12 @@ public class CloudTaskAdapter {
                 .setCredentialsProvider(FixedCredentialsProvider.create(credentials))
                 .build();
 
-        ZonedDateTime executeTime = ZonedDateTime.now(ZoneOffset.UTC).plusMinutes(10);
+        LocalDateTime executeTime = scheduleAlarm.getStartDate().minusMinutes(15);
 
         try (CloudTasksClient client = CloudTasksClient.create(settings)) {
             String queuePath = QueueName.of(projectId, locationId, queueId).toString();
 
-            Instant instant = executeTime.toInstant();
+            Instant instant = executeTime.toInstant(ZoneOffset.UTC);
             Timestamp timestamp = Timestamp.newBuilder()
                     .setSeconds(instant.getEpochSecond())
                     .setNanos(instant.getNano())
