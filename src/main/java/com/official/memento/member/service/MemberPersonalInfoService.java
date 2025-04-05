@@ -51,6 +51,7 @@ public class MemberPersonalInfoService implements MemberPersonalInfoCreateUseCas
     }
 
     @Override
+    @Transactional
     public void updateTimeZone(final MemberTimeZoneUpdateCommand command){
         MemberPersonalInfo memberPersonalInfo = memberPersonalInfoRepository.findByMemberId(command.memberId());
         memberPersonalInfoRepository.update(memberPersonalInfo.updateTimeZoneOffset(command.timeZoneOffset()));

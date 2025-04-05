@@ -88,7 +88,8 @@ public class MemberPersonalInfo {
             final Boolean isStressedUnorganizedSchedule,
             final Boolean isForgetImportantThings,
             final Boolean isPreferReminder,
-            final Boolean isImportantBreaks) {
+            final Boolean isImportantBreaks
+    ) {
         this.wakeUpTime = wakeUpTime;
         this.windDownTime = windDownTime;
         this.job = job;

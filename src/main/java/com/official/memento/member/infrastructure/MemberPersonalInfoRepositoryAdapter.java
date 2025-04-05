@@ -10,7 +10,9 @@ import com.official.memento.member.infrastructure.persistence.entity.MemberPerso
 import com.official.memento.member.infrastructure.persistence.repository.MemberPersonalInfoEntityJpaRepository;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Adapter
 @RequiredArgsConstructor
@@ -69,5 +71,13 @@ public class MemberPersonalInfoRepositoryAdapter implements MemberPersonalInfoRe
                         entity.getIsPreferReminder(),
                         entity.getIsImportantBreaks()
                 ));
+    }
+
+    @Override
+    public List<MemberPersonalInfo> findAll() {
+        return memberPersonalInfoEntityJpaRepository.findAll()
+                .stream()
+                .map(MemberPersonalInfoMapper::toDomain)
+                .collect(Collectors.toList());
     }
 }

@@ -2,6 +2,7 @@ package com.official.memento.member.domain.port;
 
 import com.official.memento.member.domain.MemberPersonalInfo;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface MemberPersonalInfoRepository {
@@ -13,4 +14,6 @@ public interface MemberPersonalInfoRepository {
     MemberPersonalInfo update(final MemberPersonalInfo memberPersonalInfo);
 
     Optional<MemberPersonalInfo> findNullableByMemberId(Long memberId);
+
+    List<MemberPersonalInfo> findAll();
 }

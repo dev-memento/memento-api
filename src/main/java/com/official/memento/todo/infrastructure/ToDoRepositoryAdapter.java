@@ -150,4 +150,31 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
                         )
                 ).toList();
     }
+
+    @Override
+    public List<ToDo> findByMemberIdAndEndDateAndIsCompleted(final long memberId, final LocalDate endDate, final boolean isCompleted) {
+        List<ToDoEntity> toDoEntityList = toDoJpaRepository.findByMemberIdAndEndDateAndIsCompleted(memberId, endDate, isCompleted);
+        return toDoEntityList.stream()
+                .map(
+                        t -> ToDo.withId(
+                                t.getId(),
+                                t.getMemberId(),
+                                t.getGroupId(),
+                                t.getStartDate(),
+                                t.getDescription(),
+                                t.getEndDate(),
+                                t.isCompleted(),
+                                t.getRepeatOption(),
+                                t.getRepeatExpiredDate(),
+                                t.getPriorityUrgency(),
+                                t.getPriorityImportance(),
+                                t.getPriorityValue(),
+                                t.getPriorityType(),
+                                t.getType(),
+                                t.getCreatedAt(),
+                                t.getUpdatedAt(),
+                                t.getTagId()
+                        )
+                ).toList();
+    }
 }
