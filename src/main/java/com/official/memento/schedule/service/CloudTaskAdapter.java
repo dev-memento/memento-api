@@ -5,6 +5,7 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.tasks.v2.*;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Timestamp;
+import com.official.memento.schedule.domain.entity.ScheduleAlarm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -34,12 +35,13 @@ public class CloudTaskAdapter {
     @Value("${gcp.service-account-key-path}")
     private String serviceAccountKeyPath;
 
-    public void createTask(String scheduleId) throws IOException {
-        ZonedDateTime executeTime = ZonedDateTime.now(ZoneOffset.UTC).plusMinutes(10);
+    public void createScheduleAlarm(final ScheduleAlarm scheduleAlarm) throws IOException {
         GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(serviceAccountKeyPath));
         CloudTasksSettings settings = CloudTasksSettings.newBuilder()
                 .setCredentialsProvider(FixedCredentialsProvider.create(credentials))
                 .build();
+
+        ZonedDateTime executeTime = ZonedDateTime.now(ZoneOffset.UTC).plusMinutes(10);
 
         try (CloudTasksClient client = CloudTasksClient.create(settings)) {
             String queuePath = QueueName.of(projectId, locationId, queueId).toString();
@@ -50,7 +52,7 @@ public class CloudTaskAdapter {
                     .setNanos(instant.getNano())
                     .build();
 
-            String payload = "{\"scheduleId\":\"" + scheduleId + "\"}";
+            String payload = "{\"scheduleId\":\"" + scheduleAlarm.getScheduleId() + "\"}";
 
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .setUrl(targetUrl)
