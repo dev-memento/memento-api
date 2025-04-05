@@ -1,5 +1,6 @@
 package com.official.memento.schedule.service;
 
+import com.official.memento.schedule.domain.ScheduleAlarmRepository;
 import com.official.memento.schedule.domain.ScheduleRepository;
 import com.official.memento.schedule.domain.entity.ScheduleAlarm;
 import com.official.memento.schedule.service.usecase.ScheduleAlarmGetUseCase;
@@ -13,10 +14,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ScheduleAlarmService implements ScheduleAlarmGetUseCase {
 
-    private final ScheduleRepository scheduleRepository;
-
+    private final ScheduleAlarmRepository scheduleAlarmRepository;
     @Override
     public List<ScheduleAlarm> getSchedulesBetween(final LocalDateTime startDateTime, final LocalDateTime endDateTime) {
-        return scheduleRepository.findSchedulesWithMemberInfoBetween(startDateTime, endDateTime);
+        return scheduleAlarmRepository.findSchedulesWithMemberInfoBetween(startDateTime, endDateTime);
     }
 }
