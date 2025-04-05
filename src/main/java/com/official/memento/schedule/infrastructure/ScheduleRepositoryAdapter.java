@@ -24,7 +24,6 @@ import java.util.Optional;
 public class ScheduleRepositoryAdapter implements ScheduleRepository {
 
     private final ScheduleEntityJpaRepository scheduleEntityJpaRepository;
-    private final ScheduleAlarmCustomRepository scheduleAlarmCustomRepository;
 
     @Override
     public Schedule save(final Schedule schedule) {
@@ -221,19 +220,6 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
                 scheduleEntity.getCreatedAt(),
                 scheduleEntity.getUpdatedAt(),
                 scheduleEntity.getTagId()
-        )).toList();
-    }
-
-    @Override
-    public List<ScheduleAlarm> findSchedulesWithMemberInfoBetween(final LocalDateTime startTime, final LocalDateTime endTime) {
-        List<ScheduleAlarmProjection> scheduleAlarmProjections = scheduleAlarmCustomRepository.findSchedulesWithMemberInfoBetween(startTime, endTime);
-        return scheduleAlarmProjections.stream().map(scheduleEntity -> ScheduleAlarm.of(
-                scheduleEntity.scheduleId(),
-                scheduleEntity.memberId(),
-                scheduleEntity.description(),
-                scheduleEntity.startDate(),
-                scheduleEntity.endDate(),
-                scheduleEntity.timeZoneOffset()
         )).toList();
     }
 
