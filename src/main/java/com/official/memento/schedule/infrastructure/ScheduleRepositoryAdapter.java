@@ -5,21 +5,26 @@ import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.stereotype.Adapter;
 import com.official.memento.schedule.domain.ScheduleRepository;
 import com.official.memento.schedule.domain.entity.Schedule;
+import com.official.memento.schedule.domain.entity.ScheduleAlarm;
 import com.official.memento.schedule.domain.enums.ScheduleType;
+import com.official.memento.schedule.infrastructure.persistence.ScheduleAlarmCustomRepository;
 import com.official.memento.schedule.infrastructure.persistence.ScheduleEntity;
 import com.official.memento.schedule.infrastructure.persistence.ScheduleEntityJpaRepository;
+import com.official.memento.schedule.infrastructure.persistence.projection.ScheduleAlarmProjection;
 import com.official.memento.schedule.infrastructure.persistence.projection.ScheduleOrderInfoProjection;
+import lombok.RequiredArgsConstructor;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
 
 @Adapter
 @RequiredArgsConstructor
 public class ScheduleRepositoryAdapter implements ScheduleRepository {
 
     private final ScheduleEntityJpaRepository scheduleEntityJpaRepository;
+    private final ScheduleAlarmCustomRepository scheduleAlarmCustomRepository;
 
     @Override
     public Schedule save(final Schedule schedule) {
@@ -220,22 +225,15 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
     }
 
     @Override
-    public List<Schedule> findSchedulesWithMemberInfoBetween(final LocalDateTime startTime, final LocalDateTime endTime) {
-        List<ScheduleEntity> scheduleEntities = scheduleEntityJpaRepository.findSchedulesWithMemberInfoBetween(startTime, endTime);
-        return scheduleEntities.stream().map(scheduleEntity -> Schedule.withId(
-                scheduleEntity.getId(),
-                scheduleEntity.getMemberId(),
-                scheduleEntity.getDescription(),
-                scheduleEntity.getStartDate(),
-                scheduleEntity.getEndDate(),
-                scheduleEntity.isAllDay(),
-                scheduleEntity.getRepeatOption(),
-                scheduleEntity.getRepeatExpiredDate(),
-                scheduleEntity.getType(),
-                scheduleEntity.getScheduleGroupId(),
-                scheduleEntity.getCreatedAt(),
-                scheduleEntity.getUpdatedAt(),
-                scheduleEntity.getTagId()
+    public List<ScheduleAlarm> findSchedulesWithMemberInfoBetween(final LocalDateTime startTime, final LocalDateTime endTime) {
+        List<ScheduleAlarmProjection> scheduleAlarmProjections = scheduleAlarmCustomRepository.findSchedulesWithMemberInfoBetween(startTime, endTime);
+        return scheduleAlarmProjections.stream().map(scheduleEntity -> ScheduleAlarm.of(
+                scheduleEntity.scheduleId(),
+                scheduleEntity.memberId(),
+                scheduleEntity.description(),
+                scheduleEntity.startDate(),
+                scheduleEntity.endDate(),
+                scheduleEntity.timeZoneOffset()
         )).toList();
     }
 
