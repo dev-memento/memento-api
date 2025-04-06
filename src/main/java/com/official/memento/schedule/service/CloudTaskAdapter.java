@@ -10,6 +10,8 @@ import com.google.cloud.tasks.v2.QueueName;
 import com.google.cloud.tasks.v2.Task;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Timestamp;
+import com.official.memento.global.exception.ErrorCode;
+import com.official.memento.global.exception.MementoException;
 import com.official.memento.schedule.domain.entity.ScheduleAlarm;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -40,7 +42,6 @@ public class CloudTaskAdapter {
 
 
     public void createScheduleAlarm(final ScheduleAlarm scheduleAlarm) throws IOException {
-        System.out.println(System.getenv("GOOGLE_APPLICATION_CREDENTIALS"));
         GoogleCredentials credentials = GoogleCredentials.fromStream(
                 new FileInputStream(System.getenv("GOOGLE_APPLICATION_CREDENTIALS")
                 ));
@@ -51,7 +52,6 @@ public class CloudTaskAdapter {
         LocalDateTime executeTime = scheduleAlarm.getStartDate().minusMinutes(15);
 
         try (CloudTasksClient client = CloudTasksClient.create(settings)) {
-            System.out.println(projectId + locationId + queueId +AUTHORIZATION_HEADER_ADMIN_PREFIX);
             String queuePath = QueueName.of(projectId, locationId, queueId).toString();
 
             Instant instant = executeTime.toInstant(ZoneOffset.UTC);
@@ -67,8 +67,9 @@ public class CloudTaskAdapter {
 
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .setUrl(targetUrl)
-                    .setHttpMethod(HttpMethod.GET)
+                    .setHttpMethod(HttpMethod.POST)
                     .putHeaders("Content-Type", "application/json")
+                    .putHeaders("Authorization","Bearer " + AUTHORIZATION_HEADER_ADMIN_PREFIX + scheduleAlarm.getMemberId())
                     .setBody(ByteString.copyFromUtf8(payload))
                     .build();
 
@@ -78,6 +79,8 @@ public class CloudTaskAdapter {
                     .build();
 
             client.createTask(queuePath, task);
+        }catch (Exception e) {
+            throw new MementoException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
 }
