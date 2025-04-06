@@ -1,5 +1,7 @@
 package com.official.memento.schedule.scheduler;
 
+import com.official.memento.global.exception.ErrorCode;
+import com.official.memento.global.exception.MementoException;
 import com.official.memento.schedule.domain.entity.ScheduleAlarm;
 import com.official.memento.schedule.service.CloudTaskAdapter;
 import com.official.memento.schedule.service.usecase.ScheduleAlarmGetUseCase;
@@ -29,7 +31,7 @@ public class scheduleAlarmScheduler {
                 cloudTaskAdapter.createScheduleAlarm(schedule);
             }
         } catch (Exception e) {
-            // Handle exception if needed
+            throw new MementoException(ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
 }
