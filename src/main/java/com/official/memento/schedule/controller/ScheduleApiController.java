@@ -9,8 +9,12 @@ import com.official.memento.schedule.controller.dto.response.ScheduleAllAllDaysG
 import com.official.memento.schedule.controller.dto.response.ScheduleAllGetResponse;
 import com.official.memento.schedule.controller.dto.response.ScheduleDetailResponse;
 import com.official.memento.schedule.domain.entity.Schedule;
+import com.official.memento.schedule.domain.entity.ScheduleAlarm;
+import com.official.memento.schedule.service.CloudTaskAdapter;
 import com.official.memento.schedule.service.command.*;
 import com.official.memento.schedule.service.usecase.*;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +35,7 @@ public class ScheduleApiController implements ScheduleApiDocs {
     private final ScheduleGroupDeleteUseCase scheduleGroupDeleteUseCase;
     private final ScheduleGroupUpdateUseCase scheduleGroupUpdateUseCase;
     private final ScheduleGroupCreateUseCase scheduleGroupCreateUseCase;
+    private final CloudTaskAdapter cloudTaskAdapter;
 
     @PostMapping
     @Override
@@ -287,6 +292,27 @@ public class ScheduleApiController implements ScheduleApiDocs {
                 HttpStatus.OK,
                 "스케줄 조회 성공",
                 ScheduleDetailResponse.of(schedule)
+        );
+    }
+
+    @GetMapping("/test")
+    public ResponseEntity<SuccessResponse<String>> test(
+            @Authorization final AuthorizationUser authorizationUser
+    ) throws IOException {
+        cloudTaskAdapter.createScheduleAlarm(
+                ScheduleAlarm.of(
+                        1L, // scheduleId
+                        1L, // memberId
+                        "회의 알림", // description
+                        LocalDateTime.of(2025, 4, 6, 7, 56), // startDate (UTC 기준)
+                        LocalDateTime.of(2025, 4, 6, 7, 59), // endDate (예시로 +1시간 후)
+                        9 // timeZoneOffset (KST 기준으로 +9)
+                )
+        );
+        return SuccessResponse.of(
+                HttpStatus.OK,
+                "스케줄 조회 성공",
+                "test"
         );
     }
 }

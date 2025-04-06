@@ -2,42 +2,48 @@ package com.official.memento.schedule.service;
 
 import com.google.api.gax.core.FixedCredentialsProvider;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.tasks.v2.*;
+import com.google.cloud.tasks.v2.CloudTasksClient;
+import com.google.cloud.tasks.v2.CloudTasksSettings;
+import com.google.cloud.tasks.v2.HttpMethod;
+import com.google.cloud.tasks.v2.HttpRequest;
+import com.google.cloud.tasks.v2.QueueName;
+import com.google.cloud.tasks.v2.Task;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Timestamp;
 import com.official.memento.schedule.domain.entity.ScheduleAlarm;
-import java.time.LocalDateTime;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 
-@Service
-@RequiredArgsConstructor
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
 public class CloudTaskAdapter {
 
-    @Value("${gcp.project-id}")
+    @Value("${GCP.PROJECT_ID}")
     private String projectId;
 
-    @Value("${gcp.location-id}")
+    @Value("${GCP.LOCATION_ID}")
     private String locationId;
 
-    @Value("${gcp.queue-id}")
+    @Value("${GCP.QUEUE_ID}")
     private String queueId;
 
-    @Value("${gcp.target-url}")
+    @Value("${GCP.TARGET_URL}")
     private String targetUrl;
 
-    @Value("${gcp.service-account-key-path}")
-    private String serviceAccountKeyPath;
+    @Value("${ADMIN.TOKEN_PREFIX}")
+    private String AUTHORIZATION_HEADER_ADMIN_PREFIX;
+
 
     public void createScheduleAlarm(final ScheduleAlarm scheduleAlarm) throws IOException {
-        GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(serviceAccountKeyPath));
+        System.out.println(System.getenv("GOOGLE_APPLICATION_CREDENTIALS"));
+        GoogleCredentials credentials = GoogleCredentials.fromStream(
+                new FileInputStream(System.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+                ));
         CloudTasksSettings settings = CloudTasksSettings.newBuilder()
                 .setCredentialsProvider(FixedCredentialsProvider.create(credentials))
                 .build();
@@ -45,6 +51,7 @@ public class CloudTaskAdapter {
         LocalDateTime executeTime = scheduleAlarm.getStartDate().minusMinutes(15);
 
         try (CloudTasksClient client = CloudTasksClient.create(settings)) {
+            System.out.println(projectId + locationId + queueId +AUTHORIZATION_HEADER_ADMIN_PREFIX);
             String queuePath = QueueName.of(projectId, locationId, queueId).toString();
 
             Instant instant = executeTime.toInstant(ZoneOffset.UTC);
@@ -53,11 +60,14 @@ public class CloudTaskAdapter {
                     .setNanos(instant.getNano())
                     .build();
 
-            String payload = "{\"scheduleId\":\"" + scheduleAlarm.getScheduleId() + "\"}";
+            String payload = "{"
+                    + "\"description\":\"" + scheduleAlarm.getDescription() + "\","
+                    + "\"memberId\":" + scheduleAlarm.getMemberId()
+                    + "}";
 
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .setUrl(targetUrl)
-                    .setHttpMethod(HttpMethod.POST)
+                    .setHttpMethod(HttpMethod.GET)
                     .putHeaders("Content-Type", "application/json")
                     .setBody(ByteString.copyFromUtf8(payload))
                     .build();

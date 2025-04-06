@@ -37,10 +37,3 @@ google:
   client:
     id: ${GOOGLE.CLIENT_ID}
     secret: ${GOOGLE.CLIENT_SECRET}
-
-gcp:
-  project-id: ${GCP.PROJECT_ID}
-  location-id: ${GCP.LOCATION-ID}
-  queue-id: ${GCP.QUEUE-ID}
-  service-account-key-path: ${GCP.SERVICE-ACCOUNT-KEY-PATH} }
-  target-url: ${GCP.TARGET-URL}
