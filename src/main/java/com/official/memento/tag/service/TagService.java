@@ -63,7 +63,7 @@ public class TagService implements TagCreateUseCase, TagGetUseCase, TagUpdateUse
         tagRepository.deleteById(tag.getId());
     }
 
-    private void validateNotDefaultTag(Tag tag) {
+    private void validateNotDefaultTag(final Tag tag) {
         if ("Untitled".equals(tag.getName()) && tag.getColor() == TagColor.GRAY05) {
             throw new InvalidRequestBodyException(ErrorCode.INVALID_JSON_FORMAT);
         }

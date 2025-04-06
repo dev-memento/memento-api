@@ -480,8 +480,12 @@ public class ToDo extends BaseTimeEntity {
                 ", Deadline: " + this.getEndDate();
     }
 
-    public void setEndDate(LocalDate endDate) {
+    public void updateEndDate(final LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public void incrementEndDate() {
+        this.endDate = this.endDate.plusDays(1);
     }
 
 }

@@ -31,7 +31,7 @@ public class ToDoSchedulerService {
                 List<ToDo> toDos = toDoRepository.findByMemberIdAndEndDateAndIsCompleted(memberPersonalInfo.getId(), today, false);
 
                 for (ToDo toDo : toDos) {
-                    toDo.setEndDate(toDo.getEndDate().plusDays(1));
+                    toDo.incrementEndDate();
                     toDoRepository.update(toDo);
                 }
             }

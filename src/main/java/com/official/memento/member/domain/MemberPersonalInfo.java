@@ -115,7 +115,7 @@ public class MemberPersonalInfo {
                 this.isImportantBreaks);
     }
 
-    public MemberPersonalInfo updateUpTime(LocalTime wakeUpTime) {
+    public MemberPersonalInfo updateUpTime(final LocalTime wakeUpTime) {
         return MemberPersonalInfo.withId(
                 this.id,
                 this.memberId,
