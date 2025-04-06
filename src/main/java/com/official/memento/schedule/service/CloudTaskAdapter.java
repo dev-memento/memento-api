@@ -63,6 +63,8 @@ public class CloudTaskAdapter {
             String payload = "{"
                     + "\"description\":\"" + scheduleAlarm.getDescription() + "\","
                     + "\"memberId\":" + scheduleAlarm.getMemberId()
+                    + "\"startTime\":" + scheduleAlarm.getStartDate().toLocalTime()
+                    + "\"endTime\":" + scheduleAlarm.getEndDate().toLocalTime()
                     + "}";
 
             HttpRequest httpRequest = HttpRequest.newBuilder()
