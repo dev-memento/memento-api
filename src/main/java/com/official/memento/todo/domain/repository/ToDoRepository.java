@@ -16,4 +16,6 @@ public interface ToDoRepository {
     List<ToDo> findAllByMemberId(final long memberId);
 
     List<ToDo> findAllByMemberIdAndStartDate(final long memberId, final LocalDate startDate);
+
+    List<ToDo> findByMemberIdAndEndDateAndIsCompleted(final long memberId, final LocalDate endDate, final boolean isCompleted);
 }

@@ -88,7 +88,8 @@ public class MemberPersonalInfo {
             final Boolean isStressedUnorganizedSchedule,
             final Boolean isForgetImportantThings,
             final Boolean isPreferReminder,
-            final Boolean isImportantBreaks) {
+            final Boolean isImportantBreaks
+    ) {
         this.wakeUpTime = wakeUpTime;
         this.windDownTime = windDownTime;
         this.job = job;
@@ -106,6 +107,21 @@ public class MemberPersonalInfo {
                 this.wakeUpTime,
                 this.windDownTime,
                 timeZoneOffset,
+                this.job,
+                this.jobOtherDetail,
+                this.isStressedUnorganizedSchedule,
+                this.isForgetImportantThings,
+                this.isPreferReminder,
+                this.isImportantBreaks);
+    }
+
+    public MemberPersonalInfo updateUpTime(final LocalTime wakeUpTime) {
+        return MemberPersonalInfo.withId(
+                this.id,
+                this.memberId,
+                wakeUpTime,
+                this.windDownTime,
+                this.timeZoneOffset,
                 this.job,
                 this.jobOtherDetail,
                 this.isStressedUnorganizedSchedule,

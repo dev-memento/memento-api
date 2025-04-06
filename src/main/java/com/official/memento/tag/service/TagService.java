@@ -1,5 +1,7 @@
 package com.official.memento.tag.service;
 
+import com.official.memento.global.exception.ErrorCode;
+import com.official.memento.global.exception.InvalidRequestBodyException;
 import com.official.memento.schedule.domain.ScheduleRepository;
 import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.schedule.service.usecase.ScheduleUpdateUseCase;
@@ -52,11 +54,19 @@ public class TagService implements TagCreateUseCase, TagGetUseCase, TagUpdateUse
         Tag tag = tagRepository.findById(command.tagId());
         tag.checkOwn(command.memberId());
 
+        validateNotDefaultTag(tag);
+
         Tag defaultTag = tagRepository.findDefaultTag(command.memberId());
 
         scheduleRepository.updateTagForSchedules(tag.getId(), defaultTag.getId());
 
         tagRepository.deleteById(tag.getId());
+    }
+
+    private void validateNotDefaultTag(final Tag tag) {
+        if ("Untitled".equals(tag.getName()) && tag.getColor() == TagColor.GRAY05) {
+            throw new InvalidRequestBodyException(ErrorCode.INVALID_JSON_FORMAT);
+        }
     }
 
     @Transactional(readOnly = true)

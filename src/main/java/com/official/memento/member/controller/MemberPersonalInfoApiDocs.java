@@ -5,6 +5,7 @@ import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
 import com.official.memento.member.controller.dto.MemberPersonalInfoRequest;
 import com.official.memento.member.controller.dto.MemberUptimeDto;
+import com.official.memento.member.controller.dto.MemberUptimeUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -43,4 +44,17 @@ public interface MemberPersonalInfoApiDocs {
     ResponseEntity<SuccessResponse<MemberUptimeDto>> getUpTime(
             @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
             @Authorization final AuthorizationUser authorizationUser);
+
+    @Operation(summary = "사용자 업타임 업데이트")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "회원 업타임 업데이트 성공"),
+                    @ApiResponse(responseCode = "400", description = "회원 업타임 업데이트 실패", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content)
+            }
+    )
+    ResponseEntity<SuccessResponse<?>> updateUpTime(
+            @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
+            @Authorization final AuthorizationUser authorizationUser,
+            @RequestBody final MemberUptimeUpdateRequest request);
 }

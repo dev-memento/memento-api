@@ -479,4 +479,9 @@ public class ToDo extends BaseTimeEntity {
                 ", Created Date: " + this.getCreatedAt() +
                 ", Deadline: " + this.getEndDate();
     }
+
+    public void incrementEndDate() {
+        this.endDate = this.endDate.plusDays(1);
+    }
+
 }
