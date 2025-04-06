@@ -21,7 +21,7 @@ public class scheduleAlarmScheduler {
 
     private final ScheduleAlarmGetUseCase scheduleAlarmGetUseCase;
 
-    @Scheduled(cron = "0 15 0 * * *", zone = "UTC") // 매일 UTC 기준 0시 30분
+    @Scheduled(cron = "0 15 0 * * *", zone = "UTC") // 매일 UTC 기준 0시 15분
     public void setScheduleAlarm() {
         LocalDateTime now = LocalDateTime.now(ZoneId.of("UTC")).plusMinutes(30);
         LocalDateTime tomorrow = now.plusDays(1);
