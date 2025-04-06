@@ -5,6 +5,8 @@ import com.official.memento.auth.domain.port.AuthRepository;
 import com.official.memento.auth.domain.Auth;
 import com.official.memento.auth.infrastructure.persistence.entity.AuthEntity;
 import com.official.memento.auth.infrastructure.persistence.repository.AuthEntityJpaRepository;
+import com.official.memento.global.exception.EntityNotFoundException;
+import com.official.memento.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +27,8 @@ public class AuthRepositoryAdapter implements AuthRepository {
                 savedEntity.getMemberId(),
                 savedEntity.getProvider(),
                 savedEntity.getPlatformId(),
-                savedEntity.getRefreshToken()
+                savedEntity.getRefreshToken(),
+                savedEntity.getFcmToken()
         );
     }
 
@@ -37,19 +40,35 @@ public class AuthRepositoryAdapter implements AuthRepository {
                         entity.getMemberId(),
                         entity.getProvider(),
                         entity.getPlatformId(),
-                        entity.getRefreshToken()
+                        entity.getRefreshToken(),
+                        entity.getFcmToken()
                 ));
     }
 
     @Override
-    public Optional<Auth> findByMemberId(final Long memberId) {
+    public Optional<Auth> findByMemberIdOrNull(final Long memberId) {
         return authEntityJpaRepository.findByMemberId(memberId)
                 .map(entity -> Auth.withId(
                         entity.getId(),
                         entity.getMemberId(),
                         entity.getProvider(),
                         entity.getPlatformId(),
-                        entity.getRefreshToken()
+                        entity.getRefreshToken(),
+                        entity.getFcmToken()
                 ));
+    }
+
+    @Override
+    public Auth findByMemberId(final Long memberId) {
+        return authEntityJpaRepository.findByMemberId(memberId)
+                .map(entity -> Auth.withId(
+                        entity.getId(),
+                        entity.getMemberId(),
+                        entity.getProvider(),
+                        entity.getPlatformId(),
+                        entity.getRefreshToken(),
+                        entity.getFcmToken()
+                ))
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY));
     }
 }

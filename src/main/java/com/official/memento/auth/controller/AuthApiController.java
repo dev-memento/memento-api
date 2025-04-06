@@ -28,7 +28,12 @@ public class AuthApiController implements AuthApiDocs {
     @Override
     @PostMapping("/api/v1/auth/login")
     public ResponseEntity<SuccessResponse<NewAuthResult>> login(@Valid @RequestBody final AuthApiRequest request) {
-        final AuthCommand command = AuthCommand.of(request.provider(), request.idToken(),request.timeZoneOffset());
+        final AuthCommand command = AuthCommand.of(
+                request.provider(),
+                request.idToken(),
+                request.timeZoneOffset(),
+                request.fcmToken()
+        );
         final NewAuthResult response = authenticateUseCase.authenticate(command);
         return SuccessResponse.of(HttpStatus.OK, "소셜 로그인 성공", response);
     }

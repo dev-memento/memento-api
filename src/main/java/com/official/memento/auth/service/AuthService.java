@@ -59,6 +59,7 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase {
 
         Optional<MemberPersonalInfo> personalInfo = memberPersonalInfoGetUseCase.findByMemberIdOrNull(auth.getMemberId());
         updateTimeZone(personalInfo, timeZoneOffset);
+        updateFcmToken(auth, command.fcmToken());
         boolean isNewUser = isFirstLogin(personalInfo) || isOnboardingIncomplete(personalInfo);
 
         AccessToken accessToken = jwtUtil.generateAccessToken(auth.getMemberId());
@@ -67,7 +68,6 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase {
         auth.withUpdatedToken(refreshToken.getToken());
         authRepository.save(auth);
         return NewAuthResult.of(accessToken.getToken(), refreshToken.getToken(), isNewUser);
-
     }
 
     @Override
@@ -78,7 +78,7 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase {
             throw new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
         String memberId = jwtUtil.getUserIdFromToken(refreshToken);
-        Auth auth = authRepository.findByMemberId(Long.parseLong(memberId))
+        Auth auth = authRepository.findByMemberIdOrNull(Long.parseLong(memberId))
                 .orElseThrow(() -> new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN));
         if (!auth.getRefreshToken().equals(refreshToken)) {
             throw new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN);
@@ -134,6 +134,12 @@ public class AuthService implements AuthenticateUseCase, RefreshTokenUseCase {
                     personalInfo.get().getMemberId(),
                     timeZoneOffset
             ));
+        }
+    }
+
+    private void updateFcmToken(final Auth auth, final String fcmToken) {
+        if (auth.getFcmToken() == null || !auth.getFcmToken().equals(fcmToken)) {
+            authRepository.save(auth.updateFcmToken(fcmToken));
         }
     }
 }

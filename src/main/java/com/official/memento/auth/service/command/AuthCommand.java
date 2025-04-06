@@ -5,9 +5,15 @@ import com.official.memento.auth.domain.AuthProvider;
 public record AuthCommand(
         AuthProvider providerName,
         String idToken,
-        int timeZoneOffset
+        int timeZoneOffset,
+        String fcmToken
 ) {
-    public static AuthCommand of(final AuthProvider providerName, final String idToken,final int timeZoneOffset) {
-        return new AuthCommand(providerName, idToken,timeZoneOffset);
+    public static AuthCommand of(
+            final AuthProvider providerName,
+            final String idToken,
+            final int timeZoneOffset,
+            final String fcmToken
+    ) {
+        return new AuthCommand(providerName, idToken,timeZoneOffset, fcmToken);
     }
 }
