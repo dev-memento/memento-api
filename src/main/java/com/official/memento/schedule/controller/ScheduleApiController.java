@@ -4,6 +4,7 @@ import com.official.memento.global.annotation.Authorization;
 import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
 import com.official.memento.global.util.Validator;
+import com.official.memento.schedule.controller.dto.ScheduleAlarmCreateRequest;
 import com.official.memento.schedule.controller.dto.request.*;
 import com.official.memento.schedule.controller.dto.response.ScheduleAllAllDaysGetResponse;
 import com.official.memento.schedule.controller.dto.response.ScheduleAllGetResponse;
@@ -31,6 +32,7 @@ public class ScheduleApiController implements ScheduleApiDocs {
     private final ScheduleGroupDeleteUseCase scheduleGroupDeleteUseCase;
     private final ScheduleGroupUpdateUseCase scheduleGroupUpdateUseCase;
     private final ScheduleGroupCreateUseCase scheduleGroupCreateUseCase;
+    private final ScheduleAlarmCreateUseCase scheduleAlarmCreateUseCase;
 
     @PostMapping
     @Override
@@ -287,6 +289,25 @@ public class ScheduleApiController implements ScheduleApiDocs {
                 HttpStatus.OK,
                 "스케줄 조회 성공",
                 ScheduleDetailResponse.of(schedule)
+        );
+    }
+    
+    @PostMapping("/alarm")
+    public ResponseEntity<SuccessResponse<?>> createAlarmSchedules(
+            @Authorization final AuthorizationUser authorizationUser,
+            @RequestBody final ScheduleAlarmCreateRequest scheduleAlarmCreateRequest
+    ) {
+        scheduleAlarmCreateUseCase.createAlarm(
+                ScheduleAlarmCreateCommand.of(
+                        scheduleAlarmCreateRequest.description(),
+                        authorizationUser.memberId(),
+                        scheduleAlarmCreateRequest.startTime(),
+                        scheduleAlarmCreateRequest.endTime()
+                )
+        );
+        return SuccessResponse.of(
+                HttpStatus.CREATED,
+                "알람 스케줄 생성 성공"
         );
     }
 }
