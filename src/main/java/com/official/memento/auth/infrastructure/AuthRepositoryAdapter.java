@@ -52,4 +52,9 @@ public class AuthRepositoryAdapter implements AuthRepository {
                         entity.getRefreshToken()
                 ));
     }
+
+    @Override
+    public void deleteByMemberId(final long memberId) {
+        authEntityJpaRepository.deleteByMemberId(memberId);
+    }
 }

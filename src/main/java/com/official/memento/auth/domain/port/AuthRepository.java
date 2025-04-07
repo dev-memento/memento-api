@@ -8,4 +8,5 @@ public interface AuthRepository {
     Auth save(Auth auth);
     Optional<Auth> findByPlatformIdAndProvider(String platformId, AuthProvider provider);
     Optional<Auth> findByMemberId(Long memberId);
+    void deleteByMemberId(final long memberId);
 }
