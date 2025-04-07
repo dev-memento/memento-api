@@ -9,8 +9,8 @@ import com.official.memento.member.service.command.MemberPersonalInfoCreateComma
 import com.official.memento.member.service.command.MemberTimeZoneUpdateCommand;
 import com.official.memento.member.service.command.MemberUpTimeUpdateCommand;
 import com.official.memento.member.service.usecase.MemberPersonalInfoCreateUseCase;
+import com.official.memento.member.service.usecase.MemberPersonalInfoDeleteUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoGetUseCase;
-import com.official.memento.member.service.usecase.MemberPersonalInfoRetrieveUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoUpdateUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,12 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class MemberPersonalInfoService implements MemberPersonalInfoCreateUseCase, MemberPersonalInfoUpdateUseCase, MemberPersonalInfoRetrieveUseCase, MemberPersonalInfoGetUseCase {
+public class MemberPersonalInfoService implements
+        MemberPersonalInfoCreateUseCase,
+        MemberPersonalInfoUpdateUseCase,
+        MemberPersonalInfoDeleteUseCase,
+        MemberPersonalInfoGetUseCase
+{
 
     private final MemberPersonalInfoRepository memberPersonalInfoRepository;
 
@@ -79,5 +84,10 @@ public class MemberPersonalInfoService implements MemberPersonalInfoCreateUseCas
         if(memberPersonalInfoRepository.findNullableByMemberId(command.memberId()).isPresent()){
             throw new DataBaseIntegrityException(ErrorCode.DB_INTEGRITY_CONFLICT);
         }
+    }
+
+    @Override
+    public void deleteByMemberId(final long memberId) {
+        memberPersonalInfoRepository.deleteByMemberId(memberId);
     }
 }

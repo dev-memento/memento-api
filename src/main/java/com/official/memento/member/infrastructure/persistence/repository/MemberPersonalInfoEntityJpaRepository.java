@@ -11,4 +11,6 @@ public interface MemberPersonalInfoEntityJpaRepository extends JpaRepository<Mem
     Optional<MemberPersonalInfoEntity> findByMemberId(final Long memberId);
 
     @NotNull List<MemberPersonalInfoEntity> findAll();
+
+    void deleteByMemberId(final long memberId);
 }

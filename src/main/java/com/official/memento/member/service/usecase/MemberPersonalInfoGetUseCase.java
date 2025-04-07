@@ -6,4 +6,6 @@ import java.util.Optional;
 
 public interface MemberPersonalInfoGetUseCase {
     Optional<MemberPersonalInfo> findByMemberIdOrNull(final long memberId);
+
+    MemberPersonalInfo retrieveUptime(Long memberId);
 }
