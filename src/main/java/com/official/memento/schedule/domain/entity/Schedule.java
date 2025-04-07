@@ -3,7 +3,6 @@ package com.official.memento.schedule.domain.entity;
 import com.official.memento.global.entity.BaseTimeEntity;
 import com.official.memento.global.entity.enums.RepeatOption;
 import com.official.memento.schedule.domain.enums.ScheduleType;
-import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.enums.TagColor;
 
 import java.time.LocalDate;
@@ -256,6 +255,33 @@ public class Schedule extends BaseTimeEntity {
         );
     }
 
+    public static Schedule ofCalcTimeZone(
+            final long memberId,
+            final String description,
+            final LocalDateTime startDate,
+            final LocalDateTime endDate,
+            final boolean isAllDay,
+            final RepeatOption repeatOption,
+            final LocalDate repeatExpiredDate,
+            final ScheduleType type,
+            final String scheduleGroupId,
+            final long tagId,
+            final Integer timezoneOffset
+    ) {
+        return new Schedule(
+                memberId,
+                description,
+                startDate.minusHours(timezoneOffset),
+                endDate.minusHours(timezoneOffset),
+                isAllDay,
+                repeatOption,
+                repeatExpiredDate,
+                type,
+                scheduleGroupId,
+                tagId
+        );
+    }
+
     public static Schedule of(
             final long memberId,
             final String description,
@@ -289,14 +315,15 @@ public class Schedule extends BaseTimeEntity {
             final boolean isAllDay,
             final long tagId,
             final RepeatOption repeatOption,
-            final LocalDate repeatExpiredDate
+            final LocalDate repeatExpiredDate,
+            final int timezoneOffset
     ) {
         return Schedule.withId(
                 id,
                 memberId,
                 description,
-                startDate,
-                endDate,
+                startDate.minusHours(timezoneOffset),
+                endDate.minusHours(timezoneOffset),
                 isAllDay,
                 repeatOption,
                 repeatExpiredDate,
