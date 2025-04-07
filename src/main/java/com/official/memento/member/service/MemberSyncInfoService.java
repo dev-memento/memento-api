@@ -7,6 +7,7 @@ import com.official.memento.member.service.command.MemberSyncInfoCreateCommand;
 import com.official.memento.member.service.command.MemberSyncInfoGetUseCase;
 import com.official.memento.member.service.result.MemberSyncInfoResult;
 import com.official.memento.member.service.usecase.MemberSyncInfoCreateUseCase;
+import com.official.memento.member.service.usecase.MemberSyncInfoDeleteUseCase;
 import com.official.memento.member.service.usecase.MemberSyncInfoUpdateUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,9 @@ import static com.official.memento.global.exception.ErrorCode.DB_INTEGRITY_CONFL
 public class MemberSyncInfoService implements
         MemberSyncInfoCreateUseCase,
         MemberSyncInfoGetUseCase,
-        MemberSyncInfoUpdateUseCase {
+        MemberSyncInfoUpdateUseCase,
+        MemberSyncInfoDeleteUseCase
+{
 
     private final MemberSyncInfoRepository memberSyncInfoRepository;
 
@@ -46,12 +49,14 @@ public class MemberSyncInfoService implements
     }
 
     @Override
+    @Transactional
     public void activateAppleSync(final long memberId) {
         MemberSyncInfo memberSyncInfo = memberSyncInfoRepository.findByMemberId(memberId);
         memberSyncInfoRepository.save(memberSyncInfo.activateAppleToken());
     }
 
     @Override
+    @Transactional
     public void updateGoogleSyncToken(final long memberId, final String googleToken) {
         MemberSyncInfo memberSyncInfo = memberSyncInfoRepository.findByMemberId(memberId);
         memberSyncInfoRepository.save(memberSyncInfo.updateGoogleToken(googleToken));
@@ -61,5 +66,11 @@ public class MemberSyncInfoService implements
         if (memberSyncInfoRepository.findNullableByMemberId(command.memberId()).isPresent()) {
             throw new DataBaseIntegrityException(DB_INTEGRITY_CONFLICT);
         }
+    }
+
+    @Override
+    @Transactional
+    public void deleteByMemberId(final long memberId) {
+        memberSyncInfoRepository.deleteById(memberId);
     }
 }
