@@ -5,7 +5,9 @@ import com.official.memento.global.entity.enums.RepeatOption;
 import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.exception.InvalidRequestBodyException;
 import com.official.memento.member.service.command.MemberSyncInfoGetUseCase;
+import com.official.memento.member.service.result.MemberPersonalInfoResult;
 import com.official.memento.member.service.result.MemberSyncInfoResult;
+import com.official.memento.member.service.usecase.MemberPersonalInfoGetUseCase;
 import com.official.memento.member.service.usecase.MemberSyncInfoUpdateUseCase;
 import com.official.memento.orderinfo.service.usecase.OrderInfoCreateUseCase;
 import com.official.memento.orderinfo.service.usecase.OrderInfoDeleteUseCase;
@@ -70,30 +72,34 @@ public class ScheduleService implements
     private final MemberSyncInfoGetUseCase memberSyncInfoGetUseCase;
     private final GoogleCalendarAdapter googleCalendarAdapter;
     private final GoogleAuthClientAdapter googleAuthClientAdapter;
+    private final MemberPersonalInfoGetUseCase memberPersonalInfoGetUseCase;
 
     @Override
     @Transactional
     public void create(final ScheduleCreateCommand command) {
         Tag tag = tagGetUseCase.findById(command.tagId());
+        MemberPersonalInfoResult memberPersonalInfo = memberPersonalInfoGetUseCase.findByMemberId(command.memberId());
         checkOwnTag(command.memberId(), tag);
         checkDate(command.startDate(), command.endDate());
-        Schedule schedule = createSchedule(command);
+        Schedule schedule = createSchedule(command, memberPersonalInfo.timeZoneOffset());    //MemberPersonal 찾아서 적용
         orderInfoCreateUseCase.assignScheduleOrder(command.startDate().toLocalDate(), schedule, command.memberId());
     }
 
     @Override
     public void createAppleSchedules(final AppleSchedulesCommand command) {
         memberSyncInfoUpdateUseCase.activateAppleSync(command.memberId());
+        MemberPersonalInfoResult result = memberPersonalInfoGetUseCase.findByMemberId(command.memberId());
         Tag tag = tagGetUseCase.findByMemberIdAndTagColor(command.memberId(), TagColor.GRAY05);
         Map<String, ScheduleVo> newScheduleMap = getScheduleVoMap(command);
         for (String addedScheduleGroupId : newScheduleMap.keySet()) {
-            createAppleSchedule(command.memberId(), tag.getId(), newScheduleMap.get(addedScheduleGroupId));
+            createAppleSchedule(command.memberId(), tag.getId(), result.timeZoneOffset(), newScheduleMap.get(addedScheduleGroupId));
         }
     }
 
     @Override
     public void syncAppleSchedules(final AppleSchedulesCommand command) {
         MemberSyncInfoResult memberSyncInfo = memberSyncInfoGetUseCase.findByMemberId(command.memberId());
+        MemberPersonalInfoResult memberPersonalInfo = memberPersonalInfoGetUseCase.findByMemberId(command.memberId());
         Tag tag = tagGetUseCase.findByMemberIdAndTagColor(command.memberId(), TagColor.GRAY05);
         Map<String, ScheduleVo> newScheduleMap = getScheduleVoMap(command);
         if (memberSyncInfo.isAppleSync()) {
@@ -121,13 +127,13 @@ public class ScheduleService implements
             }
 
             for (String addedScheduleGroupId : addedScheduleGroupIds) {
-                createAppleSchedule(command.memberId(), tag.getId(), newScheduleMap.get(addedScheduleGroupId));
+                createAppleSchedule(command.memberId(), tag.getId(), memberPersonalInfo.timeZoneOffset(), newScheduleMap.get(addedScheduleGroupId));
             }
             for (String removeScheduleGroupId : removeScheduleGroupIds) {
                 deleteAppleSchedule(removeScheduleGroupId);
             }
             for (String updatedScheduleGroupId : updatedScheduleGroupIds) {
-                updateAppleSchedule(newScheduleMap.get(updatedScheduleGroupId));
+                updateAppleSchedule(newScheduleMap.get(updatedScheduleGroupId), memberPersonalInfo.timeZoneOffset());
             }
         } else {
             throw new InvalidRequestBodyException(ErrorCode.INVALID_REQUEST_BODY);
@@ -137,6 +143,7 @@ public class ScheduleService implements
     @Override
     public void syncGoogleSchedules(final long memberId) {
         MemberSyncInfoResult memberSyncInfo = memberSyncInfoGetUseCase.findByMemberId(memberId);
+        MemberPersonalInfoResult memberPersonalInfo = memberPersonalInfoGetUseCase.findByMemberId(memberId);
         String accessToken = googleAuthClientAdapter.refreshAccessToken(memberSyncInfo.googleSyncToken());
 
         GoogleCalendarResponse googleCalendarEvents = googleCalendarAdapter.getCalendarEvents(accessToken,
@@ -153,7 +160,7 @@ public class ScheduleService implements
                 deleteSchedule.add(event.id());
             }
             if (event.status().equals("confirmed")) {
-                Schedule newSchedule = event.toSchedule(memberId, tag.getId());
+                Schedule newSchedule = event.toSchedule(memberId, tag.getId(), memberPersonalInfo.timeZoneOffset());
                 scheduleRepository.findByScheduleGroupIdOrNull(event.id()).ifPresentOrElse(
                         schedule -> {
                             if (!schedule.getStartDate().equals(newSchedule.getStartDate())) {
@@ -166,7 +173,8 @@ public class ScheduleService implements
                                     newSchedule.isAllDay(),
                                     newSchedule.getTagId(),
                                     newSchedule.getRepeatOption(),
-                                    newSchedule.getRepeatExpiredDate()
+                                    newSchedule.getRepeatExpiredDate(),
+                                    memberPersonalInfo.timeZoneOffset()
                             );
                             createOrNormalUpdateSchedules.add(schedule);
                         },
@@ -196,6 +204,7 @@ public class ScheduleService implements
     @Transactional
     public ScheduleResult update(final ScheduleUpdateCommand command) {
         Schedule schedule = scheduleRepository.findById(command.scheduleId());
+        MemberPersonalInfoResult memberPersonalInfo = memberPersonalInfoGetUseCase.findByMemberId(command.memberId());
         checkOwn(command.memberId(), schedule);
 
         if (command.tagId() != schedule.getTagId()) {
@@ -213,7 +222,8 @@ public class ScheduleService implements
                 command.isAllDay(),
                 command.tagId(),
                 command.repeatOption(),
-                command.repeatEndDate()
+                command.repeatEndDate(),
+                memberPersonalInfo.timeZoneOffset()
         ));
 
         if (schedule.getStartDate() != command.startDate() || schedule.getEndDate() != command.endDate()) {
@@ -230,6 +240,7 @@ public class ScheduleService implements
         ScheduleResult scheduleResult = update(command);
         MemberSyncInfoResult memberSyncInfo = memberSyncInfoGetUseCase.findByMemberId(command.memberId());
         String accessToken = googleAuthClientAdapter.refreshAccessToken(memberSyncInfo.googleSyncToken());
+        MemberPersonalInfoResult memberPersonalInfoResult = memberPersonalInfoGetUseCase.findByMemberId(command.memberId());
         Schedule schedule = Schedule.of(
                 command.memberId(),
                 scheduleResult.description(),
@@ -257,18 +268,6 @@ public class ScheduleService implements
     @Override
     @Transactional
     public void createRepeat(final RepeatScheduleCreateCommand command) {
-        String scheduleGroupId = UUID.randomUUID().toString();
-        List<Schedule> schedules = createRepeatSchedules(
-                command.memberId(),
-                command.description(),
-                command.startDate(),
-                command.endDate(),
-                command.repeatOption(),
-                command.repeatExpiredDate(),
-                command.isAllDay(),
-                scheduleGroupId,
-                command.tagId()
-        );
         //Todo 기능 미구현
     }
 
@@ -287,24 +286,7 @@ public class ScheduleService implements
     @Override
     @Transactional
     public void updateGroup(final ScheduleUpdateGroupCommand command) {
-        Schedule schedule = scheduleRepository.findById(command.scheduleId());
-        checkOwn(command.memberId(), schedule);
-        belongsToGroup(command.scheduleGroupId(), schedule);
-        List<Schedule> oldSchedules = scheduleRepository.findAllByScheduleGroupIdAndStartDateGreaterThanEqual(
-                command.scheduleGroupId(),
-                schedule.getStartDate()
-        );
-        List<Schedule> newSchedules = createRepeatSchedules(
-                command.memberId(),
-                command.description(),
-                command.startDate(),
-                command.endDate(),
-                command.repeatOption(),
-                command.repeatExpiredDate(),
-                command.isAllDay(),
-                schedule.getScheduleGroupId(),
-                command.tagId()
-        );
+
         //Todo 기능 미구현
     }
 
@@ -346,9 +328,9 @@ public class ScheduleService implements
         }
     }
 
-    private Schedule createSchedule(final ScheduleCreateCommand command) {
+    private Schedule createSchedule(final ScheduleCreateCommand command, final int timezoneOffset) {
         String scheduleGroupId = UUID.randomUUID().toString();
-        return scheduleRepository.save(Schedule.of(
+        return scheduleRepository.save(Schedule.ofCalcTimeZone(
                 command.memberId(),
                 command.description(),
                 command.startDate(),
@@ -358,23 +340,8 @@ public class ScheduleService implements
                 null,
                 NORMAL,
                 scheduleGroupId,
-                command.tagId()
-        ));
-    }
-
-    private Schedule createAppleSchedule(final AppleScheduleCreateCommand command, final long memberId,
-                                         final long tagId) {
-        return scheduleRepository.save(Schedule.of(
-                memberId,
-                command.description(),
-                command.startDate(),
-                command.endDate(),
-                command.isAllDay(),
-                RepeatOption.NONE,
-                null,
-                APPLE,
-                command.scheduleUniqueId(),
-                tagId
+                command.tagId(),
+                timezoneOffset
         ));
     }
 
@@ -423,12 +390,19 @@ public class ScheduleService implements
         return existingScheduleMap;
     }
 
-    private void updateAppleSchedule(final ScheduleVo scheduleVo) {
+    private void updateAppleSchedule(final ScheduleVo scheduleVo,final int timezoneOffset) {
         Optional<Schedule> schedule = scheduleRepository.findByScheduleGroupIdOrNull(scheduleVo.scheduleGroupId());
         if (schedule.isPresent()) {
-            schedule.get().update(scheduleVo.description(), scheduleVo.startDate(), scheduleVo.endDate(),
+            schedule.get().update(
+                    scheduleVo.description(),
+                    scheduleVo.startDate(),
+                    scheduleVo.endDate(),
                     scheduleVo.isAllDay(),
-                    schedule.get().getTagId(), schedule.get().getRepeatOption(), schedule.get().getRepeatExpiredDate());
+                    schedule.get().getTagId(),
+                    schedule.get().getRepeatOption(),
+                    schedule.get().getRepeatExpiredDate(),
+                    timezoneOffset
+            );
             scheduleRepository.save(schedule.get());
         }
 
@@ -445,9 +419,10 @@ public class ScheduleService implements
     private void createAppleSchedule(
             final long memberId,
             final long tagId,
+            final int timezoneOffset,
             final ScheduleVo scheduleVo
     ) {
-        Schedule schedule = scheduleRepository.save(Schedule.of(
+        Schedule schedule = scheduleRepository.save(Schedule.ofCalcTimeZone(
                 memberId,
                 scheduleVo.description(),
                 scheduleVo.startDate(),
@@ -457,64 +432,11 @@ public class ScheduleService implements
                 null,
                 APPLE,
                 scheduleVo.scheduleGroupId(),
-                tagId
+                tagId,
+                timezoneOffset
         ));
         orderInfoCreateUseCase.assignScheduleOrder(schedule.getStartDate().toLocalDate(), schedule,
                 memberId);
-    }
-
-
-    private List<Schedule> createRepeatSchedules(
-            final long memberId,
-            final String description,
-            final LocalDateTime startDate,
-            final LocalDateTime endDate,
-            final RepeatOption repeatOption,
-            final LocalDate repeatExpiredDate,
-            final boolean isAllDay,
-            final String scheduleGroupId,
-            final long tagId
-    ) {
-        List<Schedule> schedules = new ArrayList<>();
-        LocalDateTime currentStartDate = startDate;
-        LocalDateTime currentEndDate = endDate;
-        while (!currentEndDate.toLocalDate().isAfter(repeatExpiredDate)) {
-            Schedule schedule = scheduleRepository.save(Schedule.of(
-                    memberId,
-                    description,
-                    currentStartDate,
-                    currentEndDate,
-                    isAllDay,
-                    repeatOption,
-                    repeatExpiredDate,
-                    NORMAL,
-                    scheduleGroupId,
-                    tagId
-            ));
-            schedules.add(schedule);
-            switch (repeatOption) {
-                case DAILY -> {
-                    currentStartDate = currentStartDate.plusDays(1);
-                    currentEndDate = currentEndDate.plusDays(1);
-                }
-                case WEEKLY -> {
-                    currentStartDate = currentStartDate.plusWeeks(1);
-                    currentEndDate = currentEndDate.plusWeeks(1);
-                }
-                case MONTHLY -> {
-                    currentStartDate = currentStartDate.plusMonths(1);
-                    currentEndDate = currentEndDate.plusMonths(1);
-                }
-                case YEARLY -> {
-                    currentStartDate = currentStartDate.plusYears(1);
-                    currentEndDate = currentEndDate.plusYears(1);
-                }
-                default -> throw new IllegalArgumentException(
-                        "Unsupported repeat option: " + repeatOption);//Todo 커스텀 익셉션으로 교체 예정
-            }
-        }
-        return schedules;
-        //Todo 기능 미구현
     }
 
     private static void checkOwn(final long memberId, final Schedule schedule) { //Todo Schedule안으로 리팩토링
