@@ -22,7 +22,7 @@ public interface ScheduleRepository {
 
     void deleteById(final long scheduleId);
 
-    void deleteAll(final List<Schedule> schedules);
+    void deleteAllByMemberId(final long memberId);
 
     void deleteAllByScheduleGroupId(final String scheduleGroupId);
 
@@ -33,4 +33,6 @@ public interface ScheduleRepository {
     List<Schedule> findAllByStartDateAndMemberId(final LocalDate startDate, final long memberId);
 
     List<Schedule> findAllAppleByMemberId(final long memberId);
+
+    List<Schedule> findAllByMemberId(final long memberId);
 }
