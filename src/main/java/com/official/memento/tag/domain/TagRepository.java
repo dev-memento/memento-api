@@ -11,6 +11,8 @@ public interface TagRepository {
 
     void deleteById(final long tagId);
 
+    void deleteAllByMemberId(final long memberId);
+
     Tag findById(final Long id);
 
     List<Tag> findAllByMemberId(final Long memberId);
