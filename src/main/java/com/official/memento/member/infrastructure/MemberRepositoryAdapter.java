@@ -1,5 +1,7 @@
 package com.official.memento.member.infrastructure;
 
+import com.official.memento.global.exception.EntityNotFoundException;
+import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.stereotype.Adapter;
 import com.official.memento.member.domain.Member;
 import com.official.memento.member.domain.port.MemberRepository;
@@ -18,7 +20,7 @@ public class MemberRepositoryAdapter implements MemberRepository {
     private final MemberPersonalInfoEntityJpaRepository personalInfoRepository;
 
     @Override
-    public Member save(Member member) {
+    public Member save(final Member member) {
         MemberEntity entityToSave = new MemberEntity();
         entityToSave.setCreatedAt(member.getCreatedAt());
         entityToSave.setUpdatedAt(member.getUpdatedAt());
@@ -33,12 +35,19 @@ public class MemberRepositoryAdapter implements MemberRepository {
     }
 
     @Override
-    public Optional<Member> findById(Long id) {
+    public Member findById(final long id) {
         return memberEntityJpaRepository.findById(id)
                 .map(entity -> new Member(
                         entity.getId(),
                         entity.getCreatedAt(),
                         entity.getUpdatedAt()
-                ));
+                )).orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY));
+    }
+
+    @Override
+    public void delete(long memberId) {
+        MemberEntity memberEntity = memberEntityJpaRepository.findById(memberId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY));
+        memberEntityJpaRepository.delete(memberEntity);
     }
 }
