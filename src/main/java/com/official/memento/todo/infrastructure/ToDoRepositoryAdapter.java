@@ -43,7 +43,7 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
 
     @Override
     public ToDo update(final ToDo toDo) {
-        ToDoEntity toDoEntity = toDoJpaRepository.save(ToDoEntity.from(toDo));
+        ToDoEntity toDoEntity = toDoJpaRepository.save(ToDoEntity.withId(toDo));
         return ToDo.withId(
                 toDoEntity.getId(),
                 toDoEntity.getMemberId(),
@@ -95,6 +95,11 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
     @Override
     public void deleteById(final long toDoId) {
         toDoJpaRepository.deleteById(toDoId);
+    }
+
+    @Override
+    public void deleteAllByMemberId(final long memberId) {
+        toDoJpaRepository.deleteAllByMemberId(memberId);
     }
 
     @Override
