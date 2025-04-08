@@ -24,7 +24,7 @@ public class MemberApiController implements MemberApiControllerDocs {
     private final MemberDeleteUseCase memberDeleteUseCase;
 
     @Override
-    @PostMapping("/api/v1/auth/login")
+    @PutMapping
     public ResponseEntity<SuccessResponse<NewAuthResult>> login(@Valid @RequestBody final AuthApiRequest request) {
         final AuthCommand command = AuthCommand.of(request.provider(), request.idToken(),request.timeZoneOffset());
         final NewAuthResult response = memberUpdateUseCase.authenticate(command);
@@ -32,7 +32,7 @@ public class MemberApiController implements MemberApiControllerDocs {
     }
 
     @Override
-    @DeleteMapping("/{memberId}")
+    @DeleteMapping
     public ResponseEntity<SuccessResponse<?>> delete(
             @Authorization AuthorizationUser authorizationUser
     ) {
