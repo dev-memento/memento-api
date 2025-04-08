@@ -70,7 +70,7 @@ public class MemberPersonalInfoService implements
 
     @Override
     @Transactional(readOnly = true)
-    public MemberPersonalInfo retrieveUptime(final Long memberId) {
+    public MemberPersonalInfo retrieveUptime(final long memberId) {
         return memberPersonalInfoRepository.findByMemberId(memberId);
     }
 
