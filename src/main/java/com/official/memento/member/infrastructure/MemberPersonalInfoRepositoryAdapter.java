@@ -80,4 +80,9 @@ public class MemberPersonalInfoRepositoryAdapter implements MemberPersonalInfoRe
                 .map(MemberPersonalInfoMapper::toDomain)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void deleteByMemberId(final long memberId) {
+        memberPersonalInfoEntityJpaRepository.deleteByMemberId(memberId);
+    }
 }

@@ -13,6 +13,8 @@ public interface ToDoRepository {
 
     void deleteById(final long toDoId);
 
+    void deleteAllByMemberId(final long memberId);
+
     List<ToDo> findAllByMemberId(final long memberId);
 
     List<ToDo> findAllByMemberIdAndStartDate(final long memberId, final LocalDate startDate);

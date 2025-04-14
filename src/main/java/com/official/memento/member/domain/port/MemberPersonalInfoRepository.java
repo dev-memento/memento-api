@@ -13,7 +13,9 @@ public interface MemberPersonalInfoRepository {
 
     MemberPersonalInfo update(final MemberPersonalInfo memberPersonalInfo);
 
-    Optional<MemberPersonalInfo> findNullableByMemberId(Long memberId);
+    Optional<MemberPersonalInfo> findNullableByMemberId(final Long memberId);
 
     List<MemberPersonalInfo> findAll();
+
+    void deleteByMemberId(final long memberId);
 }

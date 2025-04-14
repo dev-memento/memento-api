@@ -3,15 +3,12 @@ package com.official.memento.tag.service;
 import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.exception.InvalidRequestBodyException;
 import com.official.memento.schedule.domain.ScheduleRepository;
-import com.official.memento.schedule.domain.entity.Schedule;
-import com.official.memento.schedule.service.usecase.ScheduleUpdateUseCase;
 import com.official.memento.tag.domain.Tag;
 import com.official.memento.tag.domain.TagRepository;
 import com.official.memento.tag.domain.enums.TagColor;
 import com.official.memento.tag.service.command.TagCreateCommand;
 import com.official.memento.tag.service.command.TagDeleteCommand;
 import com.official.memento.tag.service.command.TagUpdateCommand;
-import com.official.memento.todo.domain.entity.ToDo;
 import com.official.memento.todo.domain.repository.ToDoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -61,6 +58,11 @@ public class TagService implements TagCreateUseCase, TagGetUseCase, TagUpdateUse
         scheduleRepository.updateTagForSchedules(tag.getId(), defaultTag.getId());
 
         tagRepository.deleteById(tag.getId());
+    }
+
+    @Override
+    public void deleteAllByMemberId(final long memberId) {
+        tagRepository.deleteAllByMemberId(memberId);
     }
 
     private void validateNotDefaultTag(final Tag tag) {

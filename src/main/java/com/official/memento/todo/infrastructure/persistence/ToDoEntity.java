@@ -145,7 +145,7 @@ public class ToDoEntity extends BaseTimeEntity {
         );
     }
 
-    public static ToDoEntity from(final ToDo toDo) {
+    public static ToDoEntity withId(final ToDo toDo) {
         return new ToDoEntity(
                 toDo.getId(),
                 toDo.getMemberId(),
