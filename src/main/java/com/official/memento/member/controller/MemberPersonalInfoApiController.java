@@ -11,7 +11,7 @@ import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.service.command.MemberPersonalInfoCommand;
 import com.official.memento.member.service.command.MemberTimeZoneUpdateCommand;
 import com.official.memento.member.service.command.MemberUpTimeUpdateCommand;
-import com.official.memento.member.service.usecase.MemberPersonalInfoRetrieveUseCase;
+import com.official.memento.member.service.usecase.MemberPersonalInfoGetUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoUpdateUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/members/personal-info")
 public class MemberPersonalInfoApiController implements MemberPersonalInfoApiDocs {
     private final MemberPersonalInfoUpdateUseCase memberPersonalInfoUpdateUseCase;
-    private final MemberPersonalInfoRetrieveUseCase memberPersonalInfoRetrieveUseCase;
+    public final MemberPersonalInfoGetUseCase memberPersonalInfoGetUseCase;
 
     @PatchMapping
     @Override
@@ -48,7 +48,7 @@ public class MemberPersonalInfoApiController implements MemberPersonalInfoApiDoc
     @GetMapping("/uptime")
     public ResponseEntity<SuccessResponse<MemberUptimeDto>> getUpTime(
             @Authorization final AuthorizationUser authorizationUser) {
-        final MemberPersonalInfo personalInfo = memberPersonalInfoRetrieveUseCase.retrieveUptime(authorizationUser.memberId());
+        final MemberPersonalInfo personalInfo = memberPersonalInfoGetUseCase.retrieveUptime(authorizationUser.memberId());
         final MemberUptimeDto response = MemberUptimeDto.of(
                 personalInfo.getWakeUpTime().toString(),
                 personalInfo.getWindDownTime().toString()
@@ -70,7 +70,7 @@ public class MemberPersonalInfoApiController implements MemberPersonalInfoApiDoc
     @PatchMapping("/uptime")
     public ResponseEntity<SuccessResponse<?>> updateUpTime(
             @Authorization AuthorizationUser authorizationUser,
-            @RequestBody final MemberUptimeUpdateRequest request){
+            @RequestBody final MemberUptimeUpdateRequest request) {
         memberPersonalInfoUpdateUseCase.updateUpTime(MemberUpTimeUpdateCommand.of(
                 authorizationUser.memberId(),
                 request.wakeUpTime()

@@ -20,6 +20,7 @@ import com.official.memento.todo.service.command.ToDoCreateCommand;
 import com.official.memento.todo.service.command.ToDoDeleteCommand;
 import com.official.memento.todo.service.command.ToDoUpdateCommand;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +58,15 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         checkOwn(toDoDeleteCommand.memberId(), toDo);
         toDoRepository.deleteById(toDo.getId());
         orderInfoDeleteUseCase.deleteByToDoId(toDo.getId());
+    }
+
+    @Override
+    public void deleteAllByMemberId(final long memberId) {
+        List<ToDo> toDos = toDoRepository.findAllByMemberId(memberId);
+        for (ToDo toDo : toDos) {
+            orderInfoDeleteUseCase.deleteByToDoId(toDo.getId());
+        }
+        toDoRepository.deleteAllByMemberId(memberId);
     }
 
     @Override

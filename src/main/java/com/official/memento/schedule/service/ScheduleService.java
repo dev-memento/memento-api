@@ -255,6 +255,15 @@ public class ScheduleService implements
     }
 
     @Override
+    public void deleteAllByMemberId(final long memberId) {
+        List<Schedule> schedules = scheduleRepository.findAllByMemberId(memberId);
+        for (Schedule schedule : schedules) {
+            orderInfoDeleteUseCase.deleteByScheduleId(schedule.getId());
+        }
+        scheduleRepository.deleteAllByMemberId(memberId);
+    }
+
+    @Override
     @Transactional
     public void createRepeat(final RepeatScheduleCreateCommand command) {
         String scheduleGroupId = UUID.randomUUID().toString();
@@ -275,12 +284,6 @@ public class ScheduleService implements
     @Override
     @Transactional
     public void deleteGroup(final ScheduleDeleteGroupCommand command) {
-        Schedule schedule = scheduleRepository.findById(command.scheduleId());
-        checkOwn(command.memberId(), schedule);
-        belongsToGroup(command.scheduleGroupId(), schedule);
-        List<Schedule> targetSchedules = scheduleRepository.findAllByScheduleGroupIdAndStartDateGreaterThanEqual(
-                command.scheduleGroupId(), schedule.getStartDate());
-        scheduleRepository.deleteAll(targetSchedules);
         //Todo 기능 미구현
     }
 

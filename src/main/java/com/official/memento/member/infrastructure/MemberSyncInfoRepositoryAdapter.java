@@ -54,4 +54,9 @@ public class MemberSyncInfoRepositoryAdapter implements MemberSyncInfoRepository
         );
     }
 
+    @Override
+    public void deleteById(long memberId) {
+        memberSyncInfoEntityJpaRepository.deleteByMemberId(memberId);
+    }
+
 }

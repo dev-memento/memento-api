@@ -8,4 +8,5 @@ public interface MemberSyncInfoEntityJpaRepository extends JpaRepository<MemberS
 
     Optional<MemberSyncInfoEntity> findByMemberId(final long memberId);
 
+    void deleteByMemberId(final long memberId);
 }
