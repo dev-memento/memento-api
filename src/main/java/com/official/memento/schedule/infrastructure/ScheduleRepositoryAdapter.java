@@ -178,6 +178,26 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
     }
 
     @Override
+    public List<Schedule> findAllByMemberId(final long memberId) {
+        List<ScheduleEntity> scheduleEntities = scheduleEntityJpaRepository.findAllByMemberId(memberId);
+        return scheduleEntities.stream().map(scheduleEntity -> Schedule.withId(
+                scheduleEntity.getId(),
+                scheduleEntity.getMemberId(),
+                scheduleEntity.getDescription(),
+                scheduleEntity.getStartDate(),
+                scheduleEntity.getEndDate(),
+                scheduleEntity.isAllDay(),
+                scheduleEntity.getRepeatOption(),
+                scheduleEntity.getRepeatExpiredDate(),
+                scheduleEntity.getType(),
+                scheduleEntity.getScheduleGroupId(),
+                scheduleEntity.getCreatedAt(),
+                scheduleEntity.getUpdatedAt(),
+                scheduleEntity.getTagId()
+        )).toList();
+    }
+
+    @Override
     public Optional<Schedule> findByScheduleGroupIdOrNull(final String scheduleGroupId) {
         Optional<ScheduleEntity> scheduleEntity = scheduleEntityJpaRepository.findByScheduleGroupId(scheduleGroupId);
         return scheduleEntity.map(entity -> Schedule.withId(
@@ -230,9 +250,8 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
     }
 
     @Override
-    public void deleteAll(final List<Schedule> schedules) {
-        List<ScheduleEntity> scheduleEntities = schedules.stream().map(ScheduleEntity::from).toList();
-        scheduleEntityJpaRepository.deleteAll(scheduleEntities);
+    public void deleteAllByMemberId(final long memberId) {
+        scheduleEntityJpaRepository.deleteAllByMemberId(memberId);
     }
 
     @Override

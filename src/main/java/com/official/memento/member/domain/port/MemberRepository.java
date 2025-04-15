@@ -6,7 +6,9 @@ import java.util.Optional;
 
 public interface MemberRepository {
 
-    Member save(Member member); // MemberEntity 저장
+    Member save(final Member member); // MemberEntity 저장
 
-    Optional<Member> findById(Long id); // ID로 MemberEntity 조회
+    Member findById(final long id); // ID로 MemberEntity 조회
+
+    void delete(final long memberId); // MemberEntity 삭제
 }

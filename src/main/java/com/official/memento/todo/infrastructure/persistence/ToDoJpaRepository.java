@@ -16,4 +16,6 @@ public interface ToDoJpaRepository extends JpaRepository<ToDoEntity, Long> {
     List<ToDoEntity> findAllByMemberIdAndStartDate(long memberId, LocalDate startDate);
 
     List<ToDoEntity> findByMemberIdAndEndDateAndIsCompleted(final long memberId, final LocalDate endDate, final boolean isCompleted);
+
+    void deleteAllByMemberId(final long memberId);
 }

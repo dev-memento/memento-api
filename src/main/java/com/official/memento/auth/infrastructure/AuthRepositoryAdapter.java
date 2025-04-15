@@ -71,4 +71,9 @@ public class AuthRepositoryAdapter implements AuthRepository {
                 ))
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY));
     }
+
+    @Override
+    public void deleteByMemberId(final long memberId) {
+        authEntityJpaRepository.deleteByMemberId(memberId);
+    }
 }
