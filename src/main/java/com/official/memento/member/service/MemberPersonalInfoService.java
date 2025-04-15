@@ -8,6 +8,7 @@ import com.official.memento.member.service.command.MemberPersonalInfoCommand;
 import com.official.memento.member.service.command.MemberPersonalInfoCreateCommand;
 import com.official.memento.member.service.command.MemberTimeZoneUpdateCommand;
 import com.official.memento.member.service.command.MemberUpTimeUpdateCommand;
+import com.official.memento.member.service.result.MemberPersonalInfoResult;
 import com.official.memento.member.service.usecase.MemberPersonalInfoCreateUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoDeleteUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoGetUseCase;
@@ -78,6 +79,11 @@ public class MemberPersonalInfoService implements
     @Transactional(readOnly = true)
     public Optional<MemberPersonalInfo> findByMemberIdOrNull(long memberId) {
         return memberPersonalInfoRepository.findNullableByMemberId(memberId);
+    }
+
+    @Override
+    public MemberPersonalInfoResult findByMemberId(final long memberId) {
+        return MemberPersonalInfoResult.of(memberPersonalInfoRepository.findByMemberId(memberId));
     }
 
     private void checkPresentByMemberId(final MemberPersonalInfoCreateCommand command) {

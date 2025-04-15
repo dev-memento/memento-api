@@ -1,5 +1,6 @@
 package com.official.memento.member.service.result;
 
+import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.domain.enums.JobType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -22,27 +23,23 @@ public record MemberPersonalInfoResult(
         @Schema(description = "리마인더 선호 여부", example = "true")
         Boolean isPreferReminder,
         @Schema(description = "중요한 휴식 여부", example = "true")
-        Boolean isImportantBreaks
+        Boolean isImportantBreaks,
+        @Schema(description = "타임존 오프셋", example = "2")
+        int timeZoneOffset
 ) {
     public static MemberPersonalInfoResult of(
-            final LocalTime wakeUpTime,
-            final LocalTime windDownTime,
-            final JobType job,
-            final String jobOtherDetail,
-            final Boolean isStressedUnorganizedSchedule,
-            final Boolean isForgetImportantThings,
-            final Boolean isPreferReminder,
-            final Boolean isImportantBreaks)
-    {
+            final MemberPersonalInfo memberPersonalInfo
+    ) {
         return new MemberPersonalInfoResult(
-                wakeUpTime,
-                windDownTime,
-                job,
-                jobOtherDetail,
-                isStressedUnorganizedSchedule,
-                isForgetImportantThings,
-                isPreferReminder,
-                isImportantBreaks
+                memberPersonalInfo.getWakeUpTime(),
+                memberPersonalInfo.getWindDownTime(),
+                memberPersonalInfo.getJob(),
+                memberPersonalInfo.getJobOtherDetail(),
+                memberPersonalInfo.getIsStressedUnorganizedSchedule(),
+                memberPersonalInfo.getIsForgetImportantThings(),
+                memberPersonalInfo.getIsPreferReminder(),
+                memberPersonalInfo.getIsImportantBreaks(),
+                memberPersonalInfo.getTimeZoneOffset()
         );
     }
 }

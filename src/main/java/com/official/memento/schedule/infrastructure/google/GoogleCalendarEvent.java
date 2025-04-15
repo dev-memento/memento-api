@@ -16,7 +16,7 @@ public record GoogleCalendarEvent(
         List<String> recurrence,
         String recurringEventId
 ) {
-    public Schedule toSchedule(final long memberId, final long tagId) {
+    public Schedule toSchedule(final long memberId, final long tagId,final int timezoneOffset) {
         RepeatOption repeatOption = RepeatOption.NONE;
         LocalDate repeatEndDate = null;
         if (this.recurrence != null) {
@@ -32,7 +32,7 @@ public record GoogleCalendarEvent(
             }
         }
 
-        return Schedule.of(
+        return Schedule.ofCalcTimeZone(
                 memberId,
                 this.summary() != null ? this.summary() : "", // description
                 this.start().toLocalDateTime(),
@@ -42,7 +42,8 @@ public record GoogleCalendarEvent(
                 repeatEndDate,
                 ScheduleType.GOOGLE,
                 this.id(),
-                tagId
+                tagId,
+                timezoneOffset
         );
     }
 }
