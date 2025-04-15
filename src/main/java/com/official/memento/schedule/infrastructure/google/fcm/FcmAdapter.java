@@ -12,17 +12,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class FcmAdapter {
 
+    private final String title = "15분 전 알람";
+
     public void sendNotification(
             final String targetToken,
             final String description,
             final LocalTime startTime,
             final LocalTime endTime
     ) {
+
         Message message = Message.builder()
                 .setToken(targetToken)
                 .setNotification(
                         Notification.builder()
-                                .setTitle("15분 전 알람")
+                                .setTitle(title)
                                 .setBody(startTime + " ~ " + endTime + " " + description)
                                 .build()
                 )
