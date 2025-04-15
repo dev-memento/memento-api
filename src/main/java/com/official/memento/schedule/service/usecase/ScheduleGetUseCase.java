@@ -13,5 +13,4 @@ public interface ScheduleGetUseCase {
     Schedule getDetail(final long memberId, final long scheduleId);
 
     List<Schedule> getSchedules(final long memberId, final LocalDate date);
-
 }

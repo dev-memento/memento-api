@@ -1,6 +1,7 @@
 package com.official.memento.schedule.domain;
 
 import com.official.memento.schedule.domain.entity.Schedule;
+import com.official.memento.schedule.domain.entity.ScheduleAlarm;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

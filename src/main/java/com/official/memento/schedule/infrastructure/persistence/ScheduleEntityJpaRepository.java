@@ -92,9 +92,25 @@ public interface ScheduleEntityJpaRepository extends JpaRepository<ScheduleEntit
             LocalDate date
     );
 
+    @Query("""
+    SELECT s.id as scheduleId,
+           s.memberId as memberId,
+           s.description as description,
+           s.startDate as startDate,
+           s.endDate as endDate,
+           m.wakeUpTime as wakeUpTime,
+           m.windDownTime as windDownTime,
+           m.timeZoneOffset as timeZoneOffset
+    FROM ScheduleEntity s
+    JOIN MemberPersonalInfoEntity m ON s.memberId = m.memberId
+    WHERE s.startDate BETWEEN :start AND :end
+    """)
+    List<ScheduleEntity> findSchedulesWithMemberInfoBetween(final LocalDateTime startTime, final LocalDateTime endTime);
+
     List<ScheduleEntity> findAllByMemberIdAndType(long memberId, ScheduleType type);
 
     void deleteAllByScheduleGroupId(final String groupId);
+
 
     @Modifying
     @Query("UPDATE ScheduleEntity s SET s.tagId = :newTagId WHERE s.tagId = :oldTagId")

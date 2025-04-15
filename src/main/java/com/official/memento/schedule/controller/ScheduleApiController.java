@@ -9,8 +9,12 @@ import com.official.memento.schedule.controller.dto.response.ScheduleAllAllDaysG
 import com.official.memento.schedule.controller.dto.response.ScheduleAllGetResponse;
 import com.official.memento.schedule.controller.dto.response.ScheduleDetailResponse;
 import com.official.memento.schedule.domain.entity.Schedule;
+import com.official.memento.schedule.domain.entity.ScheduleAlarm;
+import com.official.memento.schedule.service.CloudTaskAdapter;
 import com.official.memento.schedule.service.command.*;
 import com.official.memento.schedule.service.usecase.*;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +35,7 @@ public class ScheduleApiController implements ScheduleApiDocs {
     private final ScheduleGroupDeleteUseCase scheduleGroupDeleteUseCase;
     private final ScheduleGroupUpdateUseCase scheduleGroupUpdateUseCase;
     private final ScheduleGroupCreateUseCase scheduleGroupCreateUseCase;
+    private final CloudTaskAdapter cloudTaskAdapter;
 
     @PostMapping
     @Override

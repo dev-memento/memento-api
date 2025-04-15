@@ -5,15 +5,19 @@ import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.stereotype.Adapter;
 import com.official.memento.schedule.domain.ScheduleRepository;
 import com.official.memento.schedule.domain.entity.Schedule;
+import com.official.memento.schedule.domain.entity.ScheduleAlarm;
 import com.official.memento.schedule.domain.enums.ScheduleType;
+import com.official.memento.schedule.infrastructure.persistence.ScheduleAlarmCustomRepository;
 import com.official.memento.schedule.infrastructure.persistence.ScheduleEntity;
 import com.official.memento.schedule.infrastructure.persistence.ScheduleEntityJpaRepository;
+import com.official.memento.schedule.infrastructure.persistence.projection.ScheduleAlarmProjection;
 import com.official.memento.schedule.infrastructure.persistence.projection.ScheduleOrderInfoProjection;
+import lombok.RequiredArgsConstructor;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
 
 @Adapter
 @RequiredArgsConstructor
