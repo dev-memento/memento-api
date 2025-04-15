@@ -36,7 +36,7 @@ public class AuthService implements
             throw new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
         String memberId = jwtUtil.getUserIdFromToken(refreshToken);
-        Auth auth = authRepository.findByMemberId(Long.parseLong(memberId))
+        Auth auth = authRepository.findByMemberIdOrNull(Long.parseLong(memberId))
                 .orElseThrow(() -> new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN));
         if (!auth.getRefreshToken().equals(refreshToken)) {
             throw new UnauthorizedException(ErrorCode.INVALID_REFRESH_TOKEN);

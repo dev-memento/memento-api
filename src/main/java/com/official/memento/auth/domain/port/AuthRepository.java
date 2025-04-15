@@ -6,7 +6,8 @@ import java.util.Optional;
 
 public interface AuthRepository {
     Auth save(Auth auth);
-    Optional<Auth> findByPlatformIdAndProvider(String platformId, AuthProvider provider);
-    Optional<Auth> findByMemberId(Long memberId);
+    Optional<Auth> findByPlatformIdAndProvider(final String platformId, AuthProvider provider);
+    Optional<Auth> findByMemberIdOrNull(final Long memberId);
+    Auth findByMemberId(final Long memberId);
     void deleteByMemberId(final long memberId);
 }

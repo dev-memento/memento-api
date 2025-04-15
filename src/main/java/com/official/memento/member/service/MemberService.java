@@ -71,6 +71,7 @@ public class MemberService implements MemberUpdateUseCase, MemberDeleteUseCase {
 
         Optional<MemberPersonalInfo> personalInfo = memberPersonalInfoGetUseCase.findByMemberIdOrNull(auth.getMemberId());
         updateTimeZone(personalInfo, timeZoneOffset);
+        updateFcmToken(auth, command.fcmToken());
         boolean isNewUser = isFirstLogin(personalInfo) || isOnboardingIncomplete(personalInfo);
 
         AccessToken accessToken = jwtUtil.generateAccessToken(auth.getMemberId());
@@ -136,4 +137,9 @@ public class MemberService implements MemberUpdateUseCase, MemberDeleteUseCase {
         return personalInfo.isPresent() && personalInfo.get().getWakeUpTime() == null;
     }
 
+    private void updateFcmToken(final Auth auth, final String fcmToken) {
+        if (auth.getFcmToken() == null || !auth.getFcmToken().equals(fcmToken)) {
+            authUpdateUseCase.update(auth.updateFcmToken(fcmToken));
+        }
+    }
 }

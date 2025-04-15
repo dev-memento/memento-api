@@ -26,7 +26,7 @@ public class MemberApiController implements MemberApiControllerDocs {
     @Override
     @PutMapping
     public ResponseEntity<SuccessResponse<NewAuthResult>> login(@Valid @RequestBody final AuthApiRequest request) {
-        final AuthCommand command = AuthCommand.of(request.provider(), request.idToken(),request.timeZoneOffset());
+        final AuthCommand command = AuthCommand.of(request.provider(), request.idToken(),request.timeZoneOffset(), request.fcmToken());
         final NewAuthResult response = memberUpdateUseCase.authenticate(command);
         return SuccessResponse.of(HttpStatus.OK, "소셜 로그인 성공", response);
     }

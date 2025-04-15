@@ -5,6 +5,7 @@ import com.official.memento.auth.domain.AuthProvider;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
         @UniqueConstraint(columnNames = {"platformId", "provider"})})
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class AuthEntity {
 
     @Id
@@ -30,35 +32,18 @@ public class AuthEntity {
     @Column(nullable = false)
     private String refreshToken;
 
+    @Column(nullable = false)
+    private String fcmToken;
+
     public static AuthEntity of(final Auth auth) {
-        return new AuthEntity(auth.getId(), auth.getMemberId(), auth.getProvider(), auth.getPlatformId(), auth.getRefreshToken());
+        return new AuthEntity(
+                auth.getId(),
+                auth.getMemberId(),
+                auth.getProvider(),
+                auth.getPlatformId(),
+                auth.getRefreshToken(),
+                auth.getFcmToken()
+        );
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public AuthProvider getProvider() {
-        return provider;
-    }
-
-    public String getPlatformId() {
-        return platformId;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public long getMemberId() {
-        return memberId;
-    }
-
-    public void updateRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
-
-    public void setMemberId(long memberId) {
-        this.memberId = memberId;
-    }
 }

@@ -10,19 +10,27 @@ public record AuthApiRequest(
         AuthProvider provider,
         @Schema(description = "OAuth ID Token", example = "eysdsdsd~")
         String idToken,
-        String authorizationCode,
-        int timeZoneOffset
+        @Schema(description = "Timezone Offset", example = "9")
+        int timeZoneOffset,
+        @Schema(description = "FCM Token", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9")
+        String fcmToken
 ) {
-    public AuthApiRequest(final AuthProvider provider,final String idToken,final String authorizationCode,final int timeZoneOffset) {
-        validate(provider, idToken, authorizationCode);
+    public AuthApiRequest(
+            final AuthProvider provider,
+            final String idToken,
+            final int timeZoneOffset,
+            final String fcmToken
+    ) {
+        validate(provider, idToken, fcmToken);
         this.provider = provider;
         this.idToken = idToken;
-        this.authorizationCode = authorizationCode;
         this.timeZoneOffset = timeZoneOffset;
+        this.fcmToken = fcmToken;
     }
 
-    private static void validate(AuthProvider provider, String idToken, String authorizationCode) {
+    private static void validate(final AuthProvider provider, final String idToken, final String fcmToken) {
         Validator.isNull(provider);
         Validator.isNull(idToken);
+        Validator.isNull(fcmToken);
     }
 }
