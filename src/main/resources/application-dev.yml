@@ -39,4 +39,4 @@ google:
     secret: ${GOOGLE.CLIENT_SECRET}
 
 firebase:
-  config-path: ${FIREBASE.CONFIG_PATH.prod}
+  config-path: ${FIREBASE.CONFIG_PATH.dev}
