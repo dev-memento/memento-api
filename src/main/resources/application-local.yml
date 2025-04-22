@@ -41,3 +41,6 @@ google:
   client:
     id: ${GOOGLE.CLIENT_ID}
     secret: ${GOOGLE.CLIENT_SECRET}
+
+firebase:
+  config-path: ${FIREBASE.CONFIG_PATH.local}
