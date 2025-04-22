@@ -21,7 +21,6 @@ public class FirebaseConfig {
 
     @PostConstruct
     public void initFirebase() throws IOException {
-        System.out.println(firebaseConfigPath);
         if (FirebaseApp.getApps().isEmpty()) {
             try (InputStream serviceAccount = new FileInputStream(firebaseConfigPath)) {
                 FirebaseOptions options = FirebaseOptions.builder()
