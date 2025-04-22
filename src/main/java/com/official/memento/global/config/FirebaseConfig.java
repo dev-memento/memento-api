@@ -7,6 +7,7 @@ import com.google.firebase.FirebaseOptions;
 import jakarta.annotation.PostConstruct;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -22,12 +23,23 @@ public class FirebaseConfig {
     @PostConstruct
     public void initFirebase() throws IOException {
         if (FirebaseApp.getApps().isEmpty()) {
-            try (InputStream serviceAccount = new FileInputStream(firebaseConfigPath)) {
-                FirebaseOptions options = FirebaseOptions.builder()
-                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                        .build();
-                FirebaseApp.initializeApp(options);
+            InputStream serviceAccount;
+
+            if (firebaseConfigPath.startsWith("classpath:")) {
+                String path = firebaseConfigPath.replace("classpath:", "");
+                serviceAccount = getClass().getClassLoader().getResourceAsStream(path);
+                if (serviceAccount == null) {
+                    throw new FileNotFoundException("Classpath 리소스를 찾을 수 없습니다: " + path);
+                }
+            } else {
+                serviceAccount = new FileInputStream(firebaseConfigPath);
             }
+
+            FirebaseOptions options = FirebaseOptions.builder()
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .build();
+
+            FirebaseApp.initializeApp(options);
         }
     }
 }
