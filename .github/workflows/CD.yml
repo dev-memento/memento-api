@@ -30,7 +30,7 @@ jobs:
         run: |
           cd src/main/resources
           touch ./cloud-task-key.json
-          echo "${{ secrets.CLOUD_TASK_JSON }}" > ./cloud-task-key.json
+           echo "${{ secrets.CLOUD_TASK_KEY_JSON_BASE64 }}" | base64 -d > cloud-task-key.json
         working-directory: ${{ env.working-directory }}
 
       - name: 빌드
