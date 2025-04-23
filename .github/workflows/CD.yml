@@ -26,7 +26,7 @@ jobs:
           echo "${{ secrets.CI_APPLICATION_SECRET }}" > ./application-secret.yml
         working-directory: ${{ env.working-directory }}
 
-      - name: cloud-task.json 생성
+      - name: cloud-task-key.json 생성
         run: |
           cd src/main/resources
           touch ./cloud-task-key.json
