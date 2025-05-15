@@ -25,7 +25,7 @@ public class MemberPersonalInfoEntity {
     private LocalTime wakeUpTime;
 
     private LocalTime windDownTime;
-    private int timeZoneOffset;
+    private String timeZoneOffset;
 
     @Enumerated(EnumType.STRING)
     private JobType job;
@@ -44,7 +44,7 @@ public class MemberPersonalInfoEntity {
             final long memberId,
             final LocalTime wakeUpTime,
             final LocalTime windDownTime,
-            final int timeZoneOffset,
+            final String timeZoneOffset,
             final JobType job,
             final String jobOtherDetail,
             final Boolean isStressedUnorganizedSchedule,

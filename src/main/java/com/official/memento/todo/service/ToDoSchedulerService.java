@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
@@ -25,7 +26,9 @@ public class ToDoSchedulerService {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
 
         for (MemberPersonalInfo memberPersonalInfo : members){
-            LocalDateTime memberLocalTime = now.plusHours(memberPersonalInfo.getTimeZoneOffset());
+            LocalDateTime memberLocalTime = now.plusSeconds(
+                    ZoneOffset.of(memberPersonalInfo.getTimeZoneOffset()).getTotalSeconds()
+            );
             if (memberLocalTime.getHour() == 0 && memberLocalTime.getMinute() == 0) {
                 LocalDate today = memberLocalTime.toLocalDate();
                 List<ToDo> toDos = toDoRepository.findByMemberIdAndEndDateAndIsCompleted(memberPersonalInfo.getId(), today, false);

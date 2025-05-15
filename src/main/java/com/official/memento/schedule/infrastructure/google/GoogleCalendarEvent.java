@@ -16,7 +16,7 @@ public record GoogleCalendarEvent(
         List<String> recurrence,
         String recurringEventId
 ) {
-    public Schedule toSchedule(final long memberId, final long tagId,final int timezoneOffset) {
+    public Schedule toSchedule(final long memberId, final long tagId,final String timezoneOffset) {
         RepeatOption repeatOption = RepeatOption.NONE;
         LocalDate repeatEndDate = null;
         if (this.recurrence != null) {

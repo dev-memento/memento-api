@@ -331,7 +331,7 @@ public class ScheduleService implements
         }
     }
 
-    private Schedule createSchedule(final ScheduleCreateCommand command, final int timezoneOffset) {
+    private Schedule createSchedule(final ScheduleCreateCommand command, final String timezoneOffset) {
         String scheduleGroupId = UUID.randomUUID().toString();
         return scheduleRepository.save(Schedule.ofCalcTimeZone(
                 command.memberId(),
@@ -393,7 +393,7 @@ public class ScheduleService implements
         return existingScheduleMap;
     }
 
-    private void updateAppleSchedule(final ScheduleVo scheduleVo,final int timezoneOffset) {
+    private void updateAppleSchedule(final ScheduleVo scheduleVo,final String timezoneOffset) {
         Optional<Schedule> schedule = scheduleRepository.findByScheduleGroupIdOrNull(scheduleVo.scheduleGroupId());
         if (schedule.isPresent()) {
             schedule.get().update(
@@ -422,7 +422,7 @@ public class ScheduleService implements
     private void createAppleSchedule(
             final long memberId,
             final long tagId,
-            final int timezoneOffset,
+            final String timezoneOffset,
             final ScheduleVo scheduleVo
     ) {
         Schedule schedule = scheduleRepository.save(Schedule.ofCalcTimeZone(

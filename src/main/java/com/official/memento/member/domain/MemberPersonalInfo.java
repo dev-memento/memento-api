@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 
 @AllArgsConstructor
 @Getter
@@ -14,7 +15,7 @@ public class MemberPersonalInfo {
     private long memberId;
     private LocalTime wakeUpTime;
     private LocalTime windDownTime;
-    private int timeZoneOffset;
+    private String timeZoneOffset;
     private JobType job;
     private String jobOtherDetail;
     private Boolean isStressedUnorganizedSchedule;
@@ -38,7 +39,7 @@ public class MemberPersonalInfo {
 
     public static MemberPersonalInfo of(
             final Long memberId,
-            final int timeZoneOffset
+            final String timeZoneOffset
     ) {
         return new MemberPersonalInfo(
                 null,
@@ -59,7 +60,7 @@ public class MemberPersonalInfo {
             final Long memberId,
             final LocalTime wakeUpTime,
             final LocalTime windDownTime,
-            final int timeZoneOffset,
+            final String timeZoneOffset,
             final JobType job,
             final String jobOtherDetail,
             final Boolean isStressedUnorganizedSchedule,
@@ -71,7 +72,7 @@ public class MemberPersonalInfo {
                 memberId,
                 wakeUpTime,
                 windDownTime,
-                timeZoneOffset,
+                jobOtherDetail,
                 job,
                 jobOtherDetail,
                 isStressedUnorganizedSchedule,
@@ -100,7 +101,7 @@ public class MemberPersonalInfo {
         this.isImportantBreaks = isImportantBreaks;
     }
 
-    public MemberPersonalInfo updateTimeZoneOffset(int timeZoneOffset) {
+    public MemberPersonalInfo updateTimeZoneOffset(String timeZoneOffset) {
         return MemberPersonalInfo.withId(
                 this.id,
                 this.memberId,

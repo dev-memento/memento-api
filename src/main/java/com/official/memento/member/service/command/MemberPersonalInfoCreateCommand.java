@@ -1,10 +1,12 @@
 package com.official.memento.member.service.command;
 
+import java.time.ZoneOffset;
+
 public record MemberPersonalInfoCreateCommand(
         long memberId,
-        int timeZoneOffset
+        String timeZoneOffset
 ) {
-    public static MemberPersonalInfoCreateCommand from(final Long memberId, final int timeZoneOffset) {
+    public static MemberPersonalInfoCreateCommand from(final Long memberId, final String timeZoneOffset) {
         return new MemberPersonalInfoCreateCommand(memberId, timeZoneOffset);
     }
 }

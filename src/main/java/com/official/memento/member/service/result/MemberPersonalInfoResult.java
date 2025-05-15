@@ -25,7 +25,7 @@ public record MemberPersonalInfoResult(
         @Schema(description = "중요한 휴식 여부", example = "true")
         Boolean isImportantBreaks,
         @Schema(description = "타임존 오프셋", example = "2")
-        int timeZoneOffset
+        String timeZoneOffset
 ) {
     public static MemberPersonalInfoResult of(
             final MemberPersonalInfo memberPersonalInfo
