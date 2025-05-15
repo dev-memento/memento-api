@@ -26,6 +26,9 @@ public class ToDoSchedulerService {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
 
         for (MemberPersonalInfo memberPersonalInfo : members){
+            if(memberPersonalInfo.getTimeZoneOffset() == null) {
+                continue;
+            }
             LocalDateTime memberLocalTime = now.plusSeconds(
                     ZoneOffset.of(memberPersonalInfo.getTimeZoneOffset()).getTotalSeconds()
             );
