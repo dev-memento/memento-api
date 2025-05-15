@@ -7,6 +7,8 @@ import com.official.memento.tag.domain.enums.TagColor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 public class Schedule extends BaseTimeEntity {
     private Long id;
@@ -266,13 +268,13 @@ public class Schedule extends BaseTimeEntity {
             final ScheduleType type,
             final String scheduleGroupId,
             final long tagId,
-            final Integer timezoneOffset
+            final String timezoneOffset
     ) {
         return new Schedule(
                 memberId,
                 description,
-                startDate.minusHours(timezoneOffset),
-                endDate.minusHours(timezoneOffset),
+                OffsetDateTime.of(startDate, ZoneOffset.of(timezoneOffset)).toInstant().atOffset(ZoneOffset.UTC).toLocalDateTime(),
+                OffsetDateTime.of(endDate, ZoneOffset.of(timezoneOffset)).toInstant().atOffset(ZoneOffset.UTC).toLocalDateTime(),
                 isAllDay,
                 repeatOption,
                 repeatExpiredDate,
@@ -316,14 +318,14 @@ public class Schedule extends BaseTimeEntity {
             final long tagId,
             final RepeatOption repeatOption,
             final LocalDate repeatExpiredDate,
-            final int timezoneOffset
+            final String timezoneOffset
     ) {
         return Schedule.withId(
                 id,
                 memberId,
                 description,
-                startDate.minusHours(timezoneOffset),
-                endDate.minusHours(timezoneOffset),
+                OffsetDateTime.of(startDate, ZoneOffset.of(timezoneOffset)).toInstant().atOffset(ZoneOffset.UTC).toLocalDateTime(),
+                OffsetDateTime.of(endDate, ZoneOffset.of(timezoneOffset)).toInstant().atOffset(ZoneOffset.UTC).toLocalDateTime(),
                 isAllDay,
                 repeatOption,
                 repeatExpiredDate,

@@ -32,7 +32,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneOffset;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -61,16 +63,15 @@ public class MemberService implements MemberUpdateUseCase, MemberDeleteUseCase {
     @Transactional
     public NewAuthResult authenticate(final AuthCommand command) {
         final AuthProvider provider = command.providerName();
-        final int timeZoneOffset = command.timeZoneOffset();
         final Map<String, Object> tokenInfo = verifyIdToken(provider, command.idToken());
         final String platformId = (String) tokenInfo.get("sub");
         final String email = (String) tokenInfo.get("email");
 
         Auth auth = authGetUseCase.findByPlatformIdAndProvider(platformId, provider)
-                .orElseGet(() -> createNewMember(platformId, provider, timeZoneOffset));
+                .orElseGet(() -> createNewMember(platformId, provider, command.timeZoneOffset()));
 
         Optional<MemberPersonalInfo> personalInfo = memberPersonalInfoGetUseCase.findByMemberIdOrNull(auth.getMemberId());
-        updateTimeZone(personalInfo, timeZoneOffset);
+        updateTimeZone(personalInfo, command.timeZoneOffset());
         updateFcmToken(auth, command.fcmToken());
         boolean isNewUser = isFirstLogin(personalInfo) || isOnboardingIncomplete(personalInfo);
 
@@ -101,7 +102,7 @@ public class MemberService implements MemberUpdateUseCase, MemberDeleteUseCase {
         return clientAdapter.verifyIdToken(idToken);
     }
 
-    private Auth createNewMember(final String platformId, final AuthProvider provider, final int timeZoneOffset) {
+    private Auth createNewMember(final String platformId, final AuthProvider provider, final String timeZoneOffset) {
         Member newMember = memberRepository.save(Member.createNew());
         Long memberId = newMember.getId();
         memberPersonalInfoCreateUseCase.create(MemberPersonalInfoCreateCommand.from(memberId, timeZoneOffset));
@@ -120,8 +121,8 @@ public class MemberService implements MemberUpdateUseCase, MemberDeleteUseCase {
         tagCreateUseCase.create(TagCreateCommand.of(memberId, TagColor.BLUE, "Personal"));
     }
 
-    private void updateTimeZone(final Optional<MemberPersonalInfo> personalInfo, final int timeZoneOffset) {
-        if (personalInfo.isPresent() && personalInfo.get().getTimeZoneOffset() != timeZoneOffset) {
+    private void updateTimeZone(final Optional<MemberPersonalInfo> personalInfo, final String timeZoneOffset) {
+        if (personalInfo.isPresent() && !Objects.equals(personalInfo.get().getTimeZoneOffset(), timeZoneOffset)) {
             memberPersonalInfoUpdateUseCase.updateTimeZone(MemberTimeZoneUpdateCommand.of(
                     personalInfo.get().getMemberId(),
                     timeZoneOffset
