@@ -22,4 +22,13 @@ public enum TagColor {
     public String getHexCode() {
         return hexCode;
     }
+
+    public static TagColor fromHex(String hexCode) {
+        for (TagColor color : values()) {
+            if (color.getHexCode().equalsIgnoreCase(hexCode)) {
+                return color;
+            }
+        }
+        throw new IllegalArgumentException("지원하지 않는 색상 코드입니다: " + hexCode);
+    }
 }

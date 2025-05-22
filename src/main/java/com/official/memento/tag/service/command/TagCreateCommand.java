@@ -7,11 +7,12 @@ public record TagCreateCommand(
         TagColor color,
         String name
 ) {
-    public static TagCreateCommand of(
-            Long memberId,
-            TagColor color,
-            String name
-    ) {
+    public static TagCreateCommand from(Long memberId, String colorHex, String name) {
+        return new TagCreateCommand(memberId, TagColor.fromHex(colorHex), name);
+    }
+
+    public static TagCreateCommand of(Long memberId, TagColor color, String name) {
         return new TagCreateCommand(memberId, color, name);
     }
+
 }
