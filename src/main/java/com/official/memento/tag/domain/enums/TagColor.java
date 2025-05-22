@@ -1,5 +1,8 @@
 package com.official.memento.tag.domain.enums;
 
+import com.official.memento.global.exception.ErrorCode;
+import com.official.memento.global.exception.InvalidRequestBodyException;
+
 public enum TagColor {
 
     GRAY05("#A9ADBB"),
@@ -29,6 +32,6 @@ public enum TagColor {
                 return color;
             }
         }
-        throw new IllegalArgumentException("지원하지 않는 색상 코드입니다: " + hexCode);
+        throw new InvalidRequestBodyException(ErrorCode.INVALID_REQUEST_BODY);
     }
 }
