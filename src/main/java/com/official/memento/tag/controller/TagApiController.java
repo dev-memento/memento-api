@@ -39,9 +39,9 @@ public class TagApiController implements TagApiDocs {
             @RequestBody final TagCreateRequest request
     ) {
         Tag tag = tagCreateUseCase.create(
-                new TagCreateCommand(
+                TagCreateCommand.createWithHexColor(
                         authorizationUser.memberId(),
-                        request.color(),
+                        request.hexCode(),
                         request.name()
                 )
         );

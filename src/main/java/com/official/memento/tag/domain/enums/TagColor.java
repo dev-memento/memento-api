@@ -1,5 +1,8 @@
 package com.official.memento.tag.domain.enums;
 
+import com.official.memento.global.exception.ErrorCode;
+import com.official.memento.global.exception.InvalidRequestBodyException;
+
 public enum TagColor {
 
     GRAY05("#A9ADBB"),
@@ -21,5 +24,14 @@ public enum TagColor {
 
     public String getHexCode() {
         return hexCode;
+    }
+
+    public static TagColor fromHex(String hexCode) {
+        for (TagColor color : values()) {
+            if (color.getHexCode().equalsIgnoreCase(hexCode)) {
+                return color;
+            }
+        }
+        throw new InvalidRequestBodyException(ErrorCode.INVALID_REQUEST_BODY);
     }
 }
