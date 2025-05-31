@@ -7,7 +7,7 @@ public record TagCreateCommand(
         TagColor color,
         String name
 ) {
-    public static TagCreateCommand from(Long memberId, String colorHex, String name) {
+    public static TagCreateCommand createWithHexColor(Long memberId, String colorHex, String name) {
         return new TagCreateCommand(memberId, TagColor.fromHex(colorHex), name);
     }
 
