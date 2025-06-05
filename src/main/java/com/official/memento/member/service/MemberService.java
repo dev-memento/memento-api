@@ -68,7 +68,7 @@ public class MemberService implements MemberUpdateUseCase, MemberDeleteUseCase {
         final String email = (String) tokenInfo.get("email");
 
         Auth auth = authGetUseCase.findByPlatformIdAndProvider(platformId, provider)
-                .orElseGet(() -> createNewMember(platformId, provider, command.timeZoneOffset()));
+                .orElseGet(() -> createNewMember(platformId, provider, command.timeZoneOffset(), command.fcmToken()));
 
         Optional<MemberPersonalInfo> personalInfo = memberPersonalInfoGetUseCase.findByMemberIdOrNull(auth.getMemberId());
         updateTimeZone(personalInfo, command.timeZoneOffset());
@@ -102,14 +102,13 @@ public class MemberService implements MemberUpdateUseCase, MemberDeleteUseCase {
         return clientAdapter.verifyIdToken(idToken);
     }
 
-    private Auth createNewMember(final String platformId, final AuthProvider provider, final String timeZoneOffset) {
+    private Auth createNewMember(final String platformId, final AuthProvider provider, final String timeZoneOffset,final String fcmToken) {
         Member newMember = memberRepository.save(Member.createNew());
         Long memberId = newMember.getId();
         memberPersonalInfoCreateUseCase.create(MemberPersonalInfoCreateCommand.from(memberId, timeZoneOffset));
         memberSyncInfoCreateUseCase.create(MemberSyncInfoCreateCommand.from(memberId));
         createOwnTags(memberId);
-        Auth newAuth = Auth.of(memberId, provider, platformId, "");
-        return authCreateUseCase.create(memberId,provider,platformId,"");
+        return authCreateUseCase.create(memberId, provider, platformId, "",fcmToken);
     }
 
     private void createOwnTags(Long memberId) {

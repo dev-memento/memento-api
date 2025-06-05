@@ -14,11 +14,12 @@ public class Auth {
     private String refreshToken;
     private String fcmToken;
 
-    private Auth(long memberId, AuthProvider provider, String platformId, String refreshToken) {
+    private Auth(final long memberId,final AuthProvider provider,final String platformId,final String refreshToken,final String fcmToken) {
         this.memberId = memberId;
         this.provider = provider;
         this.platformId = platformId;
         this.refreshToken = refreshToken;
+        this.fcmToken = fcmToken;
     }
 
     public static Auth withId(
@@ -32,8 +33,8 @@ public class Auth {
         return new Auth(id, memberId, provider, platformId, refreshToken,fcmToken);
     }
 
-    public static Auth of(long memberId, AuthProvider provider, String platformId, String refreshToken) {
-        return new Auth(memberId, provider, platformId, refreshToken);
+    public static Auth of(final long memberId,final AuthProvider provider,final String platformId,final String refreshToken,final String fcmToken) {
+        return new Auth(memberId, provider, platformId, refreshToken, fcmToken);
     }
 
     public void withUpdatedToken(final String newRefreshToken) {
