@@ -27,6 +27,7 @@ public class TagService implements TagCreateUseCase, TagGetUseCase, TagUpdateUse
     @Override
     @Transactional
     public Tag create(final TagCreateCommand command) {
+        validateDuplicateTagName(command.memberId(), command.name());
         final Tag tag = Tag.of(command.name(), command.color(), command.memberId());
         return tagRepository.save(tag);
     }
@@ -36,6 +37,7 @@ public class TagService implements TagCreateUseCase, TagGetUseCase, TagUpdateUse
     public void update(final TagUpdateCommand command) {
         Tag tag = tagRepository.findById(command.tagId());
         tag.checkOwn(command.memberId());
+        validateDuplicateTagName(command.memberId(), command.name());
 
         tag = tag.update(
                 command.name(),
@@ -67,6 +69,12 @@ public class TagService implements TagCreateUseCase, TagGetUseCase, TagUpdateUse
 
     private void validateNotDefaultTag(final Tag tag) {
         if ("Untitled".equals(tag.getName()) && tag.getColor() == TagColor.GRAY05) {
+            throw new InvalidRequestBodyException(ErrorCode.INVALID_JSON_FORMAT);
+        }
+    }
+
+    private void validateDuplicateTagName(Long memberId, String name) {
+        if (tagRepository.existsByMemberIdAndName(memberId, name)) {
             throw new InvalidRequestBodyException(ErrorCode.INVALID_JSON_FORMAT);
         }
     }

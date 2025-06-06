@@ -20,4 +20,6 @@ public interface TagRepository {
     Tag findByMemberIdAndTagColor(final Long memberId, final TagColor tagColor);
 
     Tag findDefaultTag(final Long memberId);
+
+    boolean existsByMemberIdAndName(final Long memberId, final String name);
 }

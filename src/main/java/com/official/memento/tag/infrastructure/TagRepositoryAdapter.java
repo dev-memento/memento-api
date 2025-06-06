@@ -106,4 +106,9 @@ public class TagRepositoryAdapter implements TagRepository {
                 entity.getMemberId()
         );
     }
+
+    @Override
+    public boolean existsByMemberIdAndName(Long memberId, String name) {
+        return tagJpaRepository.existsByMemberIdAndName(memberId, name);
+    }
 }
