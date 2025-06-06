@@ -9,10 +9,10 @@ import java.util.List;
 
 public interface TagJpaRepository extends JpaRepository<TagEntity, Long> {
     @Query(
-            value = "SELECT * FROM tag WHERE member_id = :memberId",
+            value = "SELECT * FROM tag WHERE member_id = :memberId ORDER BY id ASC",
             nativeQuery = true
     )
-    List<TagEntity> findAllByMemberId(Long memberId);
+    List<TagEntity> findAllByMemberIdOrderById(Long memberId);
 
     Optional<TagEntity> findByMemberIdAndColor(Long memberId, TagColor color);
 

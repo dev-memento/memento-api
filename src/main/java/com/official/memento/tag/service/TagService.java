@@ -74,7 +74,7 @@ public class TagService implements TagCreateUseCase, TagGetUseCase, TagUpdateUse
     @Transactional(readOnly = true)
     @Override
     public List<Tag> getTags(final long memberId) {
-        return tagRepository.findAllByMemberId(memberId);
+        return tagRepository.findAllByMemberIdOrderById(memberId);
     }
 
     @Transactional(readOnly = true)
