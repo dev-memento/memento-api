@@ -74,14 +74,16 @@ public class AuthService implements
             final long memberId,
             final AuthProvider provider,
             final String platformId,
-            final String refreshToken
+            final String refreshToken,
+            final String fcmToken
     ) {
         return authRepository.save(
                 Auth.of(
                         memberId,
                         provider,
                         platformId,
-                        refreshToken
+                        refreshToken,
+                        fcmToken
                 )
         );
     }

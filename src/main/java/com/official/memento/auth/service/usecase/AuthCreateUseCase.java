@@ -8,6 +8,7 @@ public interface AuthCreateUseCase {
             final long memberId,
             final AuthProvider provider,
             final String platformId,
-            final String refreshToken
+            final String refreshToken,
+            final String fcmToken
     );
 }
