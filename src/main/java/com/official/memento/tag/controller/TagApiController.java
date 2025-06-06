@@ -72,10 +72,10 @@ public class TagApiController implements TagApiDocs {
             @PathVariable final long tagId,
             @RequestBody final TagUpdateRequest tagUpdateRequest
     ) {
-        tagUpdateUseCase.update(TagUpdateCommand.of(
+        tagUpdateUseCase.update(TagUpdateCommand.updateWithHexColor(
                 authorizationUser.memberId(),
                 tagId,
-                tagUpdateRequest.color(),
+                tagUpdateRequest.hexCode(),
                 tagUpdateRequest.name()
         ));
         return SuccessResponse.of(
