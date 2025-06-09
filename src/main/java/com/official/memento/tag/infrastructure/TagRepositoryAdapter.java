@@ -71,8 +71,8 @@ public class TagRepositoryAdapter implements TagRepository {
     }
 
     @Override
-    public List<Tag> findAllByMemberId(Long memberId) {
-        return tagJpaRepository.findAllByMemberId(memberId)
+    public List<Tag> findAllByMemberIdOrderById(Long memberId) {
+        return tagJpaRepository.findAllByMemberIdOrderById(memberId)
                 .stream()
                 .map(entity -> Tag.withId(
                         entity.getId(),
@@ -105,5 +105,10 @@ public class TagRepositoryAdapter implements TagRepository {
                 entity.getColor(),
                 entity.getMemberId()
         );
+    }
+
+    @Override
+    public boolean existsByMemberIdAndName(Long memberId, String name) {
+        return tagJpaRepository.existsByMemberIdAndName(memberId, name);
     }
 }

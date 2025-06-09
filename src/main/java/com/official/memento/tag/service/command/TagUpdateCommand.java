@@ -16,4 +16,8 @@ public record TagUpdateCommand(
     ) {
         return new TagUpdateCommand(memberId, tagId, color, name);
     }
+
+    public static TagUpdateCommand updateWithHexColor(Long memberId, Long tagId, String colorHex, String name) {
+        return new TagUpdateCommand(memberId, tagId, TagColor.fromHex(colorHex), name);
+    }
 }

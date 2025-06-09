@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record TagUpdateRequest(
         @Schema(description = "태그 이름")
         String name,
-        @Schema(description = "태그 색상")
-        TagColor color
+        @Schema(description = "태그 색상 헥스코드")
+        String hexCode
 ) {
 }
