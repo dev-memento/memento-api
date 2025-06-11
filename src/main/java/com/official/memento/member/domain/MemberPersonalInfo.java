@@ -72,7 +72,7 @@ public class MemberPersonalInfo {
                 memberId,
                 wakeUpTime,
                 windDownTime,
-                jobOtherDetail,
+                timeZoneOffset,
                 job,
                 jobOtherDetail,
                 isStressedUnorganizedSchedule,
