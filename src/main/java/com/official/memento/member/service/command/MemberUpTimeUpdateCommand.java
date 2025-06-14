@@ -8,11 +8,11 @@ public record MemberUpTimeUpdateCommand(
 ) {
     public static MemberUpTimeUpdateCommand of(
             final long memberId,
-            final LocalTime wakeUpTime
+            final String wakeUpTime
     ){
         return new MemberUpTimeUpdateCommand(
                 memberId,
-                wakeUpTime
+                LocalTime.parse(wakeUpTime)
         );
     }
 }
