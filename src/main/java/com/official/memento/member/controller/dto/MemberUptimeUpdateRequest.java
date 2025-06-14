@@ -3,6 +3,6 @@ package com.official.memento.member.controller.dto;
 import java.time.LocalTime;
 
 public record MemberUptimeUpdateRequest(
-        LocalTime wakeUpTime
+        String wakeUpTime
 ) {
 }
