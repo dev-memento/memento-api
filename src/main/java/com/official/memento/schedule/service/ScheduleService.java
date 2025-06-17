@@ -333,7 +333,7 @@ public class ScheduleService implements
 
     private Schedule createSchedule(final ScheduleCreateCommand command, final String timezoneOffset) {
         String scheduleGroupId = UUID.randomUUID().toString();
-        return scheduleRepository.save(Schedule.ofCalcTimeZone(
+        return scheduleRepository.save(Schedule.of(
                 command.memberId(),
                 command.description(),
                 command.startDate(),
@@ -343,8 +343,7 @@ public class ScheduleService implements
                 null,
                 NORMAL,
                 scheduleGroupId,
-                command.tagId(),
-                timezoneOffset
+                command.tagId()
         ));
     }
 
