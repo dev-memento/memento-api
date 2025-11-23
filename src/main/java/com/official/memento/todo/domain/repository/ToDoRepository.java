@@ -15,6 +15,8 @@ public interface ToDoRepository {
 
     void deleteAllByMemberId(final long memberId);
 
+    void updateTagForTodo(final long oldTagId, final long newTagId);
+
     List<ToDo> findAllByMemberId(final long memberId);
 
     List<ToDo> findAllByMemberIdAndStartDate(final long memberId, final LocalDate startDate);

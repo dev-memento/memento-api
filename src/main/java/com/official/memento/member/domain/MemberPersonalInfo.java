@@ -130,4 +130,19 @@ public class MemberPersonalInfo {
                 this.isPreferReminder,
                 this.isImportantBreaks);
     }
+
+    public MemberPersonalInfo updateWindDownTime(final LocalTime windDownTime) {
+        return MemberPersonalInfo.withId(
+                this.id,
+                this.memberId,
+                this.wakeUpTime,
+                windDownTime,
+                this.timeZoneOffset,
+                this.job,
+                this.jobOtherDetail,
+                this.isStressedUnorganizedSchedule,
+                this.isForgetImportantThings,
+                this.isPreferReminder,
+                this.isImportantBreaks);
+    }
 }

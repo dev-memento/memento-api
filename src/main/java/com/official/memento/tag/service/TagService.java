@@ -34,17 +34,19 @@ public class TagService implements TagCreateUseCase, TagGetUseCase, TagUpdateUse
 
     @Override
     @Transactional
-    public void update(final TagUpdateCommand command) {
+    public Tag update(final TagUpdateCommand command) {
         Tag tag = tagRepository.findById(command.tagId());
         tag.checkOwn(command.memberId());
-        validateDuplicateTagName(command.memberId(), command.name());
-
+        if(!tag.getName().equals(command.name())) {
+            validateDuplicateTagName(command.memberId(), command.name());
+        }
         tag = tag.update(
                 command.name(),
                 command.color()
         );
 
         tagRepository.update(tag);
+        return tag;
     }
 
     @Override
@@ -58,6 +60,7 @@ public class TagService implements TagCreateUseCase, TagGetUseCase, TagUpdateUse
         Tag defaultTag = tagRepository.findDefaultTag(command.memberId());
 
         scheduleRepository.updateTagForSchedules(tag.getId(), defaultTag.getId());
+        toDoRepository.updateTagForTodo(tag.getId(),defaultTag.getId());
 
         tagRepository.deleteById(tag.getId());
     }

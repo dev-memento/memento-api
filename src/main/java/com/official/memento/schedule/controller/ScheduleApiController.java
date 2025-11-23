@@ -10,6 +10,7 @@ import com.official.memento.schedule.controller.dto.response.ScheduleAllAllDaysG
 import com.official.memento.schedule.controller.dto.response.ScheduleAllGetResponse;
 import com.official.memento.schedule.controller.dto.response.ScheduleDetailResponse;
 import com.official.memento.schedule.domain.entity.Schedule;
+import com.official.memento.schedule.service.ScheduleResult;
 import com.official.memento.schedule.service.command.*;
 import com.official.memento.schedule.service.usecase.*;
 import lombok.RequiredArgsConstructor;
@@ -36,11 +37,11 @@ public class ScheduleApiController implements ScheduleApiDocs {
 
     @PostMapping
     @Override
-    public ResponseEntity<SuccessResponse<?>> createSchedule(
+    public ResponseEntity<SuccessResponse<ScheduleResult>> createSchedule(
             @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final ScheduleCreateRequest scheduleCreateRequest
     ) {
-        scheduleCreateUseCase.create(
+        ScheduleResult result = scheduleCreateUseCase.create(
                 ScheduleCreateCommand.of(
                         authorizationUser.memberId(),
                         scheduleCreateRequest.description(),
@@ -52,7 +53,8 @@ public class ScheduleApiController implements ScheduleApiDocs {
         );
         return SuccessResponse.of(
                 HttpStatus.CREATED,
-                "단일 스케줄 생성 성공"
+                "단일 스케줄 생성 성공",
+                result
         );
     }
 
@@ -170,12 +172,12 @@ public class ScheduleApiController implements ScheduleApiDocs {
 
     @PatchMapping("/{scheduleId}")
     @Override
-    public ResponseEntity<SuccessResponse<?>> updateSchedule(
+    public ResponseEntity<SuccessResponse<ScheduleResult>> updateSchedule(
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long scheduleId,
             @RequestBody final ScheduleUpdateRequest scheduleUpdateRequest
     ) {
-        scheduleUpdateUseCase.update(ScheduleUpdateCommand.of(
+        ScheduleResult result = scheduleUpdateUseCase.update(ScheduleUpdateCommand.of(
                 authorizationUser.memberId(),
                 scheduleId,
                 scheduleUpdateRequest.description(),
@@ -188,7 +190,8 @@ public class ScheduleApiController implements ScheduleApiDocs {
         ));
         return SuccessResponse.of(
                 HttpStatus.OK,
-                "단일 스케줄 업데이트 성공"
+                "단일 스케줄 업데이트 성공",
+                result
         );
     }
 

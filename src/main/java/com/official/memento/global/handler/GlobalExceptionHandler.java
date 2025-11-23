@@ -6,6 +6,7 @@ import com.official.memento.global.dto.ErrorResponse;
 import com.official.memento.global.exception.*;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.io.DecodingException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -86,7 +87,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorResponse> runtimeException(final RuntimeException exception) {
+    public ResponseEntity<ErrorResponse> runtimeException(final RuntimeException exception, final HttpServletRequest request) {
         logger.error("Runtime exception occurred ", exception);
         alarmSendUseCase.sendException(new AlarmExceptionCommand(exception));
         return ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR);

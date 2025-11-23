@@ -5,6 +5,7 @@ import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
 import com.official.memento.orderinfo.controller.dto.ToDoUpdateOrderRequest;
 import com.official.memento.todo.controller.dto.*;
+import com.official.memento.todo.domain.entity.ToDo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -30,7 +31,7 @@ public interface ToDoApiDocs {
                     @ApiResponse(responseCode = "500", description = "Internal Server Error")
             }
     )
-    public ResponseEntity<SuccessResponse<?>> createToDo(
+    public ResponseEntity<SuccessResponse<ToDo>> createToDo(
             @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
             @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final ToDoCreateRequest request
@@ -58,7 +59,7 @@ public interface ToDoApiDocs {
                     @ApiResponse(responseCode = "500", description = "Internal Server Error")
             }
     )
-    public ResponseEntity<SuccessResponse<?>> updateToDo(
+    public ResponseEntity<SuccessResponse<ToDo>> updateToDo(
             @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId,

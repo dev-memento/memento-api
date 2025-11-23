@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -76,13 +77,14 @@ public class ScheduleService implements
 
     @Override
     @Transactional
-    public void create(final ScheduleCreateCommand command) {
+    public ScheduleResult create(final ScheduleCreateCommand command) {
         Tag tag = tagGetUseCase.findById(command.tagId());
-        MemberPersonalInfoResult memberPersonalInfo = memberPersonalInfoGetUseCase.findByMemberId(command.memberId());
         checkOwnTag(command.memberId(), tag);
         checkDate(command.startDate(), command.endDate());
-        Schedule schedule = createSchedule(command, memberPersonalInfo.timeZoneOffset());    //MemberPersonal 찾아서 적용
-        orderInfoCreateUseCase.assignScheduleOrder(command.startDate().toLocalDate(), schedule, command.memberId());
+        Schedule schedule = createSchedule(command);    //MemberPersonal 찾아서 적용
+        Schedule scheduleWithOrder = orderInfoCreateUseCase.assignScheduleOrder(command.startDate().toLocalDate(), schedule, command.memberId());
+        scheduleRepository.save(schedule);
+        return ScheduleResult.of(scheduleWithOrder);
     }
 
     @Override
@@ -173,8 +175,7 @@ public class ScheduleService implements
                                     newSchedule.isAllDay(),
                                     newSchedule.getTagId(),
                                     newSchedule.getRepeatOption(),
-                                    newSchedule.getRepeatExpiredDate(),
-                                    memberPersonalInfo.timeZoneOffset()
+                                    newSchedule.getRepeatExpiredDate()
                             );
                             createOrNormalUpdateSchedules.add(schedule);
                         },
@@ -204,7 +205,6 @@ public class ScheduleService implements
     @Transactional
     public ScheduleResult update(final ScheduleUpdateCommand command) {
         Schedule schedule = scheduleRepository.findById(command.scheduleId());
-        MemberPersonalInfoResult memberPersonalInfo = memberPersonalInfoGetUseCase.findByMemberId(command.memberId());
         checkOwn(command.memberId(), schedule);
 
         if (command.tagId() != schedule.getTagId()) {
@@ -214,24 +214,23 @@ public class ScheduleService implements
         if (command.startDate() != schedule.getStartDate() || command.endDate() != schedule.getEndDate()) {
             checkDate(command.startDate(), command.endDate());
         }
-
-        scheduleRepository.update(schedule.update(
+        Schedule updatedSchedule = schedule.update(
                 command.description(),
                 command.startDate(),
                 command.endDate(),
                 command.isAllDay(),
                 command.tagId(),
                 command.repeatOption(),
-                command.repeatEndDate(),
-                memberPersonalInfo.timeZoneOffset()
-        ));
+                command.repeatEndDate()
+        );
+        updatedSchedule = scheduleRepository.update(updatedSchedule);
 
-        if (schedule.getStartDate() != command.startDate() || schedule.getEndDate() != command.endDate()) {
+        if (!Objects.equals(schedule.getStartDate(), command.startDate())
+                || !Objects.equals(schedule.getEndDate(), command.endDate())) {
             orderInfoDeleteUseCase.deleteByScheduleId(schedule.getId());
-            orderInfoCreateUseCase.assignScheduleOrder(command.startDate().toLocalDate(), schedule, command.memberId());
-
+            updatedSchedule = orderInfoCreateUseCase.assignScheduleOrder(command.startDate().toLocalDate(), updatedSchedule, command.memberId());
         }
-        return ScheduleResult.of(schedule);
+        return ScheduleResult.of(updatedSchedule);
     }
 
     @Override
@@ -331,7 +330,7 @@ public class ScheduleService implements
         }
     }
 
-    private Schedule createSchedule(final ScheduleCreateCommand command, final String timezoneOffset) {
+    private Schedule createSchedule(final ScheduleCreateCommand command) {
         String scheduleGroupId = UUID.randomUUID().toString();
         return scheduleRepository.save(Schedule.of(
                 command.memberId(),
@@ -402,8 +401,7 @@ public class ScheduleService implements
                     scheduleVo.isAllDay(),
                     schedule.get().getTagId(),
                     schedule.get().getRepeatOption(),
-                    schedule.get().getRepeatExpiredDate(),
-                    timezoneOffset
+                    schedule.get().getRepeatExpiredDate()
             );
             scheduleRepository.save(schedule.get());
         }

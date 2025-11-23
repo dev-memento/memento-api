@@ -1,11 +1,13 @@
 package com.official.memento.schedule.service.usecase;
 
+import com.official.memento.schedule.domain.entity.Schedule;
+import com.official.memento.schedule.service.ScheduleResult;
 import com.official.memento.schedule.service.command.AppleSchedulesCommand;
 import com.official.memento.schedule.service.command.ScheduleCreateCommand;
 
 public interface ScheduleCreateUseCase {
 
-    void create(final ScheduleCreateCommand command);
+    ScheduleResult create(final ScheduleCreateCommand command);
 
     void createAppleSchedules(final AppleSchedulesCommand command);
 

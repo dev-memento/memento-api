@@ -6,6 +6,7 @@ import com.official.memento.global.dto.SuccessResponse;
 import com.official.memento.member.controller.dto.MemberPersonalInfoRequest;
 import com.official.memento.member.controller.dto.MemberUptimeDto;
 import com.official.memento.member.controller.dto.MemberUptimeUpdateRequest;
+import com.official.memento.member.controller.dto.MemberWindDownUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -45,11 +46,11 @@ public interface MemberPersonalInfoApiDocs {
             @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
             @Authorization final AuthorizationUser authorizationUser);
 
-    @Operation(summary = "사용자 업타임 업데이트")
+    @Operation(summary = "사용자 기상 시간 업데이트")
     @ApiResponses(
             value = {
-                    @ApiResponse(responseCode = "200", description = "회원 업타임 업데이트 성공"),
-                    @ApiResponse(responseCode = "400", description = "회원 업타임 업데이트 실패", content = @Content),
+                    @ApiResponse(responseCode = "200", description = "회원 기상 시간 업데이트 성공"),
+                    @ApiResponse(responseCode = "400", description = "회원 기상 시간 업데이트 실패", content = @Content),
                     @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content)
             }
     )
@@ -57,4 +58,18 @@ public interface MemberPersonalInfoApiDocs {
             @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
             @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final MemberUptimeUpdateRequest request);
+
+    @Operation(summary = "사용자 취침 시간 업데이트")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "회원 취침 시간 업데이트 성공"),
+                    @ApiResponse(responseCode = "400", description = "회원 취침 시간 업데이트 실패", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR", content = @Content)
+            }
+    )
+    ResponseEntity<SuccessResponse<?>> updateWindDown(
+            @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
+            @Authorization final AuthorizationUser authorizationUser,
+            @RequestBody final MemberWindDownUpdateRequest request);
 }
+

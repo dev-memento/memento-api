@@ -15,7 +15,7 @@ public interface ScheduleOrderInfoProjection {
     LocalDateTime getEndDate();
     boolean getIsAllDay();
     ScheduleType getType();
-    Integer getOrderNum();
+    Double getOrderNum();
     String getTagName();
     TagColor getTagColor();
     Long getTagId();

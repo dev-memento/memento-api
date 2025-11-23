@@ -7,12 +7,15 @@ import com.official.memento.member.controller.dto.MemberPersonalInfoRequest;
 import com.official.memento.member.controller.dto.MemberTimeZoneUpdateRequest;
 import com.official.memento.member.controller.dto.MemberUptimeDto;
 import com.official.memento.member.controller.dto.MemberUptimeUpdateRequest;
+import com.official.memento.member.controller.dto.MemberWindDownUpdateRequest;
 import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.service.command.MemberPersonalInfoCommand;
 import com.official.memento.member.service.command.MemberTimeZoneUpdateCommand;
 import com.official.memento.member.service.command.MemberUpTimeUpdateCommand;
+import com.official.memento.member.service.command.MemberWindDownUpdateCommand;
 import com.official.memento.member.service.usecase.MemberPersonalInfoGetUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoUpdateUseCase;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,8 +53,8 @@ public class MemberPersonalInfoApiController implements MemberPersonalInfoApiDoc
             @Authorization final AuthorizationUser authorizationUser) {
         final MemberPersonalInfo personalInfo = memberPersonalInfoGetUseCase.retrieveUptime(authorizationUser.memberId());
         final MemberUptimeDto response = MemberUptimeDto.of(
-                personalInfo.getWakeUpTime().toString(),
-                personalInfo.getWindDownTime().toString()
+                personalInfo.getWakeUpTime(),
+                personalInfo.getWindDownTime()
         );
         return SuccessResponse.of(HttpStatus.OK, "사용자 업타임 조회 성공", response);
     }
@@ -76,5 +79,16 @@ public class MemberPersonalInfoApiController implements MemberPersonalInfoApiDoc
                 request.wakeUpTime()
         ));
         return SuccessResponse.of(HttpStatus.OK, "사용자 기상 시간 업데이트 성공");
+    }
+
+    @PatchMapping("/wind-down")
+    public ResponseEntity<SuccessResponse<?>> updateWindDown(
+            @Authorization AuthorizationUser authorizationUser,
+            @RequestBody final MemberWindDownUpdateRequest request) {
+        memberPersonalInfoUpdateUseCase.updateWindDown(MemberWindDownUpdateCommand.of(
+                authorizationUser.memberId(),
+                request.windDownTime()
+        ));
+        return SuccessResponse.of(HttpStatus.OK, "사용자 취침 시간 업데이트 성공");
     }
 }

@@ -4,7 +4,7 @@ import com.official.memento.global.annotation.Authorization;
 import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
 import com.official.memento.tag.controller.dto.TagCreateRequest;
-import com.official.memento.tag.controller.dto.TagCreateResponse;
+import com.official.memento.tag.controller.dto.TagResponse;
 import com.official.memento.tag.controller.dto.TagGetResponse;
 import com.official.memento.tag.controller.dto.TagUpdateRequest;
 import com.official.memento.tag.domain.Tag;
@@ -34,7 +34,7 @@ public class TagApiController implements TagApiDocs {
 
     @Override
     @PostMapping
-    public ResponseEntity<SuccessResponse<TagCreateResponse>> createTag(
+    public ResponseEntity<SuccessResponse<TagResponse>> createTag(
             @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final TagCreateRequest request
     ) {
@@ -48,7 +48,7 @@ public class TagApiController implements TagApiDocs {
         return SuccessResponse.of(
                 HttpStatus.OK,
                 "Tag 생성 성공",
-                TagCreateResponse.of(tag.getName(), tag.getColor())
+                TagResponse.of(tag.getId(),tag.getName(), tag.getColor())
         );
     }
 
@@ -67,12 +67,12 @@ public class TagApiController implements TagApiDocs {
 
     @Override
     @PatchMapping("/{tagId}")
-    public ResponseEntity<SuccessResponse<?>> updateTag(
+    public ResponseEntity<SuccessResponse<TagResponse>> updateTag(
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long tagId,
             @RequestBody final TagUpdateRequest tagUpdateRequest
     ) {
-        tagUpdateUseCase.update(TagUpdateCommand.updateWithHexColor(
+        Tag tag = tagUpdateUseCase.update(TagUpdateCommand.updateWithHexColor(
                 authorizationUser.memberId(),
                 tagId,
                 tagUpdateRequest.hexCode(),
@@ -80,7 +80,8 @@ public class TagApiController implements TagApiDocs {
         ));
         return SuccessResponse.of(
                 HttpStatus.OK,
-                "태그 업데이트 성공"
+                "태그 업데이트 성공",
+                TagResponse.of(tag.getId(),tag.getName(), tag.getColor())
         );
 
     }

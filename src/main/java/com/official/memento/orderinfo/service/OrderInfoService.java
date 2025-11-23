@@ -55,18 +55,20 @@ public class OrderInfoService implements
 
     @Override
     @Transactional
-    public void assignToDoOrder(final LocalDate date, final ToDo toDo, final long memberId) {
+    public ToDo assignToDoOrder(final LocalDate date, final ToDo toDo, final long memberId) {
         List<OrderInfo> orderInfoList = orderInfoRepository.findAllByMemberIdAndDateOrderByOrderNum(memberId, date);
         double preOrder = 0;
         double nextOrder = orderInfoList.isEmpty() ? 1 : orderInfoList.get(0).getOrderNum();
         double insertOrder = (preOrder + nextOrder) / 2;
         insertOrder = checkReOrdering(date, memberId, insertOrder);
         createToDoOrderInfo(date, toDo, insertOrder, memberId);
+        toDo.updateOrderNum(insertOrder);
+        return toDo;
     }
 
     @Override
     @Transactional
-    public void assignScheduleOrder(final LocalDate date, final Schedule schedule, final long memberId){
+    public Schedule assignScheduleOrder(final LocalDate date, final Schedule schedule, final long memberId){
         List<OrderWithScheduleOrToDo> orderInfoList = orderInfoRepository.findOrderInfoWithDetails(date,memberId);
         double insertOrder = 1;
         boolean isInserted = false;
@@ -96,6 +98,8 @@ public class OrderInfoService implements
 
         insertOrder = checkReOrdering(date, memberId, insertOrder);
         createScheduleOrderInfo(date, schedule, insertOrder, memberId);
+        schedule.updateOrder(insertOrder);
+        return schedule;
     }
 
     private double checkReOrdering(final LocalDate date, final long memberId, final double insertOrder) {

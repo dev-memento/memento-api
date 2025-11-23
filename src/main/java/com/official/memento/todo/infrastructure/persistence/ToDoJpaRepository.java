@@ -17,5 +17,9 @@ public interface ToDoJpaRepository extends JpaRepository<ToDoEntity, Long> {
 
     List<ToDoEntity> findByMemberIdAndEndDateAndIsCompleted(final long memberId, final LocalDate endDate, final boolean isCompleted);
 
+    @Modifying
+    @Query("UPDATE ToDoEntity t SET t.tagId = :newTagId WHERE t.tagId = :oldTagId")
+    void updateTagForTodo(@Param("oldTagId") Long oldTagId, @Param("newTagId") Long newTagId);
+
     void deleteAllByMemberId(final long memberId);
 }

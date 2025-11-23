@@ -8,6 +8,7 @@ import com.official.memento.member.service.command.MemberPersonalInfoCommand;
 import com.official.memento.member.service.command.MemberPersonalInfoCreateCommand;
 import com.official.memento.member.service.command.MemberTimeZoneUpdateCommand;
 import com.official.memento.member.service.command.MemberUpTimeUpdateCommand;
+import com.official.memento.member.service.command.MemberWindDownUpdateCommand;
 import com.official.memento.member.service.result.MemberPersonalInfoResult;
 import com.official.memento.member.service.usecase.MemberPersonalInfoCreateUseCase;
 import com.official.memento.member.service.usecase.MemberPersonalInfoDeleteUseCase;
@@ -67,6 +68,12 @@ public class MemberPersonalInfoService implements
     public void updateUpTime(final MemberUpTimeUpdateCommand command){
         MemberPersonalInfo memberPersonalInfo = memberPersonalInfoRepository.findByMemberId(command.memberId());
         memberPersonalInfoRepository.update(memberPersonalInfo.updateUpTime(command.wakeUpTime()));
+    }
+
+    @Override
+    public void updateWindDown(final MemberWindDownUpdateCommand command){
+        MemberPersonalInfo memberPersonalInfo = memberPersonalInfoRepository.findByMemberId(command.memberId());
+        memberPersonalInfoRepository.update(memberPersonalInfo.updateWindDownTime(command.windDownTime()));
     }
 
     @Override

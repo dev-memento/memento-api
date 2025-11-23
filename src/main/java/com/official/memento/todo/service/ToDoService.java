@@ -38,17 +38,9 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
 
     @Override
     @Transactional
-    public void create(final ToDoCreateCommand command) {
+    public ToDo create(final ToDoCreateCommand command) {
         String toDoGroupId = createGroupId();
-        if (command.repeatOption() == NONE) {
-            createSingleToDo(command, toDoGroupId);
-        } else {
-            throw new MementoException(ErrorCode.INVALID_REQUEST_BODY);
-            /*
-            반복 기능 미구현으로 인한 주석 처리
-            createRepeatToDos(command, toDoGroupId);
-             */
-        }
+        return createSingleToDo(command, toDoGroupId);
     }
 
     @Override
@@ -71,7 +63,7 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
 
     @Override
     @Transactional
-    public void update(final ToDoUpdateCommand command) {
+    public ToDo update(final ToDoUpdateCommand command) {
         ToDo toDo = toDoRepository.findById(command.toDoId());
         checkOwn(command.memberId(), toDo);
 
@@ -87,31 +79,13 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
             newPriorityValue = calculatePriorityValue(command.priorityUrgency(), command.priorityImportance());
         }
 
-        updateTodo(command, toDo, newPriorityType, newPriorityValue);
+        ToDo updatedTodo = updateTodo(command, toDo, newPriorityType, newPriorityValue);
 
         if (toDo.getStartDate() != command.startDate()) {
-            orderInfoDeleteUseCase.deleteByToDoId(toDo.getId());
-            orderInfoCreateUseCase.assignToDoOrder(command.startDate(), toDo, command.memberId());
+            orderInfoDeleteUseCase.deleteByToDoId(updatedTodo.getId());
+            updatedTodo = orderInfoCreateUseCase.assignToDoOrder(command.startDate(), updatedTodo, command.memberId());
         }
-    }
-
-    private void updateTodo(
-            final ToDoUpdateCommand command,
-            final ToDo toDo,
-            final PriorityType newPriorityType,
-            final Double newPriorityValue
-    ) {
-        toDoRepository.update(toDo.update(
-                command.startDate(),
-                command.description(),
-                command.endDate(),
-                command.priorityUrgency(),
-                command.priorityImportance(),
-                null,
-                newPriorityType,
-                newPriorityValue,
-                command.tagId()
-        ));
+        return updatedTodo;
     }
 
     @Override
@@ -123,44 +97,39 @@ public class ToDoService implements ToDoCreateUseCase, ToDoDeleteUseCase, ToDoUp
         return toDoRepository.update(toDo).isCompleted();
     }
 
-    private void createSingleToDo(final ToDoCreateCommand command, final String toDoGroupId) {
+    private ToDo createSingleToDo(final ToDoCreateCommand command, final String toDoGroupId) {
         Double priorityValue = calculatePriorityValue(command.priorityUrgency(), command.priorityImportance());
         PriorityType priorityType = determinePriorityType(command.priorityUrgency(), command.priorityImportance());
         Tag tag = tagRepository.findById(command.tagId());
         checkOwnTag(command.memberId(), tag);
         ToDo toDo = createToDo(command, toDoGroupId, priorityValue, priorityType, command.startDate());
-        orderInfoCreateUseCase.assignToDoOrder(command.startDate(), toDo, command.memberId());
+        return orderInfoCreateUseCase.assignToDoOrder(command.startDate(), toDo, command.memberId());
+    }
+
+    private ToDo updateTodo(
+            final ToDoUpdateCommand command,
+            final ToDo toDo,
+            final PriorityType newPriorityType,
+            final Double newPriorityValue
+    ) {
+        ToDo updatedTodo = toDo.update(
+                command.startDate(),
+                command.description(),
+                command.endDate(),
+                command.priorityUrgency(),
+                command.priorityImportance(),
+                null,
+                newPriorityType,
+                newPriorityValue,
+                command.tagId()
+        );
+        toDoRepository.update(updatedTodo);
+        return updatedTodo;
     }
 
     private static void checkOwnTag(long memberId, Tag tag) {
         if (tag.getMemberId() != memberId) {
             throw new InvalidRequestBodyException(ErrorCode.INVALID_REQUEST_BODY);
-        }
-    }
-
-    private void createRepeatToDos(final ToDoCreateCommand command, final String toDoGroupId) {
-        LocalDate currentDate = command.startDate();
-        LocalDate repeatExpiredDate = command.repeatExpiredDate();
-
-        tagRepository.findById(command.tagId());
-
-        while (!currentDate.isAfter(repeatExpiredDate)) {
-            Double priorityValue = calculatePriorityValue(command.priorityUrgency(), command.priorityImportance());
-            PriorityType priorityType = determinePriorityType(command.priorityUrgency(), command.priorityImportance());
-
-            ToDo toDo = createToDo(command, toDoGroupId, priorityValue, priorityType, currentDate);
-
-            if (command.repeatOption() == RepeatOption.DAILY) {
-                currentDate = currentDate.plusDays(1);
-            } else if (command.repeatOption() == RepeatOption.WEEKLY) {
-                currentDate = currentDate.plusWeeks(1);
-            } else if (command.repeatOption() == RepeatOption.MONTHLY) {
-                currentDate = currentDate.plusMonths(1);
-            } else {
-                currentDate = currentDate.plusYears(1);
-            }
-
-            orderInfoCreateUseCase.assignToDoOrder(command.startDate(), toDo, command.memberId());
         }
     }
 

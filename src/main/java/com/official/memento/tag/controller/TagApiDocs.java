@@ -4,7 +4,7 @@ import com.official.memento.global.annotation.Authorization;
 import com.official.memento.global.annotation.AuthorizationUser;
 import com.official.memento.global.dto.SuccessResponse;
 import com.official.memento.tag.controller.dto.TagCreateRequest;
-import com.official.memento.tag.controller.dto.TagCreateResponse;
+import com.official.memento.tag.controller.dto.TagResponse;
 import com.official.memento.tag.controller.dto.TagGetResponse;
 import com.official.memento.tag.controller.dto.TagUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +28,7 @@ public interface TagApiDocs {
             @ApiResponse(responseCode = "400", description = "Bad Request"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    ResponseEntity<SuccessResponse<TagCreateResponse>> createTag(
+    ResponseEntity<SuccessResponse<TagResponse>> createTag(
             @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
             @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final TagCreateRequest request
@@ -51,7 +51,7 @@ public interface TagApiDocs {
             @ApiResponse(responseCode = "400", description = "Bad Request"),
             @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    ResponseEntity<SuccessResponse<?>> updateTag(
+    ResponseEntity<SuccessResponse<TagResponse>> updateTag(
             @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long tagId,

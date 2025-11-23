@@ -7,6 +7,7 @@ import com.official.memento.schedule.controller.dto.request.*;
 import com.official.memento.schedule.controller.dto.response.ScheduleAllAllDaysGetResponse;
 import com.official.memento.schedule.controller.dto.response.ScheduleAllGetResponse;
 import com.official.memento.schedule.controller.dto.response.ScheduleDetailResponse;
+import com.official.memento.schedule.service.ScheduleResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -32,7 +33,7 @@ public interface ScheduleApiDocs {
                     @ApiResponse(responseCode = "400", description = "일정 생성 실패")
             }
     )
-    ResponseEntity<SuccessResponse<?>> createSchedule(
+    ResponseEntity<SuccessResponse<ScheduleResult>> createSchedule(
             @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
             @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final ScheduleCreateRequest scheduleCreateRequest
@@ -99,7 +100,7 @@ public interface ScheduleApiDocs {
                     @ApiResponse(responseCode = "500", description = "Internal Server Error")
             }
     )
-    ResponseEntity<SuccessResponse<?>> updateSchedule(
+    ResponseEntity<SuccessResponse<ScheduleResult>> updateSchedule(
             @Parameter(name = "Authorization", in = ParameterIn.HEADER, description = "Bearer Token", required = true, example = "Bearer access_token")
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long scheduleId,

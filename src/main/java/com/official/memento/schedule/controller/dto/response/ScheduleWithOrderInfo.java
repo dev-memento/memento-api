@@ -25,7 +25,7 @@ public record ScheduleWithOrderInfo(
         @Schema(description = "스케줄 생성 타입", example = "NORMAL, GOOGLE, APPLE")
         ScheduleType scheduleType,
         @Schema(description = "순서", example = "2")
-        int order,
+        double order,
         @Schema(description = "태그 이름", example = "SOPT")
         String tagName,
         @Schema(description = "태그 색깔", example = "#EE8AAD")
@@ -48,19 +48,10 @@ public record ScheduleWithOrderInfo(
     }
 
     private static String calculateTimeDuration(LocalDateTime startDate, LocalDateTime endDate) {
-        Duration duration = Duration.between(startDate, endDate);
-        long hours = duration.toHours();
-        long minutes = duration.toMinutes() % 60;
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("ha");
         String startTime = startDate.format(timeFormatter);
         String endTime = endDate.format(timeFormatter);
-        StringBuilder durationBuilder = new StringBuilder();
-        if (hours > 0) {
-            durationBuilder.append(hours).append("h");
-        }
-        if (minutes > 0) {
-            durationBuilder.append(minutes).append("m");
-        }
-        return String.format("%s-%s (%s)", startTime, endTime, durationBuilder.toString());
+
+        return String.format("%s - %s", startTime, endTime);
     }
 }

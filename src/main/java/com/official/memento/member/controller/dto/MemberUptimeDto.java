@@ -1,6 +1,8 @@
 package com.official.memento.member.controller.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 @Schema(name = "사용자 업타임 조회 응답")
 public record MemberUptimeDto(
@@ -9,7 +11,8 @@ public record MemberUptimeDto(
         @Schema(description = "일정 마무리 시간", example = "22:30")
         String windDownTime
 ) {
-    public static MemberUptimeDto of(String wakeUpTime, String windDownTime) {
-        return new MemberUptimeDto(wakeUpTime, windDownTime);
+    public static MemberUptimeDto of(LocalTime wakeUpTime, LocalTime windDownTime) {
+        DateTimeFormatter f1 = DateTimeFormatter.ofPattern("HH:mm");
+        return new MemberUptimeDto(wakeUpTime.format(f1), windDownTime.format(f1));
     }
 }

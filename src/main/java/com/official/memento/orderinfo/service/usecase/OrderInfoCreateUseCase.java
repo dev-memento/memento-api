@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public interface OrderInfoCreateUseCase {
-    void assignToDoOrder(final LocalDate date, final ToDo toDo, final long memberId);
+    ToDo assignToDoOrder(final LocalDate date, final ToDo toDo, final long memberId);
 
-   void assignScheduleOrder(final LocalDate date, final Schedule schedule, final long memberId);
+    Schedule assignScheduleOrder(final LocalDate date, final Schedule schedule, final long memberId);
 }

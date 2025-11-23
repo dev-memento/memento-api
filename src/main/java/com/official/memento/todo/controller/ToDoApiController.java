@@ -46,11 +46,11 @@ public class ToDoApiController implements ToDoApiDocs {
 
     @PostMapping
     @Override
-    public ResponseEntity<SuccessResponse<?>> createToDo(
+    public ResponseEntity<SuccessResponse<ToDo>> createToDo(
             @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final ToDoCreateRequest request
     ) {
-        toDoCreateUseCase.create(ToDoCreateCommand.of(
+        ToDo response = toDoCreateUseCase.create(ToDoCreateCommand.of(
                         authorizationUser.memberId(),
                         request.startDate(),
                         request.description(),
@@ -64,7 +64,8 @@ public class ToDoApiController implements ToDoApiDocs {
         );
         return SuccessResponse.of(
                 HttpStatus.CREATED,
-                "ToDo 생성 성공"
+                "ToDo 생성 성공",
+                response
         );
     }
 
@@ -80,18 +81,18 @@ public class ToDoApiController implements ToDoApiDocs {
         );
         return SuccessResponse.of(
                 HttpStatus.OK,
-                "단일 스케줄 삭제 성공"
+                "Todo 삭제 성공"
         );
     }
 
     @PatchMapping("/{toDoId}")
     @Override
-    public ResponseEntity<SuccessResponse<?>> updateToDo(
+    public ResponseEntity<SuccessResponse<ToDo>> updateToDo(
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId,
             @RequestBody final ToDoUpdateRequest request
     ) {
-        toDoUpdateUseCase.update(ToDoUpdateCommand.of(
+        ToDo response = toDoUpdateUseCase.update(ToDoUpdateCommand.of(
                 authorizationUser.memberId(),
                 toDoId,
                 request.startDate(),
@@ -103,7 +104,8 @@ public class ToDoApiController implements ToDoApiDocs {
         ));
         return SuccessResponse.of(
                 HttpStatus.OK,
-                "단일 스케줄 업데이트 성공"
+                "Todo 업데이트 성공",
+                response
         );
     }
 
@@ -120,7 +122,7 @@ public class ToDoApiController implements ToDoApiDocs {
 
         return SuccessResponse.of(
                 HttpStatus.OK,
-                "단일 투두 완료 상태 업데이트 성공",
+                "Todo 완료 상태 업데이트 성공",
                 ToDoCompletionResponse.of(toDoId, currentCompletion)
         );
     }
@@ -148,7 +150,7 @@ public class ToDoApiController implements ToDoApiDocs {
         List<ToDo> todos = toDoGetUseCase.getTodosByDate(authorizationUser.memberId(), date);
         return SuccessResponse.of(
                 HttpStatus.OK,
-                "당일 투두 불러오기 성공",
+                "Todo 불러오기 성공",
                 ToDoAllGetResponse.of(todos)
         );
     }

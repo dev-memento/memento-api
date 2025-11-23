@@ -21,7 +21,7 @@ public class Schedule extends BaseTimeEntity {
     private LocalDate repeatExpiredDate;
     private ScheduleType type;
     private String scheduleGroupId;
-    private Integer orderNum;
+    private Double orderNum;
     private Long tagId;
     private String tagName;
     private TagColor tagColor;
@@ -69,7 +69,7 @@ public class Schedule extends BaseTimeEntity {
             final String scheduleGroupId,
             final LocalDateTime createdAt,
             final LocalDateTime updatedAt,
-            final int orderNum,
+            final Double orderNum,
             final String tagName,
             final TagColor tagColor,
             final long tagId
@@ -232,7 +232,7 @@ public class Schedule extends BaseTimeEntity {
             final String scheduleGroupId,
             final LocalDateTime createdAt,
             final LocalDateTime updatedAt,
-            final int orderNum,
+            final Double orderNum,
             final String tagName,
             final TagColor tagColor,
             final long tagId
@@ -317,15 +317,14 @@ public class Schedule extends BaseTimeEntity {
             final boolean isAllDay,
             final long tagId,
             final RepeatOption repeatOption,
-            final LocalDate repeatExpiredDate,
-            final String timezoneOffset
+            final LocalDate repeatExpiredDate
     ) {
         return Schedule.withId(
                 id,
                 memberId,
                 description,
-                OffsetDateTime.of(startDate, ZoneOffset.of(timezoneOffset)).toInstant().atOffset(ZoneOffset.UTC).toLocalDateTime(),
-                OffsetDateTime.of(endDate, ZoneOffset.of(timezoneOffset)).toInstant().atOffset(ZoneOffset.UTC).toLocalDateTime(),
+                startDate,
+                endDate,
                 isAllDay,
                 repeatOption,
                 repeatExpiredDate,
@@ -335,6 +334,9 @@ public class Schedule extends BaseTimeEntity {
                 LocalDateTime.now(),
                 tagId
         );
+    }
+    public void updateOrder(Double orderNum){
+        this.orderNum = orderNum;
     }
 
     public Long getId() {
@@ -386,7 +388,7 @@ public class Schedule extends BaseTimeEntity {
         return scheduleGroupId;
     }
 
-    public Integer getOrderNum() {
+    public Double getOrderNum() {
         return orderNum;
     }
 

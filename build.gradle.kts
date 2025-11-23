@@ -82,7 +82,7 @@ dependencies {
 
     //validation
     implementation ("org.springframework.boot:spring-boot-starter-validation")
-
+    implementation("com.ibm.icu:icu4j:75.1")
 }
 
 kotlin {

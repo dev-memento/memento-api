@@ -103,6 +103,11 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
     }
 
     @Override
+    public void updateTagForTodo(final long oldTagId, final long newTagId){
+        toDoJpaRepository.updateTagForTodo(oldTagId, newTagId);
+    }
+
+    @Override
     public List<ToDo> findAllByMemberId(long memberId) {
         List<ToDoEntity> toDoEntityList = toDoJpaRepository.findAllByMemberId(memberId);
         return toDoEntityList.stream()

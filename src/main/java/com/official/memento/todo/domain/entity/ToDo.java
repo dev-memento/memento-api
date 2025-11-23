@@ -258,48 +258,6 @@ public class ToDo extends BaseTimeEntity {
         );
     }
 
-    public static ToDo withIdAndTag(
-            final Long id,
-            final long memberId,
-            final String groupId,
-            final LocalDate startDate,
-            final String description,
-            final LocalDate endDate,
-            final boolean isCompleted,
-            final RepeatOption repeatOption,
-            final LocalDate repeatExpiredDate,
-            final Double priorityUrgency,
-            final Double priorityImportance,
-            final Double priorityValue,
-            final PriorityType priorityType,
-            final ToDoType type,
-            final LocalDateTime createdAt,
-            final LocalDateTime updatedAt,
-            final String tagName,
-            final TagColor tagColor
-    ) {
-        return new ToDo(
-                id,
-                memberId,
-                groupId,
-                startDate,
-                description,
-                endDate,
-                isCompleted,
-                repeatOption,
-                repeatExpiredDate,
-                priorityUrgency,
-                priorityImportance,
-                priorityValue,
-                priorityType,
-                type,
-                createdAt,
-                updatedAt,
-                tagName,
-                tagColor
-        );
-    }
-
     public static ToDo withIdAndTagAndOrder(
             final Long id,
             final long memberId,
@@ -382,10 +340,6 @@ public class ToDo extends BaseTimeEntity {
             final boolean isCompleted
     ) {
         this.isCompleted = isCompleted;
-    }
-
-    public void updateTagId(Long tagId) {
-        this.tagId = tagId;
     }
 
     public void updateTag(Tag tag) {
