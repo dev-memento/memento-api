@@ -1,7 +1,7 @@
 package com.official.memento.schedule.controller.dto.response;
 
-import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.schedule.domain.enums.ScheduleType;
+import com.official.memento.schedule.service.ScheduleResult;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
@@ -25,16 +25,16 @@ public record AllDaySchedulesResponse(
         @Schema(description = "태그 색깔", example = "#EE8AAD")
         String tagColorCode
 ) {
-    public static AllDaySchedulesResponse of(final Schedule schedule) {
+    public static AllDaySchedulesResponse of(final ScheduleResult scheduleResult) {
         return new AllDaySchedulesResponse(
-                schedule.getId(),
-                schedule.getDescription(),
-                schedule.getStartDate(),
-                schedule.getEndDate(),
-                schedule.isAllDay(),
-                schedule.getType(),
-                schedule.getTagName(),
-                schedule.getTagColor().getHexCode()
+                scheduleResult.scheduleId(),
+                scheduleResult.description(),
+                scheduleResult.startDate(),
+                scheduleResult.endDate(),
+                scheduleResult.isAllDay(),
+                scheduleResult.scheduleType(),
+                scheduleResult.tagName(),
+                scheduleResult.tagColor().getHexCode()
         );
     }
 }

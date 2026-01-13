@@ -40,3 +40,8 @@ google:
 
 firebase:
   config-path: ${firebase.config-path.dev}
+
+# Redis 설정 (Redisson 분산 락용)
+spring.data.redis:
+  host: ${REDIS.HOST.dev}
+  port: ${REDIS.PORT.dev}

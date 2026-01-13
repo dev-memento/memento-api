@@ -3,6 +3,7 @@ package com.official.memento.schedule.service;
 import com.official.memento.global.entity.enums.RepeatOption;
 import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.schedule.domain.enums.ScheduleType;
+import com.official.memento.tag.domain.enums.TagColor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,7 +18,10 @@ public record ScheduleResult(
         ScheduleType scheduleType,
         String scheduleGroupId,
         RepeatOption repeatOption,
-        LocalDate repeatEndDate
+        LocalDate repeatEndDate,
+        Double orderNum,
+        String tagName,
+        TagColor tagColor
 ) {
     public static ScheduleResult of(final Schedule schedule) {
         return new ScheduleResult(
@@ -30,7 +34,10 @@ public record ScheduleResult(
                 schedule.getType(),
                 schedule.getScheduleGroupId(),
                 schedule.getRepeatOption(),
-                schedule.getRepeatExpiredDate()
+                schedule.getRepeatExpiredDate(),
+                schedule.getOrderNum(),
+                schedule.getTagName(),
+                schedule.getTagColor()
         );
     }
 }

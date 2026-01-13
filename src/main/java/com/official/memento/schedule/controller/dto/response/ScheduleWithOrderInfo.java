@@ -1,7 +1,7 @@
 package com.official.memento.schedule.controller.dto.response;
 
-import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.schedule.domain.enums.ScheduleType;
+import com.official.memento.schedule.service.ScheduleResult;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Duration;
@@ -31,19 +31,19 @@ public record ScheduleWithOrderInfo(
         @Schema(description = "태그 색깔", example = "#EE8AAD")
         String tagColorCode
 ) {
-    public static ScheduleWithOrderInfo of(final Schedule schedule) {
-        String timeDuration = calculateTimeDuration(schedule.getStartDate(), schedule.getEndDate());
+    public static ScheduleWithOrderInfo of(final ScheduleResult scheduleResult) {
+        String timeDuration = calculateTimeDuration(scheduleResult.startDate(), scheduleResult.endDate());
         return new ScheduleWithOrderInfo(
-                schedule.getId(),
-                schedule.getDescription(),
-                schedule.getStartDate(),
-                schedule.getEndDate(),
+                scheduleResult.scheduleId(),
+                scheduleResult.description(),
+                scheduleResult.startDate(),
+                scheduleResult.endDate(),
                 timeDuration,
-                schedule.isAllDay(),
-                schedule.getType(),
-                schedule.getOrderNum(),
-                schedule.getTagName() == null ? "" : schedule.getTagName(),
-                schedule.getTagColor() == null ? "" : schedule.getTagColor().getHexCode()
+                scheduleResult.isAllDay(),
+                scheduleResult.scheduleType(),
+                scheduleResult.orderNum(),
+                scheduleResult.tagName() == null ? "" : scheduleResult.tagName(),
+                scheduleResult.tagColor() == null ? "" : scheduleResult.tagColor().getHexCode()
         );
     }
 

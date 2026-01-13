@@ -24,15 +24,14 @@ import com.official.memento.member.service.command.MemberTimeZoneUpdateCommand;
 import com.official.memento.member.service.usecase.*;
 import com.official.memento.schedule.service.usecase.ScheduleDeleteUseCase;
 import com.official.memento.tag.domain.enums.TagColor;
-import com.official.memento.tag.service.TagCreateUseCase;
-import com.official.memento.tag.service.TagDeleteUseCase;
+import com.official.memento.tag.service.usecase.TagCreateUseCase;
+import com.official.memento.tag.service.usecase.TagDeleteUseCase;
 import com.official.memento.tag.service.command.TagCreateCommand;
-import com.official.memento.todo.service.ToDoDeleteUseCase;
+import com.official.memento.todo.service.usecase.ToDoDeleteUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;

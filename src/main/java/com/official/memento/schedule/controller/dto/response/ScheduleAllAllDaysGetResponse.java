@@ -1,6 +1,6 @@
 package com.official.memento.schedule.controller.dto.response;
 
-import com.official.memento.schedule.domain.entity.Schedule;
+import com.official.memento.schedule.service.ScheduleResult;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
@@ -9,9 +9,9 @@ import java.util.List;
 public record ScheduleAllAllDaysGetResponse(
         List<AllDaySchedulesResponse> allDaySchedulesList
 ) {
-    public static ScheduleAllAllDaysGetResponse of(final List<Schedule> schedules){
+    public static ScheduleAllAllDaysGetResponse of(final List<ScheduleResult> scheduleResults){
         return new ScheduleAllAllDaysGetResponse(
-                schedules.stream().map(
+                scheduleResults.stream().map(
                         AllDaySchedulesResponse::of
                 ).toList()
         );

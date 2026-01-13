@@ -24,4 +24,10 @@ public interface OrderInfoRepository {
     OrderInfo findByScheduleId(Long scheduleId);
 
     List<OrderInfo> findAllByMemberIdAndDateOrderByOrderNum(final long memberId, final LocalDate date);
+
+    /**
+     * 배치 업데이트: 여러 OrderInfo의 orderNum을 한 번에 업데이트
+     * Dirty Checking 기반으로 트랜잭션 커밋 시 일괄 반영
+     */
+    void updateAllOrderNums(final List<OrderInfo> orderInfoList);
 }

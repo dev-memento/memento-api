@@ -1,7 +1,7 @@
 package com.official.memento.todo.controller.dto;
 
-import com.official.memento.todo.domain.entity.ToDo;
 import com.official.memento.todo.domain.entity.enums.ToDoType;
+import com.official.memento.todo.service.result.ToDoResult;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "ToDo 목록 응답")
@@ -42,21 +42,21 @@ public record ToDoGetResponse(
         @Schema(description = "정렬 순서")
         double orderNum
 ) {
-    public static ToDoGetResponse of(ToDo toDo) {
+    public static ToDoGetResponse of(ToDoResult toDoResult) {
         return new ToDoGetResponse(
-                toDo.getId(),
-                toDo.getGroupId(),
-                toDo.getDescription(),
-                toDo.getStartDate().toString(),
-                toDo.getEndDate().toString(),
-                toDo.isCompleted(),
-                toDo.getPriorityValue(),
-                toDo.getPriorityType().name(),
-                toDo.getTagName() == null ? "" : toDo.getTagName(),
-                toDo.getTagColor() == null ? "" : toDo.getTagColor().getHexCode(),
-                toDo.getType(),
+                toDoResult.id(),
+                toDoResult.groupId(),
+                toDoResult.description(),
+                toDoResult.startDate().toString(),
+                toDoResult.endDate().toString(),
+                toDoResult.isCompleted(),
+                toDoResult.priorityValue(),
+                toDoResult.priorityType().name(),
+                toDoResult.tagName() == null ? "" : toDoResult.tagName(),
+                toDoResult.tagColor() == null ? "" : toDoResult.tagColor().getHexCode(),
+                toDoResult.type(),
                 // FIXME: NPE나는 상황 찾아서, 수정
-                toDo.getOrderNum() == null ? 0.0 : toDo.getOrderNum()
+                toDoResult.orderNum() == null ? 0.0 : toDoResult.orderNum()
         );
     }
 }

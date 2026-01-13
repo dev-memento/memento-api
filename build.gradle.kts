@@ -83,6 +83,9 @@ dependencies {
     //validation
     implementation ("org.springframework.boot:spring-boot-starter-validation")
     implementation("com.ibm.icu:icu4j:75.1")
+
+    // Redisson (분산 락)
+    implementation(libs.redisson.spring.boot.starter)
 }
 
 kotlin {

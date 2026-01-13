@@ -2,20 +2,21 @@ package com.official.memento.orderinfo.service;
 
 import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.exception.InvalidRequestBodyException;
+import com.official.memento.global.lock.DistributedLock;
 import com.official.memento.orderinfo.domain.OrderInfo;
 import com.official.memento.orderinfo.domain.OrderInfoRepository;
 import com.official.memento.orderinfo.domain.OrderWithScheduleOrToDo;
 import com.official.memento.orderinfo.domain.PlanType;
-import com.official.memento.orderinfo.infrastructure.persistence.OrderInfoEntity;
 import com.official.memento.orderinfo.service.command.ToDoPositionUpdateCommand;
 import com.official.memento.orderinfo.service.usecase.OrderInfoCreateUseCase;
 import com.official.memento.orderinfo.service.usecase.OrderInfoDeleteUseCase;
 import com.official.memento.orderinfo.service.usecase.OrderInfoGetUseCase;
 import com.official.memento.orderinfo.service.usecase.OrderInfoUpdateUseCase;
+import com.official.memento.schedule.domain.ScheduleRepository;
 import com.official.memento.schedule.domain.entity.Schedule;
-import com.official.memento.todo.domain.entity.ToDo;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,9 +31,11 @@ public class OrderInfoService implements
         OrderInfoGetUseCase {
 
     private final OrderInfoRepository orderInfoRepository;
+    private final ScheduleRepository scheduleRepository;
 
     @Override
     @Transactional
+    @DistributedLock(key = "'order-info:' + #command.memberId() + ':' + #command.date()")
     public void updatePosition(final ToDoPositionUpdateCommand command) {
         OrderInfo selectedTodoOrderInfo = orderInfoRepository.findByToDoId(command.toDoId());
 
@@ -48,27 +51,30 @@ public class OrderInfoService implements
             insertOrder = (previousOrder + orderInfoRepository.findByToDoId(command.nextToDoId()).getOrderNum()) / 2;
         }
         checkInValidRequest(previousOrder, insertOrder);
-        insertOrder = checkReOrdering(selectedTodoOrderInfo.getDate(), command.memberId(), insertOrder);
-        selectedTodoOrderInfo.updateOrderNum(insertOrder);
-        orderInfoRepository.update(selectedTodoOrderInfo);
+        insertOrder = checkReOrdering(command.date(), command.memberId(), insertOrder);
+        OrderInfo updated = selectedTodoOrderInfo.toBuilder()
+                .orderNum(insertOrder)
+                .build();
+        orderInfoRepository.update(updated);
     }
 
     @Override
     @Transactional
-    public ToDo assignToDoOrder(final LocalDate date, final ToDo toDo, final long memberId) {
+    @DistributedLock(key = "'order-info:' + #memberId + ':' + #date")
+    public void assignToDoOrder(final LocalDate date, final long toDoId, final long memberId) {
         List<OrderInfo> orderInfoList = orderInfoRepository.findAllByMemberIdAndDateOrderByOrderNum(memberId, date);
         double preOrder = 0;
         double nextOrder = orderInfoList.isEmpty() ? 1 : orderInfoList.get(0).getOrderNum();
         double insertOrder = (preOrder + nextOrder) / 2;
         insertOrder = checkReOrdering(date, memberId, insertOrder);
-        createToDoOrderInfo(date, toDo, insertOrder, memberId);
-        toDo.updateOrderNum(insertOrder);
-        return toDo;
+        createToDoOrderInfo(date, toDoId, insertOrder, memberId);
     }
 
     @Override
     @Transactional
-    public Schedule assignScheduleOrder(final LocalDate date, final Schedule schedule, final long memberId){
+    @DistributedLock(key = "'order-info:' + #memberId + ':' + #date")
+    public void assignScheduleOrder(final LocalDate date, final long scheduleId, final long memberId){
+        Schedule schedule = scheduleRepository.findById(scheduleId);
         List<OrderWithScheduleOrToDo> orderInfoList = orderInfoRepository.findOrderInfoWithDetails(date,memberId);
         double insertOrder = 1;
         boolean isInserted = false;
@@ -97,30 +103,42 @@ public class OrderInfoService implements
         }
 
         insertOrder = checkReOrdering(date, memberId, insertOrder);
-        createScheduleOrderInfo(date, schedule, insertOrder, memberId);
-        schedule.updateOrder(insertOrder);
-        return schedule;
+        createScheduleOrderInfo(date, scheduleId, insertOrder, memberId);
     }
 
+    /**
+     * 부동소수점 정밀도 한계 감지 시 자동 재정렬
+     * - 임계치: insertOrder < 1e-10
+     * - 재정렬 시 모든 아이템의 순서를 1, 2, 3... 으로 초기화하여 정밀도 확보
+     * - 배치 업데이트로 N+1 쿼리 문제 해결
+     */
     private double checkReOrdering(final LocalDate date, final long memberId, final double insertOrder) {
         if (insertOrder < 1e-10) {
             List<OrderInfo> afterOrderInfoList = orderInfoRepository.findAllByMemberIdAndDateOrderByOrderNum(memberId,
                     date);
+
+            // 메모리에서 재정렬 계산
+            List<OrderInfo> reorderedList = new ArrayList<>();
             for (int i = 0; i < afterOrderInfoList.size(); i++) {
-                afterOrderInfoList.get(i).updateOrderNum(i + 1);
-                orderInfoRepository.update(afterOrderInfoList.get(i));
+                OrderInfo reordered = afterOrderInfoList.get(i).toBuilder()
+                        .orderNum(i + 1)
+                        .build();
+                reorderedList.add(reordered);
             }
+
+            // 배치 업데이트로 한 번에 반영 (Dirty Checking 기반)
+            orderInfoRepository.updateAllOrderNums(reorderedList);
             return 1;
         }
         return insertOrder;
     }
 
-    private void createToDoOrderInfo(final LocalDate date, final ToDo toDo, final double insertOrder,
+    private void createToDoOrderInfo(final LocalDate date, final long toDoId, final double insertOrder,
                                      final long memberId) {
         orderInfoRepository.save(OrderInfo.of(
                 memberId,
                 null,
-                toDo.getId(),
+                toDoId,
                 insertOrder,
                 date,
                 PlanType.TODO,
@@ -128,11 +146,11 @@ public class OrderInfoService implements
         ));
     }
 
-    private void createScheduleOrderInfo(final LocalDate date, final Schedule schedule, final double insertOrder,
+    private void createScheduleOrderInfo(final LocalDate date, final long scheduleId, final double insertOrder,
                                      final long memberId) {
         orderInfoRepository.save(OrderInfo.of(
                 memberId,
-                schedule.getId(),
+                scheduleId,
                 null,
                 insertOrder,
                 date,
@@ -158,6 +176,17 @@ public class OrderInfoService implements
 
     @Override
     public OrderInfo findByScheduleId(final long scheduleId) {return  orderInfoRepository.findByScheduleId(scheduleId);}
+
+    @Override
+    public OrderInfo findByToDoIdAndDate(Long toDoId, LocalDate date) {
+        return orderInfoRepository.findByToDoIdAndDate(toDoId, date);
+    }
+
+    @Override
+    @Transactional
+    public OrderInfo updateOrderNum(OrderInfo orderInfo, double orderNum) {
+        return orderInfoRepository.updateOrderNum(orderInfo, orderNum);
+    }
 
     private static void checkInValidRequest(final double previousOrder, final double insertOrder) {
         if (previousOrder > insertOrder) {

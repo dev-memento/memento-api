@@ -2,23 +2,24 @@ package com.official.memento.orderinfo.domain;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public class OrderInfo {
-    private Long id;
-    private long memberId;
-    private Long scheduleId;
-    private Long toDoId;
-    private double orderNum;
-    private LocalDate date;
-    private PlanType planType;
-    private LocalDateTime createdAt;
+    private final Long id;
+    private final long memberId;
+    private final Long scheduleId;
+    private final Long toDoId;
+    private final double orderNum;
+    private final LocalDate date;
+    private final PlanType planType;
+    private final LocalDateTime createdAt;
 
+    @Builder(toBuilder = true)
     private OrderInfo(
-            final Long memberId,
+            final Long id,
+            final long memberId,
             final Long scheduleId,
             final Long toDoId,
             final double orderNum,
@@ -26,6 +27,7 @@ public class OrderInfo {
             final PlanType planType,
             final LocalDateTime createdAt
     ) {
+        this.id = id;
         this.memberId = memberId;
         this.scheduleId = scheduleId;
         this.toDoId = toDoId;
@@ -35,6 +37,7 @@ public class OrderInfo {
         this.createdAt = createdAt;
     }
 
+    // 기존 코드 호환성을 위한 static 팩토리 메서드
     public static OrderInfo of(
             final long memberId,
             final Long scheduleId,
@@ -44,7 +47,15 @@ public class OrderInfo {
             final PlanType planType,
             final LocalDateTime createdAt
     ) {
-        return new OrderInfo(memberId,scheduleId, toDoId, order, date, planType, createdAt);
+        return OrderInfo.builder()
+                .memberId(memberId)
+                .scheduleId(scheduleId)
+                .toDoId(toDoId)
+                .orderNum(order)
+                .date(date)
+                .planType(planType)
+                .createdAt(createdAt)
+                .build();
     }
 
     public static OrderInfo withId(
@@ -57,57 +68,35 @@ public class OrderInfo {
             final PlanType planType,
             final LocalDateTime createdAt
     ) {
-        return new OrderInfo(id,memberId, scheduleId, toDoId, order, date, planType, createdAt);
+        return OrderInfo.builder()
+                .id(id)
+                .memberId(memberId)
+                .scheduleId(scheduleId)
+                .toDoId(toDoId)
+                .orderNum(order)
+                .date(date)
+                .planType(planType)
+                .createdAt(createdAt)
+                .build();
     }
 
-    public void updateOrderNum(final double orderNum) {
-        this.orderNum = orderNum;
+    // 불변성을 유지하면서 orderNum 증가
+    public OrderInfo withIncrementedOrder() {
+        return this.toBuilder()
+                .orderNum(this.orderNum + 1)
+                .build();
     }
 
-    // 순서를 증가
-    public void incrementOrder() {
-        this.orderNum += 1;
+    // 불변성을 유지하면서 orderNum 감소
+    public OrderInfo withDecrementedOrder() {
+        return this.toBuilder()
+                .orderNum(this.orderNum - 1)
+                .build();
     }
 
-    // 순서를 감소
-    public void decrementOrder() {
-        this.orderNum -= 1;
-
-    }
-
-    public void setOrderNum(double orderNum) {
-        this.orderNum = orderNum;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public long getMemberId() {
-        return memberId;
-    }
-
-    public Long getScheduleId() {
-        return scheduleId;
-    }
-
-    public Long getToDoId() {
-        return toDoId;
-    }
-
-    public double getOrderNum() {
-        return orderNum;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public PlanType getPlanType() {
-        return planType;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public OrderInfo updateOrderNum(final double orderNum) {
+        return  this.toBuilder()
+                .orderNum(this.orderNum + orderNum)
+                .build();
     }
 }

@@ -1,7 +1,7 @@
 package com.official.memento.schedule.controller.dto.response;
 
-import com.official.memento.schedule.domain.entity.Schedule;
 import com.official.memento.schedule.domain.enums.ScheduleType;
+import com.official.memento.schedule.service.ScheduleResult;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
@@ -23,15 +23,15 @@ public record ScheduleDetailResponse(
         @Schema(description = "태그 아이디", example = "4")
         long tagId
 ) {
-   public static ScheduleDetailResponse of(final Schedule schedule){
+   public static ScheduleDetailResponse of(final ScheduleResult scheduleResult){
       return new ScheduleDetailResponse(
-              schedule.getId(),
-              schedule.getDescription(),
-              schedule.getStartDate(),
-              schedule.getEndDate(),
-              schedule.isAllDay(),
-              schedule.getType(),
-              schedule.getTagId()
+              scheduleResult.scheduleId(),
+              scheduleResult.description(),
+              scheduleResult.startDate(),
+              scheduleResult.endDate(),
+              scheduleResult.isAllDay(),
+              scheduleResult.scheduleType(),
+              scheduleResult.tagId()
       );
    }
 }

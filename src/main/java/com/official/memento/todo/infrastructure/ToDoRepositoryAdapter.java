@@ -20,49 +20,13 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
     @Override
     public ToDo save(final ToDo toDo) {
         ToDoEntity toDoEntity = toDoJpaRepository.save(ToDoEntity.of(toDo));
-        return ToDo.withId(
-                toDoEntity.getId(),
-                toDoEntity.getMemberId(),
-                toDoEntity.getGroupId(),
-                toDoEntity.getStartDate(),
-                toDoEntity.getDescription(),
-                toDoEntity.getEndDate(),
-                toDoEntity.isCompleted(),
-                toDoEntity.getRepeatOption(),
-                toDoEntity.getRepeatExpiredDate(),
-                toDoEntity.getPriorityUrgency(),
-                toDoEntity.getPriorityImportance(),
-                toDoEntity.getPriorityValue(),
-                toDoEntity.getPriorityType(),
-                toDoEntity.getType(),
-                toDoEntity.getCreatedAt(),
-                toDoEntity.getUpdatedAt(),
-                toDoEntity.getTagId()
-        );
+        return entityToDomain(toDoEntity);
     }
 
     @Override
     public ToDo update(final ToDo toDo) {
         ToDoEntity toDoEntity = toDoJpaRepository.save(ToDoEntity.withId(toDo));
-        return ToDo.withId(
-                toDoEntity.getId(),
-                toDoEntity.getMemberId(),
-                toDoEntity.getGroupId(),
-                toDoEntity.getStartDate(),
-                toDoEntity.getDescription(),
-                toDoEntity.getEndDate(),
-                toDoEntity.isCompleted(),
-                toDoEntity.getRepeatOption(),
-                toDoEntity.getRepeatExpiredDate(),
-                toDoEntity.getPriorityUrgency(),
-                toDoEntity.getPriorityImportance(),
-                toDoEntity.getPriorityValue(),
-                toDoEntity.getPriorityType(),
-                toDoEntity.getType(),
-                toDoEntity.getCreatedAt(),
-                toDoEntity.getUpdatedAt(),
-                toDoEntity.getTagId()
-        );
+        return entityToDomain(toDoEntity);
     }
 
     @Override
@@ -71,25 +35,7 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
                 .orElseThrow(
                         () -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY)
                 );
-        return ToDo.withId(
-                toDoEntity.getId(),
-                toDoEntity.getMemberId(),
-                toDoEntity.getGroupId(),
-                toDoEntity.getStartDate(),
-                toDoEntity.getDescription(),
-                toDoEntity.getEndDate(),
-                toDoEntity.isCompleted(),
-                toDoEntity.getRepeatOption(),
-                toDoEntity.getRepeatExpiredDate(),
-                toDoEntity.getPriorityUrgency(),
-                toDoEntity.getPriorityImportance(),
-                toDoEntity.getPriorityValue(),
-                toDoEntity.getPriorityType(),
-                toDoEntity.getType(),
-                toDoEntity.getCreatedAt(),
-                toDoEntity.getUpdatedAt(),
-                toDoEntity.getTagId()
-        );
+        return entityToDomain(toDoEntity);
     }
 
     @Override
@@ -111,80 +57,46 @@ public class ToDoRepositoryAdapter implements ToDoRepository {
     public List<ToDo> findAllByMemberId(long memberId) {
         List<ToDoEntity> toDoEntityList = toDoJpaRepository.findAllByMemberId(memberId);
         return toDoEntityList.stream()
-                .map(
-                        t -> ToDo.withId(
-                                t.getId(),
-                                t.getMemberId(),
-                                t.getGroupId(),
-                                t.getStartDate(),
-                                t.getDescription(),
-                                t.getEndDate(),
-                                t.isCompleted(),
-                                t.getRepeatOption(),
-                                t.getRepeatExpiredDate(),
-                                t.getPriorityUrgency(),
-                                t.getPriorityImportance(),
-                                t.getPriorityValue(),
-                                t.getPriorityType(),
-                                t.getType(),
-                                t.getCreatedAt(),
-                                t.getUpdatedAt(),
-                                t.getTagId()
-                        )
-                ).toList();
+                .map(this::entityToDomain)
+                .toList();
     }
 
     @Override
     public List<ToDo> findAllByMemberIdAndStartDate(long memberId, LocalDate startDate) {
         List<ToDoEntity> toDoEntityList = toDoJpaRepository.findAllByMemberIdAndStartDate(memberId, startDate);
         return toDoEntityList.stream()
-                .map(
-                        t -> ToDo.withId(
-                                t.getId(),
-                                t.getMemberId(),
-                                t.getGroupId(),
-                                t.getStartDate(),
-                                t.getDescription(),
-                                t.getEndDate(),
-                                t.isCompleted(),
-                                t.getRepeatOption(),
-                                t.getRepeatExpiredDate(),
-                                t.getPriorityUrgency(),
-                                t.getPriorityImportance(),
-                                t.getPriorityValue(),
-                                t.getPriorityType(),
-                                t.getType(),
-                                t.getCreatedAt(),
-                                t.getUpdatedAt(),
-                                t.getTagId()
-                        )
-                ).toList();
+                .map(this::entityToDomain)
+                .toList();
     }
 
     @Override
     public List<ToDo> findByMemberIdAndEndDateAndIsCompleted(final long memberId, final LocalDate endDate, final boolean isCompleted) {
         List<ToDoEntity> toDoEntityList = toDoJpaRepository.findByMemberIdAndEndDateAndIsCompleted(memberId, endDate, isCompleted);
         return toDoEntityList.stream()
-                .map(
-                        t -> ToDo.withId(
-                                t.getId(),
-                                t.getMemberId(),
-                                t.getGroupId(),
-                                t.getStartDate(),
-                                t.getDescription(),
-                                t.getEndDate(),
-                                t.isCompleted(),
-                                t.getRepeatOption(),
-                                t.getRepeatExpiredDate(),
-                                t.getPriorityUrgency(),
-                                t.getPriorityImportance(),
-                                t.getPriorityValue(),
-                                t.getPriorityType(),
-                                t.getType(),
-                                t.getCreatedAt(),
-                                t.getUpdatedAt(),
-                                t.getTagId()
-                        )
-                ).toList();
+                .map(this::entityToDomain)
+                .toList();
+    }
+
+    // Entity를 Domain으로 변환하는 Helper 메서드
+    private ToDo entityToDomain(final ToDoEntity entity) {
+        return ToDo.builder()
+                .id(entity.getId())
+                .memberId(entity.getMemberId())
+                .groupId(entity.getGroupId())
+                .startDate(entity.getStartDate())
+                .description(entity.getDescription())
+                .endDate(entity.getEndDate())
+                .isCompleted(entity.isCompleted())
+                .repeatOption(entity.getRepeatOption())
+                .repeatExpiredDate(entity.getRepeatExpiredDate())
+                .priorityUrgency(entity.getPriorityUrgency())
+                .priorityImportance(entity.getPriorityImportance())
+                .priorityValue(entity.getPriorityValue())
+                .priorityType(entity.getPriorityType())
+                .type(entity.getType())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
+                .tagId(entity.getTagId())
+                .build();
     }
 }

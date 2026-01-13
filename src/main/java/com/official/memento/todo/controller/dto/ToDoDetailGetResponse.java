@@ -1,7 +1,7 @@
 package com.official.memento.todo.controller.dto;
 
-import com.official.memento.todo.domain.entity.ToDo;
 import com.official.memento.todo.domain.entity.enums.ToDoType;
+import com.official.memento.todo.service.result.ToDoResult;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "단일 ToDo 디테일 응답")
@@ -36,18 +36,18 @@ public record ToDoDetailGetResponse(
         @Schema(description = "ToDo 유형")
         ToDoType toDoType
 ) {
-    public static ToDoDetailGetResponse of(ToDo toDo) {
+    public static ToDoDetailGetResponse of(ToDoResult toDoResult) {
         return new ToDoDetailGetResponse(
-                toDo.getId(),
-                toDo.getDescription(),
-                toDo.getStartDate().toString(),
-                toDo.getEndDate().toString(),
-                toDo.isCompleted(),
-                toDo.getPriorityType().name(),
-                toDo.getTagId() == null ? 0L : toDo.getTagId(),
-                toDo.getTagName() == null ? "" : toDo.getTagName(),
-                toDo.getTagColor() == null ? "" : toDo.getTagColor().getHexCode(),
-                toDo.getType()
+                toDoResult.id(),
+                toDoResult.description(),
+                toDoResult.startDate().toString(),
+                toDoResult.endDate().toString(),
+                toDoResult.isCompleted(),
+                toDoResult.priorityType().name(),
+                toDoResult.tagId() == null ? 0L : toDoResult.tagId(),
+                toDoResult.tagName() == null ? "" : toDoResult.tagName(),
+                toDoResult.tagColor() == null ? "" : toDoResult.tagColor().getHexCode(),
+                toDoResult.type()
         );
     }
 }

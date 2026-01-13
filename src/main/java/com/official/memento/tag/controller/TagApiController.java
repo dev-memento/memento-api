@@ -7,11 +7,11 @@ import com.official.memento.tag.controller.dto.TagCreateRequest;
 import com.official.memento.tag.controller.dto.TagResponse;
 import com.official.memento.tag.controller.dto.TagGetResponse;
 import com.official.memento.tag.controller.dto.TagUpdateRequest;
-import com.official.memento.tag.domain.Tag;
-import com.official.memento.tag.service.TagCreateUseCase;
-import com.official.memento.tag.service.TagDeleteUseCase;
-import com.official.memento.tag.service.TagGetUseCase;
-import com.official.memento.tag.service.TagUpdateUseCase;
+import com.official.memento.tag.service.result.TagResult;
+import com.official.memento.tag.service.usecase.TagCreateUseCase;
+import com.official.memento.tag.service.usecase.TagDeleteUseCase;
+import com.official.memento.tag.service.usecase.TagGetUseCase;
+import com.official.memento.tag.service.usecase.TagUpdateUseCase;
 import com.official.memento.tag.service.command.TagCreateCommand;
 import com.official.memento.tag.service.command.TagDeleteCommand;
 import com.official.memento.tag.service.command.TagUpdateCommand;
@@ -38,7 +38,7 @@ public class TagApiController implements TagApiDocs {
             @Authorization final AuthorizationUser authorizationUser,
             @RequestBody final TagCreateRequest request
     ) {
-        Tag tag = tagCreateUseCase.create(
+        TagResult tag = tagCreateUseCase.create(
                 TagCreateCommand.createWithHexColor(
                         authorizationUser.memberId(),
                         request.hexCode(),
@@ -48,7 +48,7 @@ public class TagApiController implements TagApiDocs {
         return SuccessResponse.of(
                 HttpStatus.OK,
                 "Tag 생성 성공",
-                TagResponse.of(tag.getId(),tag.getName(), tag.getColor())
+                TagResponse.of(tag.id(),tag.name(), tag.color())
         );
     }
 
@@ -57,11 +57,11 @@ public class TagApiController implements TagApiDocs {
     public ResponseEntity<SuccessResponse<List<TagGetResponse>>> getTags(
             @Authorization final AuthorizationUser authorizationUser
     ) {
-        final List<Tag> tags = tagGetUseCase.getTags(authorizationUser.memberId());
+        final List<TagResult> tags = tagGetUseCase.getTags(authorizationUser.memberId());
         return SuccessResponse.of(
                 HttpStatus.OK,
                 "Tag 조회 성공",
-                tags.stream().map(tag -> TagGetResponse.of(tag.getId(), tag.getName(), tag.getColor().getHexCode())).toList()
+                tags.stream().map(tag -> TagGetResponse.of(tag.id(), tag.name(), tag.color().getHexCode())).toList()
         );
     }
 
@@ -72,7 +72,7 @@ public class TagApiController implements TagApiDocs {
             @PathVariable final long tagId,
             @RequestBody final TagUpdateRequest tagUpdateRequest
     ) {
-        Tag tag = tagUpdateUseCase.update(TagUpdateCommand.updateWithHexColor(
+        TagResult tag = tagUpdateUseCase.update(TagUpdateCommand.updateWithHexColor(
                 authorizationUser.memberId(),
                 tagId,
                 tagUpdateRequest.hexCode(),
@@ -81,7 +81,7 @@ public class TagApiController implements TagApiDocs {
         return SuccessResponse.of(
                 HttpStatus.OK,
                 "태그 업데이트 성공",
-                TagResponse.of(tag.getId(),tag.getName(), tag.getColor())
+                TagResponse.of(tag.id(),tag.name(), tag.color())
         );
 
     }

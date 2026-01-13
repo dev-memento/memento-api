@@ -33,6 +33,7 @@ public class OrderInfoApiController implements OrderInfoApiDocs {
                 ToDoPositionUpdateCommand.of(
                         authorizationUser.memberId(),
                         toDoId,
+                        request.date(),
                         request.previousToDoId(),
                         request.nextToDoId()
                 )

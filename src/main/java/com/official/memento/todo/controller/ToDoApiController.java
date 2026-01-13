@@ -11,10 +11,11 @@ import com.official.memento.todo.controller.dto.ToDoCreateRequest;
 import com.official.memento.todo.controller.dto.ToDoDetailGetResponse;
 import com.official.memento.todo.controller.dto.ToDoUpdateRequest;
 import com.official.memento.todo.domain.entity.ToDo;
-import com.official.memento.todo.service.ToDoCreateUseCase;
-import com.official.memento.todo.service.ToDoDeleteUseCase;
-import com.official.memento.todo.service.ToDoGetUseCase;
-import com.official.memento.todo.service.ToDoUpdateUseCase;
+import com.official.memento.todo.service.result.ToDoResult;
+import com.official.memento.todo.service.usecase.ToDoCreateUseCase;
+import com.official.memento.todo.service.usecase.ToDoDeleteUseCase;
+import com.official.memento.todo.service.usecase.ToDoGetUseCase;
+import com.official.memento.todo.service.usecase.ToDoUpdateUseCase;
 import com.official.memento.todo.service.command.ToDoCompletionUpdateCommand;
 import com.official.memento.todo.service.command.ToDoCreateCommand;
 import com.official.memento.todo.service.command.ToDoDeleteCommand;
@@ -132,11 +133,11 @@ public class ToDoApiController implements ToDoApiDocs {
     public ResponseEntity<SuccessResponse<ToDoAllGetResponse>> getToDos(
             @Authorization final AuthorizationUser authorizationUser
     ) {
-        List<ToDo> allToDos = toDoGetUseCase.getToDos(authorizationUser.memberId());
+        List<ToDoResult> allToDoResults = toDoGetUseCase.getToDos(authorizationUser.memberId());
         return SuccessResponse.of(
                 HttpStatus.OK,
                 "ToDo 조회 목록 성공",
-                ToDoAllGetResponse.of(allToDos)
+                ToDoAllGetResponse.of(allToDoResults)
         );
     }
 
@@ -147,11 +148,11 @@ public class ToDoApiController implements ToDoApiDocs {
             @RequestParam final LocalDate date
     ) {
         Validator.isNull(date);
-        List<ToDo> todos = toDoGetUseCase.getTodosByDate(authorizationUser.memberId(), date);
+        List<ToDoResult> toDoResults = toDoGetUseCase.getTodosByDate(authorizationUser.memberId(), date);
         return SuccessResponse.of(
                 HttpStatus.OK,
                 "Todo 불러오기 성공",
-                ToDoAllGetResponse.of(todos)
+                ToDoAllGetResponse.of(toDoResults)
         );
     }
 
@@ -162,11 +163,11 @@ public class ToDoApiController implements ToDoApiDocs {
             @Authorization final AuthorizationUser authorizationUser,
             @PathVariable final long toDoId
     ) {
-        ToDo toDo = toDoGetUseCase.getDetail(authorizationUser.memberId(), toDoId);
+        ToDoResult toDoResult = toDoGetUseCase.getDetail(authorizationUser.memberId(), toDoId);
         return SuccessResponse.of(
                 HttpStatus.OK,
                 "ToDo 디테일 반환 성공",
-                ToDoDetailGetResponse.of(toDo)
+                ToDoDetailGetResponse.of(toDoResult)
         );
     }
 }

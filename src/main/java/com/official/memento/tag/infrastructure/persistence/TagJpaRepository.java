@@ -1,7 +1,9 @@
 package com.official.memento.tag.infrastructure.persistence;
 
 import com.official.memento.tag.domain.enums.TagColor;
+
 import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -12,17 +14,17 @@ public interface TagJpaRepository extends JpaRepository<TagEntity, Long> {
             value = "SELECT * FROM tag WHERE member_id = :memberId ORDER BY id ASC",
             nativeQuery = true
     )
-    List<TagEntity> findAllByMemberIdOrderById(Long memberId);
+    List<TagEntity> findAllByMemberIdOrderById(final Long memberId);
 
-    Optional<TagEntity> findByMemberIdAndColor(Long memberId, TagColor color);
+    Optional<TagEntity> findByMemberIdAndColor(final Long memberId, final TagColor color);
 
     @Query(
             value = "SELECT * FROM tag WHERE member_id = :memberId AND name = 'Untitled' AND color = 'GRAY05'",
             nativeQuery = true
     )
-    Optional<TagEntity> findDefaultTag(Long memberId);
+    Optional<TagEntity> findDefaultTag(final Long memberId);
 
     void deleteAllByMemberId(final long memberId);
 
-    boolean existsByMemberIdAndName(Long memberId, String name);
+    boolean existsByMemberIdAndName(final Long memberId, final String name);
 }

@@ -3,6 +3,7 @@ package com.official.memento.member.service.result;
 import com.official.memento.member.domain.MemberPersonalInfo;
 import com.official.memento.member.domain.enums.JobType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.jspecify.annotations.NonNull;
 
 import java.time.LocalTime;
 
@@ -41,5 +42,18 @@ public record MemberPersonalInfoResult(
                 memberPersonalInfo.getIsImportantBreaks(),
                 memberPersonalInfo.getTimeZoneOffset()
         );
+    }
+
+    public @NonNull String toPersonalInfoString() {
+        return "MemberPersonalInfo" +
+                ", wakeUpTime=" + wakeUpTime +
+                ", windDownTime=" + windDownTime +
+                ", timeZoneOffset=" + timeZoneOffset +
+                ", job=" + job +
+                (jobOtherDetail != null ? ", jobOtherDetail=" + jobOtherDetail : "") +
+                ", stressed unorganized schedule isStressedUnorganizedSchedule=" + isStressedUnorganizedSchedule +
+                ", often forget important things =" + isForgetImportantThings +
+                ", prefer reminders =" + isPreferReminder +
+                ", break is important =" + isImportantBreaks;
     }
 }

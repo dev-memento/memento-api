@@ -1,7 +1,7 @@
 package com.official.memento.global.handler;
 
 import com.official.memento.alarm.service.command.AlarmExceptionCommand;
-import com.official.memento.alarm.service.command.AlarmSendUseCase;
+import com.official.memento.alarm.service.usecase.AlarmSendUseCase;
 import com.official.memento.global.dto.ErrorResponse;
 import com.official.memento.global.exception.*;
 import io.jsonwebtoken.ExpiredJwtException;

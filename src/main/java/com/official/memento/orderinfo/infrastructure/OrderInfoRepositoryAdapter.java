@@ -92,8 +92,8 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
         OrderInfoEntity entity = orderInfoEntityJpaRepository.findById(orderInfo.getId())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_ENTITY));
         entity.updateOrderNum(orderNum);
-        orderInfo.updateOrderNum(orderNum);
-        return orderInfo;
+        
+        return orderInfo.updateOrderNum(orderNum);
     }
 
     @Override
@@ -130,5 +130,32 @@ public class OrderInfoRepositoryAdapter implements OrderInfoRepository {
                 orderInfoEntity.getPlanType(),
                 orderInfoEntity.getCreatedAt()
         );
+    }
+
+    @Override
+    public void updateAllOrderNums(final List<OrderInfo> orderInfoList) {
+        if (orderInfoList.isEmpty()) {
+            return;
+        }
+
+        List<Long> ids = orderInfoList.stream()
+                .map(OrderInfo::getId)
+                .toList();
+
+        // 한 번의 쿼리로 모든 엔티티 조회
+        List<OrderInfoEntity> entities = orderInfoEntityJpaRepository.findAllById(ids);
+
+        // ID를 키로 하는 Map 생성하여 O(1) 접근
+        java.util.Map<Long, OrderInfoEntity> entityMap = entities.stream()
+                .collect(java.util.stream.Collectors.toMap(OrderInfoEntity::getId, e -> e));
+
+        // Dirty Checking을 통한 배치 업데이트
+        for (OrderInfo orderInfo : orderInfoList) {
+            OrderInfoEntity entity = entityMap.get(orderInfo.getId());
+            if (entity != null) {
+                entity.updateOrderNum(orderInfo.getOrderNum());
+            }
+        }
+        // 트랜잭션 커밋 시 JPA가 자동으로 변경 감지하여 일괄 UPDATE
     }
 }
