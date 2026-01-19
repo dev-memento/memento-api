@@ -2,7 +2,6 @@ package com.official.memento.orderinfo.service;
 
 import com.official.memento.global.exception.ErrorCode;
 import com.official.memento.global.exception.InvalidRequestBodyException;
-import com.official.memento.global.lock.DistributedLock;
 import com.official.memento.orderinfo.domain.OrderInfo;
 import com.official.memento.orderinfo.domain.OrderInfoRepository;
 import com.official.memento.orderinfo.domain.OrderWithScheduleOrToDo;
@@ -12,12 +11,14 @@ import com.official.memento.orderinfo.service.usecase.OrderInfoCreateUseCase;
 import com.official.memento.orderinfo.service.usecase.OrderInfoDeleteUseCase;
 import com.official.memento.orderinfo.service.usecase.OrderInfoGetUseCase;
 import com.official.memento.orderinfo.service.usecase.OrderInfoUpdateUseCase;
+import com.official.memento.global.lock.AdvisoryLock;
 import com.official.memento.schedule.domain.ScheduleRepository;
 import com.official.memento.schedule.domain.entity.Schedule;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,10 +33,10 @@ public class OrderInfoService implements
 
     private final OrderInfoRepository orderInfoRepository;
     private final ScheduleRepository scheduleRepository;
+    private final AdvisoryLock advisoryLock;
 
     @Override
     @Transactional
-    @DistributedLock(key = "'order-info:' + #command.memberId() + ':' + #command.date()")
     public void updatePosition(final ToDoPositionUpdateCommand command) {
         OrderInfo selectedTodoOrderInfo = orderInfoRepository.findByToDoId(command.toDoId());
 
@@ -60,7 +61,6 @@ public class OrderInfoService implements
 
     @Override
     @Transactional
-    @DistributedLock(key = "'order-info:' + #memberId + ':' + #date")
     public void assignToDoOrder(final LocalDate date, final long toDoId, final long memberId) {
         List<OrderInfo> orderInfoList = orderInfoRepository.findAllByMemberIdAndDateOrderByOrderNum(memberId, date);
         double preOrder = 0;
@@ -72,8 +72,7 @@ public class OrderInfoService implements
 
     @Override
     @Transactional
-    @DistributedLock(key = "'order-info:' + #memberId + ':' + #date")
-    public void assignScheduleOrder(final LocalDate date, final long scheduleId, final long memberId){
+    public void assignScheduleOrder(final LocalDate date, final long scheduleId, final long memberId) {
         Schedule schedule = scheduleRepository.findById(scheduleId);
         List<OrderWithScheduleOrToDo> orderInfoList = orderInfoRepository.findOrderInfoWithDetails(date,memberId);
         double insertOrder = 1;
@@ -109,26 +108,30 @@ public class OrderInfoService implements
     /**
      * 부동소수점 정밀도 한계 감지 시 자동 재정렬
      * - 임계치: insertOrder < 1e-10
-     * - 재정렬 시 모든 아이템의 순서를 1, 2, 3... 으로 초기화하여 정밀도 확보
+     * - 재정렬 시 모든 아이템의 순서를 1000, 2000, 3000... 으로 초기화하여 정밀도 확보
      * - 배치 업데이트로 N+1 쿼리 문제 해결
+     * - Advisory Lock으로 재정렬 구간만 동시성 보호
      */
     private double checkReOrdering(final LocalDate date, final long memberId, final double insertOrder) {
         if (insertOrder < 1e-10) {
-            List<OrderInfo> afterOrderInfoList = orderInfoRepository.findAllByMemberIdAndDateOrderByOrderNum(memberId,
-                    date);
+            // 재정렬 구간에만 Advisory Lock 적용 (memberId + date 조합으로 키 생성)
+            long lockKey = Objects.hash("ORDER_REORDER", memberId, date);
+            advisoryLock.lock(lockKey);
 
-            // 메모리에서 재정렬 계산
+            List<OrderInfo> afterOrderInfoList = orderInfoRepository.findAllByMemberIdAndDateOrderByOrderNum(memberId, date);
+
+            // 메모리에서 재정렬 계산 (1000 단위 간격)
             List<OrderInfo> reorderedList = new ArrayList<>();
             for (int i = 0; i < afterOrderInfoList.size(); i++) {
                 OrderInfo reordered = afterOrderInfoList.get(i).toBuilder()
-                        .orderNum(i + 1)
+                        .orderNum((i + 1) * 1000)
                         .build();
                 reorderedList.add(reordered);
             }
 
-            // 배치 업데이트로 한 번에 반영 (Dirty Checking 기반)
+            // 배치 업데이트
             orderInfoRepository.updateAllOrderNums(reorderedList);
-            return 1;
+            return 1000;
         }
         return insertOrder;
     }

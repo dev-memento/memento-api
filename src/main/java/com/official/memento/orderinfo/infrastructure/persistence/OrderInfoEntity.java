@@ -32,7 +32,6 @@ public class OrderInfoEntity {
     private PlanType planType;
     private LocalDateTime createdAt;
 
-
     private OrderInfoEntity(
             final long memberId,
             final Long scheduleId,
